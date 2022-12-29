@@ -43,6 +43,10 @@
   box-sizing: border-box;
 }
 
+*:focus{
+  outline-color: var(--accent);
+}
+
 [hidden]{
   display: none!important;
 }
@@ -267,7 +271,6 @@ nav{
     linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--bg-primary) 32%);
 }
 
-
 progress{
   width: auto;
   height: .25rem;
@@ -276,6 +279,9 @@ progress{
   right: 0;
   bottom: 0;
   left: 0;
+  margin: .5rem;
+  border-radius: .125rem;
+  overflow: hidden; /* to hide the value's border-radius of 0  */
   background-color: var(--bg-primary);
 }
 
@@ -305,7 +311,7 @@ progress::-moz-progress-bar {
   max-width: calc(56ch - 1rem);
   min-width: 6rem;
   padding: 1rem 1rem 1.25rem;
-  margin: 1.875rem auto 0;
+  margin: 0 auto;
   background-color: var(--bg-popover);
   filter:
     drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.12))
@@ -343,7 +349,7 @@ body:not(.started.show-translation) [data-translation-popover]{
   bottom: -1.5rem;
   left: 50%;
   transform: translateX(-50%);
-  background-color: transparent;
+  background-color: var(--bg-popover);
 }
 
 [data-translation-popover] button[data-hide-translation]::before{
@@ -358,6 +364,7 @@ body:not(.started.show-translation) [data-translation-popover]{
   height: 1.5rem;
   color: var(--bg-popover);
   z-index: -1;
+  pointer-events: none;
 }
 
 

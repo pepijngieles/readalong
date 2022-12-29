@@ -1,4 +1,24 @@
-/* Define variables
+/*
+
+  Index
+
+  1. Define variables
+  2. Start, Play, Pause & End
+  3. Automatically change sentence based on timestamps
+  4. Change a sentence
+    4.1 Highlight a sentence
+    4.2 Update the translation
+    4.3 Check if auto-scrolling is needed
+    4.4 Update the progress bar
+  5. Play a sentence when clicking on it
+  6. Toggle the translation on/off
+  7. Developer related functions
+
+*/
+
+
+
+/* 1. Define variables
 ---------------------------------------------------------------------------- */
 const audioFile = document.querySelector('audio'),
       progressBar = document.querySelector('progress'),
@@ -17,17 +37,18 @@ let   started = false,
       currentSentenceEl = sentences[0],
       voice = 'pepijn', // TODO: change audio file on selection
       interval,
-      showTranslation = true
+      showTranslation = true,
+      popoverOffset = 0
 
 // Make all sentences clickable
-// TODO: use event delegation
-for (var i = 0; i < sentences.length; i++) {
-  sentences[i].addEventListener('click', playSentence, false)
+for (sentence of sentences) {
+  // TODO: use event delegation instead of separate event listeners
+  sentence.addEventListener('click', playSentence, false)
 }
 
 
 
-/* Start, Play, Pause & End
+/* 2. Start, Play, Pause & End
 ---------------------------------------------------------------------------- */
 function start() {
   started = true
@@ -68,7 +89,7 @@ function end() {
 
 
 
-/* Automatically change sentence based on timestamps
+/* 3. Automatically change sentence based on timestamps
 ---------------------------------------------------------------------------- */
 function autoPlay() {
   // If current time is equal to, or greater than timestamp of current sentence
@@ -87,89 +108,102 @@ function autoPlay() {
 
 
 
-/* 
+/* 4. Change a sentence
 ---------------------------------------------------------------------------- */
 function changeSentence() {
   currentSentenceEl = sentences[currentSentence]
-  // Highlight the current sentence
   highlightSentence()
+  // The updateTranslation function is also triggered when the translation
+  // is not visible. This prevents the distance of the animation to grow very
+  // large, which could lead to an uneasy transition when toggled on again
   updateTranslation()
   updateProgressBar()
+  // A little timeOut is needed so the function uses the updated values
   setTimeout(function(){
     checkForScroll()
   }, 240)
 }
 
-function highlightSentence(number) {
-  if (!started) start()
-  document.querySelector('[data-sentence][aria-current]').removeAttribute('aria-current')
-  currentSentenceEl.setAttribute('aria-current', 'true')
-  // TODO: find out how to cope with focus()
-}
+  /* 4.1 Highlight a sentence ---------------------------------------------- */
+  function highlightSentence(number) {
+    if (!started) start()
+    document.querySelector('[data-sentence][aria-current]').removeAttribute('aria-current')
+    currentSentenceEl.setAttribute('aria-current', 'true')
+    // TODO: find out how to cope with focus()
+  }
 
-function updateTranslation() {
-  // Update translation
-  translationText.innerHTML = currentSentenceEl.dataset.translation
-  // TODO: only add this if
-  var popoverOffset = currentSentenceEl.offsetHeight - 22
-  popoverOffset += currentSentenceEl.offsetTop
-  translationPopover.style.transform = 'translateY(' + (popoverOffset / 16 - 1) + 'rem) translateZ(0)'
-  // translateZ(0) is added so the filter drop-shadow doesn't animate laggy
-  
-}
+  /* 4.2 Update the translation -------------------------------------------- */
+  function updateTranslation() {
+    // Replace the text
+    translationText.innerHTML = currentSentenceEl.dataset.translation
+    // Calculate the right Y-position for the popover
+    popoverOffset = currentSentenceEl.offsetHeight - 8
+    popoverOffset += currentSentenceEl.offsetTop
+    // Convert the pixel-value to rem
+    popoverOffset /= 16
+    // Update transform property. A translateZ of 0 is added to prevent
+    // laggy animation of the filter drop-shadow
+    translationPopover.style.transform = 'translateY(' + popoverOffset + 'rem) translateZ(0)'
+  }
 
-function checkForScroll() {
-  // TODO: use highlighted sentence for when no translation is shown instead of popover
-  if(showTranslation) {
-    var popoverOffset = translationPopover.getBoundingClientRect()
-    var contentWindowHeight = window.innerHeight - navHeight
-    if (contentWindowHeight < (popoverOffset.bottom + 48)) {
-      window.scrollBy(0, (contentWindowHeight / 1.4))
+  /* 4.3 Check if auto-scrolling is needed --------------------------------- */
+  function checkForScroll() {
+    // TODO: use highlighted sentence for when no translation is shown instead of popover
+    if(showTranslation) {
+      var popoverOffset = translationPopover.getBoundingClientRect()
+      var contentWindowHeight = window.innerHeight - navHeight
+      if (contentWindowHeight < (popoverOffset.bottom + 48)) {
+        window.scrollBy(0, (contentWindowHeight / 1.4))
+      }
     }
   }
-}
+
+  /* 4.4 Update the progress bar ------------------------------------------- */
+  function updateProgressBar() {
+    // Update the time
+    time = audioFile.currentTime.toFixed(1)
+    // Update the progress bar value
+    progressBar.value = (audioFile.currentTime * 100 / audioFile.duration).toFixed(0)
+    // Update the shown time for developer purposed
+    if (timeDisplay) timeDisplay.innerText = time + " seconden"
+  }
+
+  /* 4.5 Disable rewind/forward button if needed --------------------------- */
+  function disableButton(button){
+    // Check for forward/rewind buttons to be enabled/disabled
+    // if (currentSentence = 0) disableButton('rewind')
+    // if (currentSentence == sentences.length) disableButton('forward')
+    document.querySelector('[data-action=' + button + ']').setAttribute('disabled', 'true')
+  }
 
 
 
-/* 
+/* 5. Play a sentence when clicking on it
 ---------------------------------------------------------------------------- */
 function playSentence(number) {
+  // 1. Check if the number parameter is filled, else use the clicked sentence
   if (number === parseInt(number, 10)) currentSentence = number
   else currentSentence = parseInt(this.dataset.sentence)
-  // 
+  // 2. Get the right timestamp and play the audio file from there
   time = timestamps[voice][currentSentence]
   audioFile.currentTime = time
-
+  // 3. After the audio file time-change, the UI can be updated accordingly
   changeSentence()
 }
 
-function updateProgressBar() {
-  // Update the time
-  time = audioFile.currentTime.toFixed(1)
-  // Update the progress bar
-  progressBar.value = (audioFile.currentTime * 100 / audioFile.duration).toFixed(0)
-  // Update the shown time for developer purposed
-  if (timeDisplay) timeDisplay.innerText = time + " seconden"
-}
-
-function disableButton(button){
-  // Check for forward/rewind buttons to be enabled/disabled
-  // if (currentSentence = 0) disableButton('rewind')
-  // if (currentSentence == sentences.length) disableButton('forward')
-  document.querySelector('[data-action=' + button + ']').setAttribute('disabled', 'true')
-}
 
 
-
-/* 
+/* 6. Toggle the translation on/off
 ---------------------------------------------------------------------------- */
-function addTimestamp() {
-  textarea.value += ',' + time
-}
-
-
-
 function toggleTranslation() {
   showTranslation = !showTranslation
   document.body.classList.toggle('show-translation')
+}
+
+
+
+/* 7. Developer related functions
+---------------------------------------------------------------------------- */
+function addTimestamp() {
+  textarea.value += ',' + time
 }
