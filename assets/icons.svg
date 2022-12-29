@@ -1,0 +1,19 @@
+<svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="play" viewBox="0 0 24 24">
+      <path d="M6.5 21.5V2.5L21.5 12L6.5 21.5Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="pause" viewBox="0 0 24 24">
+      <rect x="6" y="4" width="3" height="16" fill="currentColor"/>
+      <rect x="15" y="4" width="3" height="16" fill="currentColor"/>
+    </symbol>
+    <symbol id="rewind" viewBox="0 0 24 24">
+      <path d="M18.5 18.5C18.5 12.9772 14.0228 8.5 8.5 8.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.5 10.5V6.5L5.5 8.5L8.5 10.5Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="forward" viewBox="0 0 24 24">
+      <path d="M5.5 18.5C5.5 12.9772 9.97715 8.5 15.5 8.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.5 10.5V6.5L18.5 8.5L15.5 10.5Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>

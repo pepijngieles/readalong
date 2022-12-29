@@ -1,0 +1,163 @@
+:root{
+  --background-color: #ffffff;
+}
+
+*,
+*::after,
+*::before{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html{
+  scroll-behavior: smooth;
+  cursor: default;
+  background-color: var(--background-color);
+}
+
+body{
+  font-family: sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(0,0,0,.8);
+}
+
+[hidden]{
+  display: none!important;
+}
+
+.visually-hidden{
+  position: absolute !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  -webkit-clip-path: inset(50%) !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  height: 1px !important;
+  width: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+main{
+  max-width: 56ch;
+  margin: 4.5rem auto;
+  padding: 0 1rem 3rem;
+}
+
+h1{
+  font-size: 1.125rem;
+  line-height: 1.5rem;
+  color: rgba(0,0,0,.88);
+}
+
+h1, p{
+  margin: 1.5rem 0;
+}
+
+[data-sentence]{
+  transition: opacity .2s;
+}
+
+[data-sentence]:focus{
+  outline: none;
+}
+
+body.started [data-sentence]:not([aria-current]){
+  opacity: .5;
+}
+
+a:visited{
+  color: #6C003E;
+}
+
+body.started:not(.paused) .play,
+body:not(.started.paused) .pause,
+body.paused .pause{
+  display: none;
+}
+
+body.started:not(.paused) .pause{
+  display: inline-block;
+}
+
+
+button{
+  border: 1px solid transparent;
+  min-width: 3rem;
+  height: 3rem;
+  padding: 0 .5rem;
+  border-radius: .75rem;
+  vertical-align: bottom;
+}
+
+button:hover{
+  filter: brightness(.98);
+}
+
+button:active{
+  filter: brightness(.96);
+}
+
+button.secondary{
+  border: 1px solid #e8e8e8;
+}
+
+button.icon-only{
+  line-height: 0;
+  background: var(--background-color);
+  border-radius: 50%;
+}
+
+button.play,
+button.pause{
+  color: #ECBF4B;
+}
+
+button.forward,
+button.rewind{
+  color: #5c5c5c;
+}
+
+button.play{
+  box-shadow: inset 2px -4px 8px rgba(0, 0, 0, 0.01);
+}
+
+button.pause{
+  box-shadow: inset 2px 4px 8px rgba(0, 0, 0, 0.02);
+}
+
+footer{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  background: var(--background-color);
+  position: sticky;
+  bottom: 0;
+  padding: 3.75rem 0 1rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 50%);
+}
+
+
+progress{
+  width: auto;
+  height: .25rem;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: var(--background-color);
+}
+
+progress::-webkit-progress-bar {
+  background-color: var(--background-color);
+  border-radius: 0;
+}
+progress::-webkit-progress-value {
+  background-color: #ECBF4B;
+  border-radius: 0;
+}
+progress::-moz-progress-bar {
+  /* style rules */
+}
