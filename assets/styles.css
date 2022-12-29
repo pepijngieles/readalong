@@ -219,9 +219,7 @@ progress::-moz-progress-bar {
 
 
 
-
-[data-translation][aria-current]::after{
-  content: attr(data-translation);
+[data-translation]{
   z-index: 1;
   position: absolute;
   right: 0;
@@ -236,7 +234,8 @@ progress::-moz-progress-bar {
   color: var(--txt-secondary);
 }
 
-body:not(.started.show-translation) [data-translation][aria-current]::after{
+body:not(.started.show-translation) [data-translation],
+[data-sentence]:not([aria-current]) > [data-translation]{
   display: none;
 }
 
