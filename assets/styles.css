@@ -122,17 +122,14 @@ h1, p{
 }
 
 [data-sentence]{
-  z-index: 0;
   transition: color .2s;
 }
 
 [data-sentence]:focus{
   outline-color: var(--accent);
-  z-index: 0;
 }
 
 [data-sentence][aria-current]{
-  z-index: 1;
   color: var(--txt-primary);
 }
 
@@ -275,7 +272,7 @@ progress{
   width: auto;
   height: .25rem;
   position: fixed;
-  z-index: 4;
+  z-index: 3;
   right: 0;
   bottom: 0;
   left: 0;
@@ -302,7 +299,7 @@ progress::-moz-progress-bar {
 
 
 [data-translation-popover]{
-  z-index: 1;
+  z-index: 4;
   position: absolute;
   top: 1rem;
   right: 0;
@@ -338,13 +335,8 @@ body:not(.started.show-translation) [data-translation-popover]{
   transform: none!important;
 }
 
-[data-translation-text]{
-  z-index: 2;
-}
-
 [data-translation-popover] button[data-hide-translation]{
   color: var(--txt-secondary);
-  z-index: 1;
   position: absolute;
   bottom: -1.5rem;
   left: 50%;
