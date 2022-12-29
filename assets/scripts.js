@@ -77,7 +77,10 @@ function pause() {
 }
 
 function playSentence() {
-  if (this.hasAttribute('aria-current')) document.body.classList.toggle('show-translation')
+  if (this.hasAttribute('aria-current')) {
+    document.body.classList.toggle('show-translation');
+    return;
+  }
   playFrom(parseInt(this.dataset.sentence))
 }
 

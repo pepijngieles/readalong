@@ -1,10 +1,15 @@
 :root{
   --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
   --bg-popover: #ffffff;
+  --txt-primary: rgba(0,0,0,1);
+  --txt-secondary: rgba(0,0,0,.85);
+  --txt-tertiary: rgba(0,0,0,.5);
+  --accent: #ECBF4B;
 }
 
 .started.show-translation{
-  --bg-primary: #fafafa;
+  --bg-primary: var(--bg-secondary);
 }
 
 *,
@@ -18,11 +23,14 @@
 html{
   scroll-behavior: smooth;
   cursor: default;
-  background-color: var(--bg-primary);
   font: 100% / 1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif;
-  color: rgba(0,0,0,.9);
+  color: var(--txt-secondary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body{
+  background-color: var(--bg-primary);
 }
 
 [hidden]{
@@ -43,6 +51,7 @@ html{
 }
 
 main{
+  position: relative;
   max-width: 56ch;
   margin: 2rem auto;
   padding: 0 1rem 3rem;
@@ -60,10 +69,19 @@ main{
   }
 }
 
+main p:first-of-type:first-letter{
+  float: left;
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: .8;
+  margin: .3rem .2rem 0 -.1rem;
+  color: rgba(0, 0, 0, .6);
+}
+
 h1{
   font-size: 1.125rem;
   line-height: 1.5rem;
-  color: rgba(0,0,0,.88);
+  color: var(--txt-secondary);
 }
 
 h1, p{
@@ -71,15 +89,22 @@ h1, p{
 }
 
 [data-sentence]{
-  transition: opacity .2s;
+  z-index: 0;
+  transition: color .2s;
 }
 
 [data-sentence]:focus{
   outline: none;
+  z-index: 0;
+}
+
+[data-sentence][aria-current]{
+  z-index: 1;
+  color: var(--txt-primary);
 }
 
 body.started [data-sentence]:not([aria-current]){
-  opacity: .5;
+  color: var(--txt-tertiary);
 }
 
 a:visited{
@@ -97,27 +122,34 @@ body.started:not(.paused) .pause{
 }
 
 
-button{
+button,
+.button-size{
+  display: inline-block;
   border: 1px solid transparent;
-  min-width: 3rem;
-  height: 3rem;
+  min-width: 4rem;
+  height: 4rem;
   padding: 0 .5rem;
   border-radius: .75rem;
-  vertical-align: bottom;
+  text-align: center;
 }
 
-@media screen and (min-width: 371px){
-  button{
-    min-width: 4rem;
-    height: 4rem;
+@media screen and (max-width: 370px){
+  button,
+  .button-size{
+    min-width: 3rem;
+    height: 3rem;
   }
 }
 
-button:hover{
-  filter: brightness(.98);
+@media (hover: hover) {
+  button:hover,
+  .button-size:hover{
+    filter: brightness(.98);
+  }
 }
 
-button:active{
+button:active,
+.button-size:active{
   filter: brightness(.97);
 }
 
@@ -126,9 +158,9 @@ button:disabled{
 }
 
 button.secondary{
-  border: 1px solid #e8e8e8;
+  border-color: #e8e8e8;
   box-shadow: inset 2px -4px 8px rgba(0, 0, 0, 0.01);
-  color: #ECBF4B;
+  color: var(--accent);
 }
 
 button.secondary:active,
@@ -140,21 +172,23 @@ button.tertiary{
   color: #5c5c5c;
 }
 
-button.icon-only{
+button.icon-only,
+.button-size.icon-only{
   line-height: 0;
-  background: var(--bg-primary);
   border-radius: 50%;
+  background: var(--bg-primary);
 }
 
 footer{
+  z-index: 2;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   background: var(--bg-primary);
   position: sticky;
   bottom: 0;
-  padding: 3.75rem 1rem 1rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--bg-primary) 50%);
+  padding: 3.75rem 1rem 3rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--bg-primary) 32%);
 }
 
 
@@ -162,6 +196,7 @@ progress{
   width: auto;
   height: .25rem;
   position: fixed;
+  z-index: 4;
   right: 0;
   bottom: 0;
   left: 0;
@@ -173,7 +208,7 @@ progress::-webkit-progress-bar {
   border-radius: 0;
 }
 progress::-webkit-progress-value {
-  background-color: #ECBF4B;
+  background-color: var(--accent);
   border-radius: 0;
 }
 progress::-moz-progress-bar {
@@ -183,17 +218,31 @@ progress::-moz-progress-bar {
 
 
 
-[data-translation]{
-  position: relative;
-}
 
-.started.show-translation [data-translation][aria-current]::after{
-  display: block;
-  padding: 1rem;
-  margin: .5rem -1rem 1.5rem;
+
+[data-translation][aria-current]::after{
   content: attr(data-translation);
-  background-color: var(--background-popover);
-
+  z-index: 1;
+  position: absolute;
+  right: 0;
+  left: 0;
+  width: fit-content;
+  max-width: calc(56ch - 1rem);
+  padding: 1rem;
+  margin: 1.875rem auto 0;
+  background-color: var(--bg-popover);
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12), 0px 2px 8px rgba(0, 0, 0, 0.08), 0px 8px 24px rgba(0, 0, 0, 0.04);
   border-radius: 1rem;
+  color: var(--txt-secondary);
 }
+
+body:not(.started.show-translation) [data-translation][aria-current]::after{
+  display: none;
+}
+
+
+
+
+
+
+
