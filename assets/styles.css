@@ -19,6 +19,7 @@
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
   --bg-popover: #ffffff;
+  --shade-default: rgba(0,0,0,.02);
   --txt-primary: rgba(0,0,0,1);
   --txt-secondary: rgba(0,0,0,.88);
   --txt-tertiary: rgba(0,0,0,.48);
@@ -279,16 +280,16 @@ progress{
   margin: .5rem;
   border-radius: .125rem;
   overflow: hidden; /* to hide the value's border-radius of 0  */
-  background-color: var(--bg-primary);
+  background-color: var(--shade-default);
 }
 
 progress::-webkit-progress-bar {
-  background-color: var(--bg-primary);
   border-radius: 0;
+  background-color: var(--shade-default);
 }
 progress::-webkit-progress-value {
-  background-color: var(--accent);
   border-radius: 0;
+  background-color: var(--accent);
 }
 progress::-moz-progress-bar {
   /* style rules */
