@@ -8,7 +8,9 @@
   4. Typography
   5. Icons
   6. Buttons
-  7. 
+  7. Navigation
+  8. Progress bar
+  9. Popovers
 
 */
 
@@ -26,6 +28,8 @@
   --icon-default: rgba(0,0,0,.64);
   --border-default: rgba(0,0,0,.12);
   --accent: #ECBF4B;
+
+/*  accent-color: var(--accent);*/
 }
 
 .started.show-translation{
@@ -252,6 +256,12 @@ button.small{
   padding: .75rem;
 }
 
+
+
+
+
+/* 7. Navigation
+---------------------------------------------------------------------------- */
 nav{
   z-index: 2;
   position: fixed;
@@ -269,6 +279,16 @@ nav{
     linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--bg-primary) 32%);
 }
 
+
+
+
+
+
+
+
+
+/* 8. Progress bar
+---------------------------------------------------------------------------- */
 progress{
   width: auto;
   height: .25rem;
@@ -299,7 +319,26 @@ progress::-moz-progress-bar {
 
 
 
-[data-translation-popover]{
+
+
+
+
+/* 9. Popovers
+---------------------------------------------------------------------------- */
+[class*=popover]{
+  background-color: var(--bg-popover);
+  filter:
+    drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.12))
+    drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.08))
+    drop-shadow(0px 8px 24px rgba(0, 0, 0, 0.04));
+  border-radius: 1rem;
+}
+
+
+
+
+
+.translation-popover{
   z-index: 4;
   position: absolute;
   top: 1rem;
@@ -310,25 +349,18 @@ progress::-moz-progress-bar {
   min-width: 6rem;
   padding: 1rem 1rem 1.25rem;
   margin: 0 auto;
-  background-color: var(--bg-popover);
-  filter:
-    drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.12))
-    drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.08))
-    drop-shadow(0px 8px 24px rgba(0, 0, 0, 0.04));
-  border-radius: 1rem;
-  color: var(--txt-secondary);
-  overflow: visible;
+  overflow: visible; /* for the close button to be visible */
   transition: transform .4s cubic-bezier(0,1.3,.8,1);
 }
 
 body.show-translation [data-show-translation],
-body.show-translation:not(.started) [data-translation-popover],
+body.show-translation:not(.started) .translation-popover,
 body:not(.show-translation) [data-translation-text],
 body:not(.show-translation) [data-hide-translation]{
   display: none;
 }
 
-body:not(.started.show-translation) [data-translation-popover]{
+body:not(.started.show-translation) .translation-popover{
   position: fixed;
   top: auto;
   bottom: 11rem;
@@ -336,7 +368,7 @@ body:not(.started.show-translation) [data-translation-popover]{
   transform: none!important;
 }
 
-[data-translation-popover] button[data-hide-translation]{
+.translation-popover button[data-hide-translation]{
   color: var(--txt-secondary);
   position: absolute;
   bottom: -1.5rem;
@@ -345,18 +377,18 @@ body:not(.started.show-translation) [data-translation-popover]{
   background-color: var(--bg-popover);
 }
 
-[data-translation-popover] button[data-hide-translation]::before{
+.translation-popover button[data-hide-translation]::before{
   background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCA4MCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxLjEzNzQgMTQuODQwOEMyNS41MzIxIDIwLjQxODcgMzIuMzQ3OCAyNCA0MCAyNEM0Ny42NTIyIDI0IDU0LjQ2NzkgMjAuNDE4NyA1OC44NjI2IDE0Ljg0MDlDNjQuMzMxMyA3Ljg5OTc5IDcxLjE2MzQgMCA4MCAwSDBDOC44MzY1NiAwIDE1LjY2ODcgNy44OTk3OCAyMS4xMzc0IDE0Ljg0MDhaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)
 }
 
-[data-translation-popover] button .curve{
+.translation-popover button .curve{
+  z-index: -1;
   position: absolute;
   bottom: -1px;
   left: -1rem;
   width: 5rem;
   height: 1.5rem;
   color: var(--bg-popover);
-  z-index: -1;
   pointer-events: none;
 }
 
@@ -364,5 +396,20 @@ body:not(.started.show-translation) [data-translation-popover]{
 
 
 
+/* X. Settings
+---------------------------------------------------------------------------- */
+.settings-popover{
+  z-index: 5;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1.25rem 1rem 1rem;
+  border-radius: 1rem 1rem 0 0;
+}
 
 
+input[type=range]::-webkit-slider-runnable-track{
+/*  background-color: var(--shade-default);*/
+/*  background-color: black;*/
+}

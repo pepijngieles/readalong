@@ -12,7 +12,10 @@
     4.4 Update the progress bar
   5. Play a sentence when clicking on it
   6. Toggle the translation on/off
-  7. Developer related functions
+  7. Settings
+    7.1 Toggle
+    7.2 Update
+  X. Developer related functions
 
 */
 
@@ -30,17 +33,21 @@ const audioFile = document.querySelector('audio'),
       translationPopover = document.querySelector('[data-translation-popover]'),
       translationText = document.querySelector('[data-translation-text]'),
       navHeight = document.querySelector('nav').offsetHeight,
+      settingsPopover = document.querySelector('.settings-popover'),
       timestamps = {'pepijn': [0,5.6,9.4,13,18.6,26.9,28.8,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7]}
 
 let   started = false,
       playing = false,
       time = 0,
+      sentencePause = 0,
       currentSentence = 0, // TODO: get current sentence from localStorage
       currentSentenceEl = sentences[0],
       voice = 'pepijn', // TODO: change audio file on selection
       interval,
+      sentencePauseTimeout,
       showTranslation = true,
-      popoverOffset = 0
+      popoverOffset = 0,
+      playbackRate = 1
 
 // Make all sentences clickable
 for (sentence of sentences) {
@@ -65,13 +72,14 @@ function play() {
   document.body.classList.remove('paused')
   audioFile.play()
   checkForScroll()
-
+  // Start interval to check every 0.1s if the next sentence should be shown
   interval = setInterval(function() {
     if(playing) autoPlay()
   }, 100)
 }
 
 function pause() {
+  clearTimeout(sentencePauseTimeout)
   playing = false
   document.body.classList.add('paused')
   audioFile.pause()
@@ -97,7 +105,12 @@ function autoPlay() {
   // of the next sentence, move to the next sentence
   if (time >= timestamps[voice][currentSentence + 1]) {
     currentSentence++
-    changeSentence()
+    // Pause the audio file for as long as sentencePause
+    audioFile.pause()
+    sentencePauseTimeout = setTimeout(function(){
+      audioFile.play()
+      changeSentence()
+    }, sentencePause)
   }
   updateProgressBar()
 }
@@ -145,7 +158,8 @@ function changeSentence() {
 
   /* 4.3 Check if auto-scrolling is needed --------------------------------- */
   function checkForScroll() {
-    // TODO: use highlighted sentence for when no translation is shown instead of popover
+    // TODO: use the highlighted sentence's dimenions instead of popover for
+    //  when no translation is shown
     if(showTranslation) {
       var popoverOffset = translationPopover.getBoundingClientRect()
       var contentWindowHeight = window.innerHeight - navHeight
@@ -199,7 +213,23 @@ function toggleTranslation() {
 
 
 
-/* 7. Developer related functions
+/* 7. Settings
+---------------------------------------------------------------------------- */
+
+/* 7.1 Toggle -------------------------------------------------------------- */
+function toggleSettings() {
+  console.log(settingsPopover)
+  settingsPopover.hidden = !settingsPopover.hidden
+}
+
+/* 7.2 Update -------------------------------------------------------------- */
+function updateSettings() {
+  audioFile.playbackRate = document.forms.settings.playbackRate.value
+  sentencePause = document.forms.settings.sentencePause.value
+}
+
+
+/* X. Developer related functions
 ---------------------------------------------------------------------------- */
 function addTimestamp() {
   textarea.value += ',' + time
