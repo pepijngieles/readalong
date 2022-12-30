@@ -212,14 +212,14 @@ button,
 }
 
 @media (hover: hover) {
-  button:hover,
-  .button-style:hover{
+  button:hover:not([disabled]),
+  .button-style:hover:not([disabled]){
     filter: brightness(.98);
   }
 }
 
-button:active,
-.button-style:active{
+button:active:not([disabled]),
+.button-style:active:not([disabled]){
   filter: brightness(.97);
 }
 

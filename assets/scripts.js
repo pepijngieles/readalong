@@ -21,6 +21,8 @@
 /* 1. Define variables
 ---------------------------------------------------------------------------- */
 const audioFile = document.querySelector('audio'),
+      rewindButton = document.querySelector('[data-rewind]'),
+      fastForwardButton = document.querySelector('[data-fast-forward]'),
       progressBar = document.querySelector('progress'),
       sentences = document.querySelectorAll('[data-sentence]'),
       timeDisplay = document.getElementById("time-display"),
@@ -78,13 +80,12 @@ function pause() {
 
 function end() {
   audioFile.currentTime = 0
-  document.body.classList.remove('started')
   currentSentence = 0
+  document.body.classList.remove('started')
   changeSentence()
   time = 0
   playing = false
-  
-  return
+  started = false
 }
 
 
@@ -92,16 +93,11 @@ function end() {
 /* 3. Automatically change sentence based on timestamps
 ---------------------------------------------------------------------------- */
 function autoPlay() {
-  // If current time is equal to, or greater than timestamp of current sentence
+  // If the current time is equal to, or greater than the starting time
+  // of the next sentence, move to the next sentence
   if (time >= timestamps[voice][currentSentence + 1]) {
-    // And if there are sentences left to read
-    if(sentences.length > currentSentence) {  
-      // Move to the next sentence
-      currentSentence++
-      changeSentence()
-    }
-    // If there are no sentences left, end the story
-    else end()
+    currentSentence++
+    changeSentence()
   }
   updateProgressBar()
 }
@@ -118,6 +114,7 @@ function changeSentence() {
   // large, which could lead to an uneasy transition when toggled on again
   updateTranslation()
   updateProgressBar()
+  disableButtons()
   // A little timeOut is needed so the function uses the updated values
   setTimeout(function(){
     checkForScroll()
@@ -169,11 +166,11 @@ function changeSentence() {
   }
 
   /* 4.5 Disable rewind/forward button if needed --------------------------- */
-  function disableButton(button){
-    // Check for forward/rewind buttons to be enabled/disabled
-    // if (currentSentence = 0) disableButton('rewind')
-    // if (currentSentence == sentences.length) disableButton('forward')
-    document.querySelector('[data-action=' + button + ']').setAttribute('disabled', 'true')
+  function disableButtons(button){
+    if (currentSentence == 0) rewindButton.disabled = true
+    else if (rewindButton.disabled) rewindButton.disabled = false
+    if (currentSentence == sentences.length - 1) fastForwardButton.disabled = true
+    else if (fastForwardButton.disabled) fastForwardButton.disabled = false
   }
 
 

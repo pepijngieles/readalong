@@ -90,7 +90,7 @@
 
 		<progress value="0" max="100"></progress>
 
-		<audio>
+		<audio onended="end()">
 			<source src="../../audio/two_frogs-nl-pepijn.mp3" type="audio/mpeg">
 		</audio>
 
@@ -106,7 +106,7 @@
 			</a>
 		</div>
 		<div class=audio-controls>
-			<button class="rewind tertiary icon-only" data-action=rewind onclick="playSentence(currentSentence - 1)">
+			<button class="rewind tertiary icon-only" data-rewind onclick="playSentence(currentSentence - 1)" disabled>
 				<span class=visually-hidden>Rewind</span>
 				<svg width=24 height=24 class=icon aria-hidden=true>
 					<use xlink:href=#rewind></use>
@@ -124,7 +124,7 @@
 					<use xlink:href=#pause></use>
 				</svg>
 			</button>
-			<button class="forward tertiary icon-only" data-action=forward onclick="playSentence(currentSentence + 1)">
+			<button class="forward tertiary icon-only" data-fast-forward onclick="playSentence(currentSentence + 1)">
 				<span class=visually-hidden>Forward</span>
 				<svg width=24 height=24 class=icon aria-hidden=true>
 					<use xlink:href=#forward></use>
