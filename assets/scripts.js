@@ -106,12 +106,16 @@ function autoPlay() {
   // of the next sentence, move to the next sentence
   if (time >= timestamps[voice][currentSentence + 1]) {
     currentSentence++
-    // Pause the audio file for as long as sentencePause
-    audioFile.pause()
-    sentencePauseTimeout = setTimeout(function(){
-      audioFile.play()
-      changeSentence()
-    }, sentencePause)
+    // Change to next sentence if no pause was set
+    if (sentencePause == 0) changeSentence()
+    // Else, pause the audio file for as long as sentencePause
+    else {
+      audioFile.pause()
+      sentencePauseTimeout = setTimeout(function(){
+        audioFile.play()
+        changeSentence()
+      }, sentencePause)
+    }
   }
   updateProgressBar()
 }
