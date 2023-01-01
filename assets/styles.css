@@ -27,6 +27,7 @@
   --txt-tertiary: rgba(0,0,0,.48);
   --icon-default: rgba(0,0,0,.64);
   --border-default: rgba(0,0,0,.12);
+  --border-default: rgba(0,0,0,.08);
   --accent: #ECBF4B;
 
 /*  accent-color: var(--accent);*/
@@ -272,11 +273,15 @@ nav{
   grid-template-columns: 1fr auto 1fr;
   width: 100%;
   max-width: 56ch;
-  padding: 3.75rem 1rem 3rem;
+  padding: 1rem;
   margin: 0 auto;
+  border-top: 1px solid var(--border-default);
   user-select: none;
-  background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--bg-primary) 32%);
+  background-color: var(--bg-primary);
+}
+
+.ios nav{
+  padding-bottom: 3rem;
 }
 
 
@@ -297,22 +302,22 @@ progress{
   right: 0;
   bottom: 0;
   left: 0;
-  margin: .5rem;
-  border-radius: .125rem;
-  overflow: hidden; /* to hide the value's border-radius of 0  */
-  background-color: var(--shade-default);
+  background-color: transparent;
 }
 
 progress::-webkit-progress-bar {
   border-radius: 0;
-  background-color: var(--shade-default);
+  background-color: transparent;
 }
+
 progress::-webkit-progress-value {
   border-radius: 0;
   background-color: var(--accent);
 }
+
 progress::-moz-progress-bar {
-  /* style rules */
+  border-radius: 0;
+  background-color: var(--accent);
 }
 
 

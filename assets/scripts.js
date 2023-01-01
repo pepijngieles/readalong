@@ -15,6 +15,7 @@
   7. Settings
     7.1 Toggle
     7.2 Update
+  8. Detect iOS
   X. Developer related functions
 
 */
@@ -227,6 +228,26 @@ function updateSettings() {
   audioFile.playbackRate = document.forms.settings.playbackRate.value
   sentencePause = document.forms.settings.sentencePause.value
 }
+
+
+
+/* 8. Detect iOS
+---------------------------------------------------------------------------- */
+function iOS() {
+  return [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ].includes(navigator.platform)
+  // iPad on iOS 13 detection
+  || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+}
+
+if (iOS()) document.body.classList.add('ios')
+
 
 
 /* X. Developer related functions
