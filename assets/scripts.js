@@ -13,10 +13,8 @@
   5. Play a sentence when clicking on it
   6. Toggle the translation on/off
   7. Settings
-    7.1 Toggle
-    7.2 Update
   8. Detect iOS
-  X. Developer related functions
+  X. Developer controls
 
 */
 
@@ -29,13 +27,14 @@ const audioFile = document.querySelector('audio'),
       fastForwardButton = document.querySelector('[data-fast-forward]'),
       progressBar = document.querySelector('progress'),
       sentences = document.querySelectorAll('[data-sentence]'),
-      timeDisplay = document.getElementById("time-display"),
       textarea = document.querySelector('textarea'), // For developer purposes
+      timeInput =  document.querySelector('input[name=currentSentenceTime]'), // For developer purposes
       translationPopover = document.querySelector('[data-translation-popover]'),
       translationText = document.querySelector('[data-translation-text]'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
-      timestamps = {'pepijn': [0,5.6,9.4,13,18.6,26.9,28.8,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7]}
+      timestamps = {'pepijn': [0]},
+      parameterList = new URLSearchParams (window.location.search)
 
 let   started = false,
       playing = false,
@@ -133,6 +132,8 @@ function changeSentence() {
   updateTranslation()
   updateProgressBar()
   disableButtons()
+  // Dev thinghies
+  timeInput.value = timestamps[voice][currentSentence]
   // A little timeOut is needed so the function uses the updated values
   setTimeout(function(){
     checkForScroll()
@@ -180,8 +181,6 @@ function changeSentence() {
     time = audioFile.currentTime.toFixed(1)
     // Update the progress bar value
     progressBar.value = (audioFile.currentTime * 100 / audioFile.duration).toFixed(0)
-    // Update the shown time for developer purposed
-    if (timeDisplay) timeDisplay.innerText = time + " seconden"
   }
 
   /* 4.5 Disable rewind/forward button if needed --------------------------- */
@@ -220,14 +219,11 @@ function toggleTranslation() {
 
 /* 7. Settings
 ---------------------------------------------------------------------------- */
-
-/* 7.1 Toggle -------------------------------------------------------------- */
 function toggleSettings() {
   console.log(settingsPopover)
   settingsPopover.hidden = !settingsPopover.hidden
 }
 
-/* 7.2 Update -------------------------------------------------------------- */
 function updateSettings() {
   audioFile.playbackRate = document.forms.settings.playbackRate.value
   sentencePause = document.forms.settings.sentencePause.value
@@ -254,8 +250,23 @@ if (iOS()) document.body.classList.add('ios')
 
 
 
-/* X. Developer related functions
+/* X. Developer controls
 ---------------------------------------------------------------------------- */
 function addTimestamp() {
-  textarea.value += ',' + time
+  timestamps[voice].push(time)
+  timeInput.value = time
+}
+
+function updateTimestamps() {
+  timestamps[voice][currentSentence] = timeInput.value
+  play()
+  playSentence(currentSentence)
+}
+
+function copyTimestamps() {
+  navigator.clipboard.writeText(timestamps[voice])
+}
+
+for (parameter of parameterList) {
+  if (parameter[0] == 'devmode' && parameter[1] == 'on') document.body.classList.add('devmode')
 }
