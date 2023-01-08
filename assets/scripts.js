@@ -33,7 +33,7 @@ const audioFile = document.querySelector('audio'),
       translationText = document.querySelector('[data-translation-text]'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
-      timestamps = {'pepijn': [0]},
+      timestamps = {'pepijn': [0,5.6,9.4,13,18.6,26.9,28.8,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7]},
       parameterList = new URLSearchParams (window.location.search)
 
 let   started = false,
