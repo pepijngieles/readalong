@@ -47,7 +47,8 @@ let   started = false,
       sentencePauseTimeout,
       showTranslation = true,
       popoverOffset = 0,
-      playbackRate = 1
+      playbackRate = 1,
+      volume = 1
 
 // Make all sentences clickable
 for (sentence of sentences) {
@@ -220,13 +221,13 @@ function toggleTranslation() {
 /* 7. Settings
 ---------------------------------------------------------------------------- */
 function toggleSettings() {
-  console.log(settingsPopover)
   settingsPopover.hidden = !settingsPopover.hidden
 }
 
 function updateSettings() {
   audioFile.playbackRate = document.forms.settings.playbackRate.value
   sentencePause = document.forms.settings.sentencePause.value
+  audioFile.volume = document.forms.settings.volume.value
 }
 
 

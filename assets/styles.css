@@ -266,7 +266,7 @@ button.small{
 
 /* 7. Inputs
 ---------------------------------------------------------------------------- */
-input,
+input:not([type=range]),
 textarea{
   font: inherit;
   padding: .75rem;
