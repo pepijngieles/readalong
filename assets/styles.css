@@ -74,6 +74,15 @@
   border: 0 !important;
 }
 
+ul {
+  padding-inline-start: 1.5rem;
+}
+
+hr {
+  border-width: 1px 0 0 0;
+  border-color: var(--border-subtle);
+}
+
 
 
 /* 3. ...
@@ -119,11 +128,20 @@ h1{
   font-size: 1.125rem;
   line-height: 1.5rem;
   color: var(--txt-secondary);
-  padding-bottom: .75rem;
+  padding-bottom: .5rem;
+  padding-bottom: calc(.5rem - 1px);
   border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 1.25rem;
 }
 
-h1, p{
+h2{
+  font-size: 1rem;
+  line-height: 1.25rem;
+  color: var(--txt-secondary);
+  padding-bottom: .25rem;
+}
+
+.story p{
   margin: 1.25rem 0;
 }
 
