@@ -156,24 +156,23 @@ function changeSentence() {
     // Calculate the right Y-position for the popover
     popoverOffset = currentSentenceEl.offsetHeight - 8
     popoverOffset += currentSentenceEl.offsetTop
-    // Convert the pixel-value to rem
+    // Convert pixel-value to rem
     popoverOffset /= 16
-    // Update transform property. A translateZ of 0 is added to prevent
-    // laggy animation of the filter drop-shadow
+    // Update transform property
+    // Added translateZ(0) to prevent laggy animation of drop-shadow filter
     translationPopover.style.transform = 'translateY(' + popoverOffset + 'rem) translateZ(0)'
   }
 
   /* 4.3 Check if auto-scrolling is needed --------------------------------- */
   function checkForScroll() {
-    // TODO: use the highlighted sentence's dimenions instead of popover for
-    //  when no translation is shown
-    if(showTranslation) {
-      var popoverOffset = translationPopover.getBoundingClientRect()
-      var contentWindowHeight = window.innerHeight - navHeight
-      if (contentWindowHeight < (popoverOffset.bottom + 48)) {
-        window.scrollBy(0, (contentWindowHeight / 1.4))
-      }
-    }
+    let contentHeight = window.innerHeight - navHeight
+    let sentenceOffset = currentSentenceEl.getBoundingClientRect()
+    let popoverOffset = translationPopover.getBoundingClientRect()
+
+    if(showTranslation) let offsetBottom = popoverOffset.bottom + 48
+    else let offsetBottom = sentenceOffset.bottom + 12
+
+    if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - 12)
   }
 
   /* 4.4 Update the progress bar ------------------------------------------- */
