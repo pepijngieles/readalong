@@ -15,6 +15,10 @@
 				<path d="M2.5 11.5H22.5" class="round"/>
 				<path d="M9.5 18.5L2.5 11.5" class="round"/>
 			</symbol>
+			<symbol id="chevron-down" viewBox="0 0 16 16">
+				<path d="M7.5 10.5L4.5 7.5" class="round"/>
+				<path d="M7.5 10.5L10.5 7.5" class="round"/>
+			</symbol>
 			<symbol id="close" viewBox="0 0 24 24">
 				<path d="M4.5 19.5L19.5 4.5" class="round"/>
 				<path d="M19.5 19.5L4.5 4.5" class="round"/>
@@ -49,6 +53,15 @@
 		<article class=story>
 
 			<h1>Het verhaal van twee kikkers</h1>
+
+			<label for=voice>Voice</label>
+			<select id=voice name=voice class=quiet>
+				<option value=pepijn>Pepijn</option>
+				<option value=annelinn>AnneLinn</option>
+			</select>
+			<svg width=16 height=16 class=icon aria-hidden=true>
+				<use xlink:href=#chevron-down></use>
+			</svg>
 
 			<p>
 				<span tabindex=1 data-sentence=0 data-translation="Once upon a time there was a large group of frogs who always went to the forest to hang out and have fun.">Er was eens een grote groep kikkers die altijd naar het bos ging om rond te hangen en zich te vermaken.</span> <span tabindex=1 data-sentence=1 data-translation="They all sang and jumped until nightfall.">Ze zongen en sprongen allemaal tot de avond viel.</span> <span tabindex=1 data-sentence=2 data-translation="They always laughed really hard and were inseparable.">Ze lachten altijd heel hard en waren onafscheidelijk.</span>

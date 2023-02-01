@@ -8,8 +8,8 @@
   4. Typography
   5. Icons
   6. Buttons
-  7. Inputs
-  7. Navigation
+  7. Form elements
+  8. Navigation
   9. Progress bar
   10. Popovers
   11. Developer controls
@@ -144,6 +144,13 @@ h2{
 
 .story p{
   margin: 1.25rem 0;
+}
+
+small,
+.small,
+label{
+  font-size: .875rem;
+  line-height: 1rem;
 }
 
 .text-align-right{
@@ -283,8 +290,14 @@ button.small{
 
 
 
-/* 7. Inputs
+/* 7. Form elements
 ---------------------------------------------------------------------------- */
+label{
+  display: block;
+  padding-bottom: .25rem;
+  color: var(--txt-tertiary);
+}
+
 input:not([type=range]),
 textarea{
   font: inherit;
@@ -306,6 +319,14 @@ textarea:focus{
   outline: none;
   border-color: var(--border-strong);
   box-shadow: inset 0 3px 9px 0 rgba(0, 0, 0, .024);
+}
+
+select.quiet{
+  appearance: none;
+  padding: 0;
+  border: none;
+  border-radius: .25rem;
+  font: inherit;
 }
 
 

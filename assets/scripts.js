@@ -168,9 +168,10 @@ function changeSentence() {
     let contentHeight = window.innerHeight - navHeight
     let sentenceOffset = currentSentenceEl.getBoundingClientRect()
     let popoverOffset = translationPopover.getBoundingClientRect()
+    let offsetBottom
 
-    if(showTranslation) let offsetBottom = popoverOffset.bottom + 48
-    else let offsetBottom = sentenceOffset.bottom + 12
+    if(showTranslation) offsetBottom = popoverOffset.bottom + 48
+    else offsetBottom = sentenceOffset.bottom + 12
 
     if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - 12)
   }
