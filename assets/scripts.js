@@ -3,17 +3,19 @@
   Index
 
   1. Define variables
-  2. Start, Play, Pause & End
-  3. Automatically change sentence based on timestamps
-  4. Change a sentence
-    4.1 Highlight a sentence
-    4.2 Update the translation
-    4.3 Check if auto-scrolling is needed
-    4.4 Update the progress bar
-  5. Play a sentence when clicking on it
-  6. Toggle the translation on/off
-  7. Settings
-  8. Detect iOS
+  2. Generic functions
+  3. Start, Play, Pause & End
+  4. Automatically change sentence based on timestamps
+  5. Change a sentence
+    5.1 Highlight a sentence
+    5.2 Update the translation
+    5.3 Check if auto-scrolling is needed
+    5.4 Update the progress bar
+  6. Play a sentence when clicking on it
+  7. Toggle the translation on/off
+  8. Switch voice
+  9. Settings
+  10. Detect iOS
   X. Developer controls
 
 */
@@ -23,6 +25,7 @@
 /* 1. Define variables
 ---------------------------------------------------------------------------- */
 const audioFile = document.querySelector('audio'),
+      audioSource = document.querySelector('audio source'),
       rewindButton = document.querySelector('[data-rewind]'),
       fastForwardButton = document.querySelector('[data-fast-forward]'),
       progressBar = document.querySelector('progress'),
@@ -33,8 +36,13 @@ const audioFile = document.querySelector('audio'),
       translationText = document.querySelector('[data-translation-text]'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
-      timestamps = {'pepijn': [0,5.6,9.4,13,18.6,26.9,28.8,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7]},
-      parameterList = new URLSearchParams (window.location.search)
+      timestamps = {
+        'pepijn': [0,5.6,9.4,13,18.6,26.9,28.8,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7],
+        'annelinn': [0,5.5,8.2,11.0,15.2,21.0,22.4,25.5]
+      },
+      parameterList = new URLSearchParams (window.location.search),
+      storyID = 'two_frogs',
+      languageCode = 'nl'
 
 let   started = false,
       playing = false,
@@ -58,7 +66,23 @@ for (sentence of sentences) {
 
 
 
-/* 2. Start, Play, Pause & End
+/* 2. Generic functions
+---------------------------------------------------------------------------- */
+function secondsToHms(d) {
+    d = Number(d);
+    var h = Math.floor(d / 3600);
+    var m = Math.floor(d % 3600 / 60);
+    var s = Math.floor(d % 3600 % 60);
+
+    var hDisplay = h > 0 ? (h < 10 ? "0" : "") + h + ":" : "00:";
+    var mDisplay = m > 0 ? (m < 10 ? "0" : "") + m + ":" : "00:";
+    var sDisplay = s > 0 ? (s < 10 ? "0" : "") + s : "00";
+    return hDisplay + mDisplay + sDisplay; 
+}
+
+
+
+/* 3. Start, Play, Pause & End
 ---------------------------------------------------------------------------- */
 function start() {
   started = true
@@ -99,7 +123,7 @@ function end() {
 
 
 
-/* 3. Automatically change sentence based on timestamps
+/* 4. Automatically change sentence based on timestamps
 ---------------------------------------------------------------------------- */
 function autoPlay() {
   // If the current time is equal to, or greater than the starting time
@@ -122,7 +146,7 @@ function autoPlay() {
 
 
 
-/* 4. Change a sentence
+/* 5. Change a sentence
 ---------------------------------------------------------------------------- */
 function changeSentence() {
   currentSentenceEl = sentences[currentSentence]
@@ -141,7 +165,7 @@ function changeSentence() {
   }, 240)
 }
 
-  /* 4.1 Highlight a sentence ---------------------------------------------- */
+  /* 5.1 Highlight a sentence ---------------------------------------------- */
   function highlightSentence(number) {
     if (!started) start()
     document.querySelector('[data-sentence][aria-current]').removeAttribute('aria-current')
@@ -149,7 +173,7 @@ function changeSentence() {
     // TODO: find out how to cope with focus()
   }
 
-  /* 4.2 Update the translation -------------------------------------------- */
+  /* 5.2 Update the translation -------------------------------------------- */
   function updateTranslation() {
     // Replace the text
     translationText.innerHTML = currentSentenceEl.dataset.translation
@@ -163,7 +187,7 @@ function changeSentence() {
     translationPopover.style.transform = 'translateY(' + popoverOffset + 'rem) translateZ(0)'
   }
 
-  /* 4.3 Check if auto-scrolling is needed --------------------------------- */
+  /* 5.3 Check if auto-scrolling is needed --------------------------------- */
   function checkForScroll() {
     let contentHeight = window.innerHeight - navHeight
     let sentenceOffset = currentSentenceEl.getBoundingClientRect()
@@ -176,7 +200,7 @@ function changeSentence() {
     if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - 12)
   }
 
-  /* 4.4 Update the progress bar ------------------------------------------- */
+  /* 5.4 Update the progress bar ------------------------------------------- */
   function updateProgressBar() {
     // Update the time
     time = audioFile.currentTime.toFixed(1)
@@ -194,7 +218,7 @@ function changeSentence() {
 
 
 
-/* 5. Play a sentence when clicking on it
+/* 6. Play a sentence when clicking on it
 ---------------------------------------------------------------------------- */
 function playSentence(number) {
   // 1. Check if the number parameter is filled, else use the clicked sentence
@@ -209,7 +233,7 @@ function playSentence(number) {
 
 
 
-/* 6. Toggle the translation on/off
+/* 7. Toggle the translation on/off
 ---------------------------------------------------------------------------- */
 function toggleTranslation() {
   showTranslation = !showTranslation
@@ -218,7 +242,33 @@ function toggleTranslation() {
 
 
 
-/* 7. Settings
+/* 8. Switch voice
+---------------------------------------------------------------------------- */
+let wasPlaying = playing
+const voiceSelect = document.querySelector('[data-voice]')
+const durationEl = document.querySelector('[data-duration]')
+voiceSelect.addEventListener('change', switchVoice, false)
+
+function switchVoice() {
+  wasPlaying = (playing == true) ? true : false
+  pause()
+  voice = this.value
+  audioSource.src = '../../audio/' + storyID + '/' + languageCode + '/' + this.value + '.mp3'
+  // TODO: add loading state
+  document.documentElement.classList.add('loading')
+  audioFile.load()
+}
+
+audioFile.addEventListener('canplaythrough', function(){
+  document.documentElement.classList.remove('loading')
+  durationEl.innerHTML = secondsToHms(audioFile.duration)
+  if (started) playSentence(currentSentence)
+  if (wasPlaying) play()
+}, false)
+
+
+
+/* 9. Settings
 ---------------------------------------------------------------------------- */
 function toggleSettings() {
   settingsPopover.hidden = !settingsPopover.hidden
@@ -232,7 +282,7 @@ function updateSettings() {
 
 
 
-/* 8. Detect iOS
+/* 10. Detect iOS
 ---------------------------------------------------------------------------- */
 function iOS() {
   return [
@@ -271,3 +321,5 @@ function copyTimestamps() {
 for (parameter of parameterList) {
   if (parameter[0] == 'devmode' && parameter[1] == 'on') document.body.classList.add('devmode')
 }
+
+

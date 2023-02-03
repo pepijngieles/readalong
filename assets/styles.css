@@ -12,7 +12,8 @@
   8. Navigation
   9. Progress bar
   10. Popovers
-  11. Developer controls
+  11. Voice selection
+  12. Developer controls
 
 */
 
@@ -78,9 +79,29 @@ ul {
   padding-inline-start: 1.5rem;
 }
 
+dl dt{
+  padding-bottom: .25rem;
+}
+
 hr {
   border-width: 1px 0 0 0;
   border-color: var(--border-subtle);
+}
+
+html.loading{
+  cursor: progress;
+}
+
+body{
+  transition: opacity linear .3s;
+}
+
+html.loading body{
+  opacity: .3;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+  transition: opacity linear 0s;
 }
 
 
@@ -147,10 +168,12 @@ h2{
 }
 
 small,
+dt,
 .small,
 label{
   font-size: .875rem;
   line-height: 1rem;
+  color: var(--txt-tertiary);
 }
 
 .text-align-right{
@@ -295,7 +318,6 @@ button.small{
 label{
   display: block;
   padding-bottom: .25rem;
-  color: var(--txt-tertiary);
 }
 
 input:not([type=range]),
@@ -326,7 +348,13 @@ select.quiet{
   padding: 0;
   border: none;
   border-radius: .25rem;
+  background-color: var(--bg-primary);
   font: inherit;
+}
+
+select + .icon{
+  vertical-align: top;
+  margin-top: .25rem;
 }
 
 
@@ -487,7 +515,20 @@ body.ios .translation-popover{
 
 
 
-/* 11. Developer controls
+/* 11. Voice selection
+---------------------------------------------------------------------------- */
+.voice-selection{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 1.5rem;
+}
+
+[data-duration]{
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* 12. Developer controls
 ---------------------------------------------------------------------------- */
 .developer-controls{
   grid-column: 1 / span 3;
