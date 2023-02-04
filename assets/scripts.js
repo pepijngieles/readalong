@@ -189,14 +189,17 @@ function changeSentence() {
 
   /* 5.3 Check if auto-scrolling is needed --------------------------------- */
   function checkForScroll() {
-    let contentHeight = window.innerHeight - navHeight
+
     let sentenceOffset = currentSentenceEl.getBoundingClientRect()
+    if (sentenceOffset.top < 12) {
+      window.scrollBy(0, sentenceOffset.top - 12)
+      return
+    }
+
+    let contentHeight = window.innerHeight - navHeight
     let popoverOffset = translationPopover.getBoundingClientRect()
-    let offsetBottom
-
-    if(showTranslation) offsetBottom = popoverOffset.bottom + 48
-    else offsetBottom = sentenceOffset.bottom + 12
-
+    let offsetBottom = (showTranslation) ? popoverOffset.bottom + 48 : sentenceOffset.bottom + 12
+    
     if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - 12)
   }
 
