@@ -37,8 +37,8 @@ const audioFile = document.querySelector('audio'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
       timestamps = {
-        'pepijn': [0,5.6,9.4,13,18.6,26.9,28.8,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7],
-        'annelinn': [0,5.5,8.2,11.0,15.2,21.0,22.4,25.5]
+        'pepijn': [0,5.6,9.4,13,18.6,26.9,29.1,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7],
+        'annelinn': [0,7.1,10.8,14.5,20.5,28.5,31.3,35.5,38.7,45.1,49.9,55.3,59.9,64.1,67.1,71.7,74.3,83,85.6,88.7,91.4]
       },
       parameterList = new URLSearchParams (window.location.search),
       storyID = 'two_frogs',
@@ -257,17 +257,19 @@ function switchVoice() {
   pause()
   voice = this.value
   audioSource.src = '../../audio/' + storyID + '/' + languageCode + '/' + this.value + '.mp3'
-  // TODO: add loading state
   document.documentElement.classList.add('loading')
   audioFile.load()
+  audioFile.addEventListener('canplaythrough', audioReady)
 }
 
-audioFile.addEventListener('canplaythrough', function(){
+// TODO: rename this function to an active variant
+function audioReady() {
   document.documentElement.classList.remove('loading')
   durationEl.innerHTML = secondsToHms(audioFile.duration)
   if (started) playSentence(currentSentence)
   if (wasPlaying) play()
-}, false)
+  audioFile.removeEventListener('canplaythrough', audioReady)
+}
 
 
 
