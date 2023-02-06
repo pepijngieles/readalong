@@ -87,6 +87,7 @@ dl dt{
 hr {
   border-width: 1px 0 0 0;
   border-color: var(--border-subtle);
+  margin-block: 1.5rem;
 }
 
 html.loading{
@@ -209,12 +210,9 @@ a:visited{
   margin-left: 0;
 }
 
-.list li{
-  padding-block: 1rem;
-}
-
 .list a{
   display: block;
+  padding-block: 1rem;
   text-decoration: none;
 }
 
