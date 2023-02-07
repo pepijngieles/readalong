@@ -28,7 +28,7 @@
   --shade-default: rgba(0,0,0,.02);
   --txt-primary: rgba(0,0,0,1);
   --txt-secondary: rgba(0,0,0,.88);
-  --txt-tertiary: rgba(0,0,0,.48);
+  --txt-tertiary: rgba(0,0,0,.55);
   --icon-default: rgba(0,0,0,.64);
   --border-subtle: rgba(0,0,0,.08);
   --border-default: rgba(0,0,0,.12);
@@ -167,6 +167,14 @@ h2{
   margin: 1.25rem 0;
 }
 
+a{
+  color: var(--txt-secondary);
+}
+
+a:visited{
+  color: #6C003E;
+}
+
 small,
 dt,
 .small,
@@ -194,10 +202,6 @@ label{
 
 body.started [data-sentence]:not([aria-current]){
   color: var(--txt-tertiary);
-}
-
-a:visited{
-  color: #6C003E;
 }
 
 
