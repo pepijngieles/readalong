@@ -1,6 +1,6 @@
 {
   "name": "Read Along",
-  "short_name": "Read Along",/*
+  "short_name": "Read Along",
   "icons": [
     {
       "src": "/images/favicons/favicon-192.png",
@@ -12,7 +12,7 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],*/
+  ],
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone",
