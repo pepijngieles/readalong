@@ -1,4 +1,4 @@
-# Read Along <small>bèta</small>
+# Read Along (bèta)
 Read foreign languages along with native speakers. No tests, no rankings, no gamification. No nonsense. Just read along at your pace. That's it.
 
 ## How to contribute
