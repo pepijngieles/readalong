@@ -95,15 +95,19 @@ body{
   border: 0 !important;
 }
 
-ul {
+ul{
   padding-inline-start: 1.5rem;
+}
+
+dl{
+  user-select: none;
 }
 
 dl dt{
   padding-bottom: .25rem;
 }
 
-hr {
+hr{
   border-width: 0.0625rem 0 0 0;
   border-color: var(--border-subtle);
   margin-block: 1.5rem;
@@ -347,6 +351,7 @@ body.started:not(.paused) .pause{
 label{
   display: block;
   padding-bottom: .25rem;
+  user-select: none;
 }
 
 input:not([type=range]),
@@ -457,17 +462,17 @@ progress{
   background-color: transparent;
 }
 
-progress::-webkit-progress-bar {
+progress::-webkit-progress-bar{
   border-radius: 0;
   background-color: var(--shade-default);
 }
 
-progress::-webkit-progress-value {
+progress::-webkit-progress-value{
   border-radius: 0;
   background-color: var(--accent);
 }
 
-progress::-moz-progress-bar {
+progress::-moz-progress-bar{
   border-radius: 0;
   background-color: var(--accent);
 }
@@ -577,7 +582,6 @@ body.ios:not(.started.show-translation) .translation-popover{
   display: grid;
   grid-template-columns: auto 1fr;
   grid-gap: 1.5rem;
-  user-select: none;
 }
 
 [data-duration]{
