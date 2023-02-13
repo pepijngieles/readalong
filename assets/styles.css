@@ -13,9 +13,10 @@
   9. Navigation
   10. Progress bar
   11. Popovers
-  12. Voice selection
-  13. Loading state
-  14. Developer controls
+  12. Info blocks
+  13. Voice selection
+  14. Loading state
+  15. Developer controls
 
 */
 
@@ -23,17 +24,21 @@
 /* 1. Custom properties
 ---------------------------------------------------------------------------- */
 :root{
-  --accent: #ecbf4b;
+  --accent-yellow: #ecbf4b;
+
   --shade-default: rgba(0,0,0,.02);
   --shade-dark: rgba(0,0,0,.08);
 
-  --bg-primary: #ffffff;
-  --bg-secondary: #fafafa;
-  --bg-popover: #ffffff;
+  --background-primary: #ffffff;
+  --background-secondary: #fafafa;
+  --background-popover: #ffffff;
+  --background-yellow: #faf3e1;
+  --background-velvet: #eddde6;
 
-  --txt-primary: rgba(0,0,0,1);
-  --txt-secondary: rgba(0,0,0,.88);
-  --txt-tertiary: rgba(0,0,0,.55);
+  --text-primary: rgba(0,0,0,1);
+  --text-secondary: rgba(0,0,0,.88);
+  --text-tertiary: rgba(0,0,0,.55);
+  --text-velvet: #6c003e;
 
   --icon-default: rgba(0,0,0,.64);
 
@@ -48,7 +53,7 @@
 }
 
 .started.show-translation{
-  --bg-primary: var(--bg-secondary);
+  --background-primary: var(--background-secondary);
 }
 
 
@@ -64,7 +69,7 @@
 }
 
 *:focus-visible{
-  outline-color: var(--accent);
+  outline-color: var(--accent-yellow);
 }
 
 html{
@@ -74,7 +79,7 @@ html{
 
 body{
   padding-bottom: 12rem; /* make sure content doesn't dissapear behind nav */
-  background-color: var(--bg-primary);
+  background-color: var(--background-primary);
   transition: opacity linear .3s; /* to animate html.loading */
 }
 
@@ -142,7 +147,7 @@ main{
 ---------------------------------------------------------------------------- */
 html{
   font: var(--font-size) / var(--line-height) -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif;
-  color: var(--txt-secondary);
+  color: var(--text-secondary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -150,7 +155,7 @@ html{
 h1{
   font-size: 1.125rem;
   line-height: 1.5rem;
-  color: var(--txt-secondary);
+  color: var(--text-secondary);
   padding-bottom: .25rem;
   margin-bottom: 1rem;
 }
@@ -158,7 +163,7 @@ h1{
 h2{
   font-size: 1rem;
   line-height: 1.25rem;
-  color: var(--txt-secondary);
+  color: var(--text-secondary);
   padding-bottom: .25rem;
   margin-top: 1.25rem;
 }
@@ -168,7 +173,7 @@ h2{
 }
 
 a{
-  color: var(--txt-secondary);
+  color: var(--text-secondary);
 }
 
 a:visited{
@@ -181,7 +186,7 @@ dt,
 label{
   font-size: .875rem;
   line-height: 1rem;
-  color: var(--txt-tertiary);
+  color: var(--text-tertiary);
 }
 
 .text-align-right{
@@ -193,15 +198,15 @@ label{
 }
 
 [data-sentence]:focus{
-  outline-color: var(--accent);
+  outline-color: var(--accent-yellow);
 }
 
 [data-sentence][aria-current]{
-  color: var(--txt-primary);
+  color: var(--text-primary);
 }
 
 body.started [data-sentence]:not([aria-current]){
-  color: var(--txt-tertiary);
+  color: var(--text-tertiary);
 }
 
 
@@ -211,7 +216,7 @@ body.started [data-sentence]:not([aria-current]){
 .list{
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-block: 0 1.5rem;
 }
 
 .list li:not(:first-of-type){
@@ -272,10 +277,10 @@ button,
   border: 1px solid transparent;
   padding: 1.25rem;
   padding: calc(1.25rem - 1px); /* exclude border */
-  background: var(--bg-primary);
+  background: var(--background-primary);
   border-radius: .75rem;
   font: inherit;
-  color: var(--txt-primary);
+  color: var(--text-primary);
   text-align: center;
 }
 
@@ -314,7 +319,7 @@ button.secondary.pressed{
 }
 
 button.quiet{
-  color: var(--txt-secondary);
+  color: var(--text-secondary);
 }
 
 button.small{
@@ -331,7 +336,7 @@ button.icon-only,
 
 button.icon-only.play,
 button.icon-only.pause{
-  color: var(--accent);
+  color: var(--accent-yellow);
 }
 
 body.started:not(.paused) .play,
@@ -381,13 +386,13 @@ select{
   appearance: none;
   border-radius: .25rem;
   font: inherit;
-  color: var(--txt-primary);
+  color: var(--text-primary);
 }
 
 select.quiet{
   padding: 0;
   border: none;
-  background-color: var(--bg-primary);
+  background-color: var(--background-primary);
 }
 
 select + .icon{
@@ -399,7 +404,7 @@ select + .icon{
 
 /*input[type=range]{
   appearance: none;
-  accent-color: var(--accent);
+  accent-color: var(--accent-yellow);
   height: .25rem;
   border-radius: .125rem;
   background: var(--shade-dark);
@@ -411,7 +416,7 @@ input[type=range]::-webkit-slider-thumb{
   cursor: ew-resize;
   width: 19px;
   height: 19px;
-  background: var(--bg-popover);
+  background: var(--background-popover);
   box-shadow: 0px .25rem .5rem rgba(0, 0, 0, 0.04), 0px 0px 3px rgba(0, 0, 0, 0.24);
   border-radius: 50%;
 }
@@ -439,7 +444,7 @@ nav{
   padding: 1rem;
   margin: 0 auto;
   border-top: 1px solid var(--border-subtle);
-  background-color: var(--bg-primary);
+  background-color: var(--background-primary);
   user-select: none;
 }
 
@@ -469,12 +474,12 @@ progress::-webkit-progress-bar{
 
 progress::-webkit-progress-value{
   border-radius: 0;
-  background-color: var(--accent);
+  background-color: var(--accent-yellow);
 }
 
 progress::-moz-progress-bar{
   border-radius: 0;
-  background-color: var(--accent);
+  background-color: var(--accent-yellow);
 }
 
 
@@ -482,7 +487,7 @@ progress::-moz-progress-bar{
 /* 11. Popovers
 ---------------------------------------------------------------------------- */
 [class*=popover]{
-  background-color: var(--bg-popover);
+  background-color: var(--background-popover);
   filter:
     drop-shadow(0px .25rem .25rem rgba(0, 0, 0, 0.08))
     drop-shadow(0px .25rem .5rem rgba(0, 0, 0, 0.08))
@@ -530,12 +535,12 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .translation-popover button[data-hide-translation]{
-  color: var(--txt-secondary);
+  color: var(--text-secondary);
   position: absolute;
   bottom: -1.5rem;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--bg-popover);
+  background-color: var(--background-popover);
 }
 
 .translation-popover button[data-hide-translation]::before{
@@ -549,8 +554,23 @@ body.ios:not(.started.show-translation) .translation-popover{
   left: -1rem;
   width: 5rem;
   height: 1.5rem;
-  color: var(--bg-popover);
+  color: var(--background-popover);
   pointer-events: none;
+}
+
+
+/* 12. Info Blocks
+---------------------------------------------------------------------------- */
+.info{
+  background-color: var(--background-yellow);
+  border-radius: .25rem;
+  padding-inline: .75rem;
+  padding-block: .5rem;
+  margin-block-end: 1.5rem;
+}
+
+.info.velvet{
+  background-color: var(--background-velvet);
 }
 
 
@@ -576,7 +596,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 12. Voice selection
+/* 13. Voice selection
 ---------------------------------------------------------------------------- */
 .voice-selection{
   display: grid;
@@ -590,7 +610,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 13. Loading state
+/* 14. Loading state
 ---------------------------------------------------------------------------- */
 html.loading{
   cursor: progress;
@@ -606,7 +626,7 @@ html.loading body{
 
 
 
-/* 14. Developer controls
+/* 15. Developer controls
 ---------------------------------------------------------------------------- */
 .developer-controls{
   grid-column: 1 / span 3;
