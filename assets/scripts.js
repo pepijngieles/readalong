@@ -50,7 +50,7 @@ let   started = false,
       sentencePause = 0,
       currentSentence = 0, // TODO: get current sentence from localStorage
       currentSentenceEl = sentences[0],
-      voice = 'pepijn', // TODO: change audio file on selection
+      voice = 'annelinn', // TODO: change audio file on selection
       interval,
       sentencePauseTimeout,
       showTranslation = true,

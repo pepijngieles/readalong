@@ -36,7 +36,7 @@
   --background-velvet: #eedfe7;
 
   --text-primary: rgba(0,0,0,1);
-  --text-secondary: rgba(0,0,0,.88);
+  --text-secondary: rgba(0,0,0,.84);
   --text-tertiary: rgba(0,0,0,.55);
   --text-velvet: #6c003e;
 
@@ -78,12 +78,12 @@ html{
 }
 
 body{
-  padding-bottom: 12rem; /* make sure content doesn't dissapear behind nav */
   background-color: var(--background-primary);
   transition: opacity linear .3s; /* to animate html.loading */
 }
 
-[hidden]{
+[hidden],
+body.ios .hide-on-ios{
   display: none!important;
 }
 
@@ -109,7 +109,7 @@ dl{
 }
 
 dl dt{
-  padding-bottom: .25rem;
+  padding-block-end: .25rem;
 }
 
 hr{
@@ -126,18 +126,22 @@ main{
   position: relative;
   max-width: var(--page-width);
   margin: 2rem auto;
-  padding: 0 1rem 3rem;
+  padding: 0 1rem 0;
+}
+
+main .story{
+  padding-block-end: 12rem; /* make sure content doesn't dissapear behind nav */
 }
 
 @media screen and (min-width: 561px){
   main{
-    margin-top: 3rem;
+    margin-block-start: 3rem;
   }
 }
 
 @media screen and (min-width: 641px){
   main{
-    margin-top: 4.5rem;
+    margin-block-start: 4.5rem;
   }
 }
 
@@ -156,16 +160,18 @@ h1{
   font-size: 1.125rem;
   line-height: 1.5rem;
   color: var(--text-secondary);
-  padding-bottom: .25rem;
-  margin-bottom: 1rem;
+}
+
+main > h1{
+  padding-block-end: .25rem;
 }
 
 h2{
   font-size: 1rem;
   line-height: 1.25rem;
   color: var(--text-secondary);
-  padding-bottom: .25rem;
-  margin-top: 1.25rem;
+  padding-block-end: .25rem;
+  margin-block-start: 1.25rem;
 }
 
 .story p{
@@ -355,7 +361,7 @@ body.started:not(.paused) .pause{
 ---------------------------------------------------------------------------- */
 label{
   display: block;
-  padding-bottom: .25rem;
+  padding-block-end: .25rem;
   user-select: none;
 }
 
@@ -399,7 +405,7 @@ select + .icon{
   width: 1rem;
   height: 1rem;
   vertical-align: top;
-  margin-top: .25rem;
+  margin-block-start: .25rem;
 }
 
 /*input[type=range]{
@@ -449,7 +455,7 @@ nav{
 }
 
 .ios nav{
-  padding-bottom: 3rem;
+  padding-block-end: 3rem;
 }
 
 
@@ -561,12 +567,14 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 /* 12. Info Blocks
 ---------------------------------------------------------------------------- */
-.info{
+p.info{
   background-color: var(--background-yellow);
   border-radius: .25rem;
   padding-inline: .75rem;
   padding-block: .5rem;
-  margin-block-end: 1.5rem;
+  margin-block: 1.5rem;
+  font-size: .875rem;
+  color: var(--text-tertiary);
 }
 
 .info.velvet{
@@ -596,12 +604,12 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 13. Voice selection
+/* 13. Voice & language selection
 ---------------------------------------------------------------------------- */
-.voice-selection{
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-gap: 1.5rem;
+.selection-row{
+  display: flex;
+  gap: 1.5rem;
+  margin-block: 1.5rem;
 }
 
 [data-duration]{
@@ -633,7 +641,7 @@ html.loading body{
   display: none;
   grid-template-columns: auto 1fr auto;
   grid-gap: 1rem;
-  margin-top: 1rem;
+  margin-block-start: 1rem;
   text-align: center;
 }
 
