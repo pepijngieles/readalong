@@ -244,16 +244,12 @@ body.started [data-sentence]:not([aria-current]){
   text-decoration: none;
 }
 
-@media (hover: hover) {
-  .list a:hover p{
-    text-decoration: underline;
-  }
+.list a p{
+  text-decoration: underline;
 }
 
-@media (hover: none) {
-  .list a p{
-    text-decoration: underline;
-  }
+.list a:hover p{
+  text-decoration: none;
 }
 
 
