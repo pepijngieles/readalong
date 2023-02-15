@@ -1,6 +1,7 @@
 {
   "name": "Read Along",
   "short_name": "Read Along",
+  "start_url": "https://pepijngieles.nl/readalong/latest-version",
   "icons": [
     {
       "src": "/images/favicons/favicon-192.png",
