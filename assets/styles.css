@@ -83,8 +83,14 @@ body{
 }
 
 [hidden],
-body.ios .hide-on-ios{
-  display: none!important;
+.ios .hide-on-ios{
+  display: none !important;
+}
+
+@media screen and (display-mode: standalone){
+  .hide-on-landscape{
+    display: none !important;
+  }
 }
 
 .visually-hidden{
