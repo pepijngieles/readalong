@@ -36,6 +36,7 @@ const audioFile = document.querySelector('audio'),
       translationText = document.querySelector('[data-translation-text]'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
+      themeColorEl = document.querySelector("meta[name=theme-color]"),
       timestamps = {
         'pepijn': [0,5.6,9.4,13,18.6,26.9,29.1,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7],
         'annelinn': [0,7.1,10.8,14.5,20.5,28.5,31.3,35.5,38.7,45.1,49.9,55.3,59.9,64.1,67.1,71.7,74.3,83,85.6,88.7,91.4]
@@ -56,7 +57,8 @@ let   started = false,
       showTranslation = true,
       popoverOffset = 0,
       playbackRate = 1,
-      volume = 1
+      volume = 1,
+      themeColorValue = '#ffffff'
 
 // Make all sentences clickable
 for (sentence of sentences) {
@@ -69,15 +71,15 @@ for (sentence of sentences) {
 /* 2. Generic functions
 ---------------------------------------------------------------------------- */
 function secondsToHms(d) {
-    d = Number(d);
-    var h = Math.floor(d / 3600);
-    var m = Math.floor(d % 3600 / 60);
-    var s = Math.floor(d % 3600 % 60);
+    d = Number(d)
+    var h = Math.floor(d / 3600)
+    var m = Math.floor(d % 3600 / 60)
+    var s = Math.floor(d % 3600 % 60)
 
-    var hDisplay = h > 0 ? (h < 10 ? '0' : '') + h + ':' : '';
-    var mDisplay = m > 0 ? (m < 10 ? '0' : '') + m + ':' : '00:';
-    var sDisplay = s > 0 ? (s < 10 ? '0' : '') + s : '00';
-    return hDisplay + mDisplay + sDisplay; 
+    var hDisplay = h > 0 ? (h < 10 ? '0' : '') + h + ':' : ''
+    var mDisplay = m > 0 ? (m < 10 ? '0' : '') + m + ':' : '00:'
+    var sDisplay = s > 0 ? (s < 10 ? '0' : '') + s : '00'
+    return hDisplay + mDisplay + sDisplay 
 }
 
 
@@ -87,6 +89,7 @@ function secondsToHms(d) {
 function start() {
   started = true
   document.body.classList.add('started','paused')
+  themeColorEl.setAttribute("content", "#fafafa")
   currentSentenceEl.setAttribute('aria-current', 'true')
   updateTranslation()
 }
@@ -115,6 +118,7 @@ function end() {
   audioFile.currentTime = 0
   currentSentence = 0
   document.body.classList.remove('started')
+  themeColorEl.setAttribute("content", "#ffffff")
   changeSentence()
   time = 0
   playing = false
@@ -240,6 +244,8 @@ function playSentence(number) {
 ---------------------------------------------------------------------------- */
 function toggleTranslation() {
   showTranslation = !showTranslation
+  themeColorValue = (showTranslation) ? "#fafafa" : "#ffffff"
+  themeColorEl.setAttribute("content", themeColorValue)
   document.body.classList.toggle('show-translation')
 }
 
