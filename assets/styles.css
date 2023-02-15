@@ -52,6 +52,7 @@
   --line-height: 1.5;
 }
 
+.show-settings,
 .started.show-translation{
   --background-primary: var(--background-secondary);
 }

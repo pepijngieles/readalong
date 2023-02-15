@@ -88,8 +88,8 @@ function secondsToHms(d) {
 ---------------------------------------------------------------------------- */
 function start() {
   started = true
-  document.body.classList.add('started','paused')
   themeColorEl.setAttribute("content", "#fafafa")
+  document.body.classList.add('started','paused')
   currentSentenceEl.setAttribute('aria-current', 'true')
   updateTranslation()
 }
@@ -117,8 +117,8 @@ function pause() {
 function end() {
   audioFile.currentTime = 0
   currentSentence = 0
-  document.body.classList.remove('started')
   themeColorEl.setAttribute("content", "#ffffff")
+  document.body.classList.remove('started')
   changeSentence()
   time = 0
   playing = false
@@ -283,6 +283,9 @@ function audioReady() {
 ---------------------------------------------------------------------------- */
 function toggleSettings() {
   settingsPopover.hidden = !settingsPopover.hidden
+  themeColorValue = (settingsPopover.hidden || !started) ? "#ffffff" : "#fafafa"
+  themeColorEl.setAttribute("content", themeColorValue)
+  document.body.classList.toggle('show-settings')
 }
 
 function updateSettings() {
