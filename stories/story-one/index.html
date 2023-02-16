@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang=en class=no-js>
+<html lang=en translate=yes class=no-js>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no">
@@ -62,11 +62,11 @@
 
 	<main>
 
-		<article class=story>
+		<article class=story lang=nl translate=no>
 
 			<h1>Het verhaal van twee kikkers</h1>
 
-			<div class=selection-row>
+			<div class=selection-row lang=en translate=yes>
 				<div class=voice>
 					<label for=voice>Voice</label>
 					<select id=voice name=voice class=quiet data-voice>
@@ -82,6 +82,10 @@
 					<dd data-duration>01:36</dd>
 				</dl>
 			</div>
+
+			<noscript class=info>
+				It seems like javascript is turned off. You can still hit play and read along. When you turn on javascript you can easily replay sentences, change the playback speed or add pauses in between sentences.
+			</noscript>
 
 			<p>
 				<span tabindex=1 data-sentence=0 data-translation="Once upon a time there was a large group of frogs who always went to the forest to hang out and have fun.">Er was eens een grote groep kikkers die altijd naar het bos ging om rond te hangen en zich te vermaken.</span> <span tabindex=1 data-sentence=1 data-translation="They all sang and jumped until nightfall.">Ze zongen en sprongen allemaal tot de avond viel.</span> <span tabindex=1 data-sentence=2 data-translation="They always laughed really hard and were inseparable.">Ze lachten altijd heel hard en waren onafscheidelijk.</span>
@@ -127,10 +131,6 @@
 
 		<progress value="0" max="100"></progress>
 
-		<audio onended="end()">
-			<source src="../../audio/two_frogs/nl/annelinn.mp3" type="audio/mpeg">
-		</audio>
-
 	</main>
 
 	<nav>
@@ -142,7 +142,13 @@
 				</svg>
 			</a>
 		</div>
-		<div class=audio-controls>
+		<audio class=no-js-only onended="end()" controls>
+			<source src="../../audio/two_frogs/nl/annelinn.mp3" type="audio/mpeg">
+		</audio>
+		<script type="text/javascript">
+			document.querySelector('audio').removeAttribute('controls')
+		</script>
+		<div class="audio-controls js-only">
 			<button class="rewind quiet icon-only" data-rewind onclick="playSentence(currentSentence - 1)" disabled>
 				<span class=visually-hidden>Rewind</span>
 				<svg width=24 height=24 class=icon aria-hidden=true>
@@ -168,7 +174,7 @@
 				</svg>
 			</button>
 		</div>
-		<div class=text-align-right>
+		<div class="js-only text-align-right">
 			<button class="settings quiet icon-only" onclick="toggleSettings()">
 				<span class=visually-hidden>Settings</span>
 				<svg width=24 height=24 class=icon aria-hidden=true>
@@ -186,16 +192,21 @@
 	</nav>
 
 	<form id=settings class="settings-popover" oninput="updateSettings()" hidden>
+
 		<label for=playbackRate>Playback speed</label>
 		<input type=range name=playbackRate id=playbackRate min=0.6 max=1.2 value=1 step=0.01 list=playbackRates><br><br>
 		<datalist id=playbackRates>
 			<option>1</option>
 		</datalist>
+
 		<label for=sentencePause>Pause between sentences</label>
 		<input type=range name=sentencePause id=sentencePause min=0 max=5000 value=0 step=80><br><br>
+
 		<label for=volume>Volume</label>
 		<input type=range name=volume id=volume min=0 max=1 value=1 step=0.02><br><br>
+
 		<button type=button onclick="toggleSettings()" style=float:right>Close</button>
+
 	</form>
 
 	<script type="text/javascript" src="../../assets/scripts.js?v=8"></script>

@@ -84,7 +84,9 @@ body{
 }
 
 [hidden],
-.ios .hide-on-ios{
+.ios .hide-on-ios,
+.no-js .js-only,
+.js .no-js-only{
   display: none !important;
 }
 
@@ -454,6 +456,7 @@ nav{
   left: 0;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   width: 100%;
   max-width: var(--page-width);
   padding: 1rem;
@@ -576,7 +579,8 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 /* 12. Info Blocks
 ---------------------------------------------------------------------------- */
-p.info{
+.info{
+  display: block;
   background-color: var(--background-yellow);
   border-radius: .25rem;
   padding-inline: .75rem;
