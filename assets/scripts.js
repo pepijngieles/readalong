@@ -292,6 +292,9 @@ function updateSettings() {
   audioFile.playbackRate = document.forms.settings.playbackRate.value
   sentencePause = document.forms.settings.sentencePause.value
   audioFile.volume = document.forms.settings.volume.value
+  document.documentElement.style.setProperty('--font-size', document.forms.settings.fontSize.value + '%')
+  document.querySelector('.story').style.setProperty('--line-height', document.forms.settings.lineHeight.value)
+  updateTranslation()
 }
 
 
