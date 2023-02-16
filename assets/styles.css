@@ -109,18 +109,6 @@ body{
   border: 0 !important;
 }
 
-ul{
-  padding-inline-start: 1.5rem;
-}
-
-dl{
-  user-select: none;
-}
-
-dl dt{
-  padding-block-end: .25rem;
-}
-
 hr{
   border-width: 0.0625rem 0 0 0;
   border-color: var(--border-subtle);
@@ -171,10 +159,6 @@ h1{
   color: var(--text-secondary);
 }
 
-main > h1{
-  padding-block-end: .25rem;
-}
-
 h2{
   font-size: 1rem;
   line-height: 1.25rem;
@@ -183,8 +167,13 @@ h2{
   margin-block-start: 1.25rem;
 }
 
+h1 + p{
+  margin-block-start: .25rem;
+}
+
 .story p{
   margin: 1.25rem 0;
+  margin: calc(var(--line-height) * 0.8333rem) 0;
 }
 
 a{
@@ -195,10 +184,10 @@ a:visited{
   color: #6C003E;
 }
 
-small,
 dt,
-.small,
-label{
+label,
+small,
+.small{
   font-size: .875rem;
   line-height: 1rem;
   color: var(--text-tertiary);
@@ -228,6 +217,18 @@ body.started [data-sentence]:not([aria-current]){
 
 /* 5. Lists
 ---------------------------------------------------------------------------- */
+ul{
+  padding-inline-start: 1.5rem;
+}
+
+dl{
+  user-select: none;
+}
+
+dl dt{
+  padding-block-end: .25rem;
+}
+
 .list{
   list-style: none;
   padding: 0;
@@ -288,83 +289,95 @@ body.started [data-sentence]:not([aria-current]){
 
 /* 7. Buttons
 ---------------------------------------------------------------------------- */
-button,
-.button-style{
-  display: inline-block;
-  border: 1px solid transparent;
-  padding: 1.25rem;
-  padding: calc(1.25rem - 1px); /* exclude border */
-  background: var(--background-primary);
-  border-radius: .75rem;
-  font: inherit;
-  color: var(--text-primary);
-  text-align: center;
-}
 
-@media screen and (max-width: 370px){
+
+  /* 7.1 Generic ----------------------------------------------------------- */
   button,
-  .button-style{
+  .button{
+    display: inline-block;
+    border: 1px solid transparent;
+    padding: 1.25rem;
+    padding: calc(1.25rem - 1px); /* exclude border */
+    background: var(--background-primary);
+    border-radius: .75rem;
+    font: inherit;
+    color: var(--text-primary);
+    text-align: center;
+  }
+
+  @media screen and (max-width: 370px){
+    button,
+    .button{
+      padding: .75rem;
+      padding: calc(.75rem - 1px); /* exclude border */
+    }
+  }
+
+  @media (hover: hover) {
+    button:hover:not([disabled]),
+    .button:hover:not([disabled]){
+      filter: brightness(.98);
+    }
+  }
+
+  button:active:not([disabled]),
+  .button:active:not([disabled]){
+    filter: brightness(.97);
+  }
+
+  button:disabled{
+    opacity: .3;
+    cursor: not-allowed;
+  }
+
+
+  /* 7.2 Secondary button -------------------------------------------------- */
+  button.secondary{
+    border-color: #e8e8e8;
+    box-shadow: inset .125rem -.25rem .5rem rgba(0, 0, 0, 0.01);
+  }
+
+  button.secondary:active,
+  button.secondary.pressed{
+    box-shadow: inset .125rem .25rem .5rem rgba(0, 0, 0, 0.02);
+  }
+
+
+  /* 7.3 Quiet button ------------------------------------------------------ */
+  button.quiet{
+    color: var(--text-secondary);
+  }
+
+
+  /* 7.4 Small button ------------------------------------------------------ */
+  button.small{
     padding: .75rem;
     padding: calc(.75rem - 1px); /* exclude border */
   }
-}
 
-@media (hover: hover) {
-  button:hover:not([disabled]),
-  .button-style:hover:not([disabled]){
-    filter: brightness(.98);
+  /* 7.5 Icon only --------------------------------------------------------- */
+  button.icon-only,
+  .button.icon-only{
+    line-height: 0;
+    border-radius: 50%;
+    color: var(--icon-default);
   }
-}
 
-button:active:not([disabled]),
-.button-style:active:not([disabled]){
-  filter: brightness(.97);
-}
+  /* 7.6 Play and pause ------------------------------------------------------ */
+  button.icon-only.play,
+  button.icon-only.pause{
+    color: var(--accent-yellow);
+  }
 
-button:disabled{
-  opacity: .3;
-}
+  body.started:not(.paused) .play,
+  body:not(.started.paused) .pause,
+  body.paused .pause{
+    display: none;
+  }
 
-button.secondary{
-  border-color: #e8e8e8;
-  box-shadow: inset .125rem -.25rem .5rem rgba(0, 0, 0, 0.01);
-}
-
-button.secondary:active,
-button.secondary.pressed{
-  box-shadow: inset .125rem .25rem .5rem rgba(0, 0, 0, 0.02);
-}
-
-button.quiet{
-  color: var(--text-secondary);
-}
-
-button.small{
-  padding: .75rem;
-  padding: calc(.75rem - 1px); /* exclude border */
-}
-
-button.icon-only,
-.button-style.icon-only{
-  line-height: 0;
-  border-radius: 50%;
-  color: var(--icon-default);
-}
-
-button.icon-only.play,
-button.icon-only.pause{
-  color: var(--accent-yellow);
-}
-
-body.started:not(.paused) .play,
-body:not(.started.paused) .pause,
-body.paused .pause{
-  display: none;
-}
-
-body.started:not(.paused) .pause{
-  display: inline-block;
-}
+  body.started:not(.paused) .pause{
+    display: inline-block;
+  }
 
 
 
