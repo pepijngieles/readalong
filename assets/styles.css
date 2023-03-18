@@ -123,11 +123,7 @@ main{
   position: relative;
   max-width: var(--page-width);
   margin: 2rem auto;
-  padding: 0 1rem 0;
-}
-
-main .story{
-  padding-block-end: 12rem; /* make sure content doesn't dissapear behind nav */
+  padding: 0 1rem 12rem; /* make sure content doesn't dissapear behind nav */
 }
 
 @media screen and (min-width: 561px){
