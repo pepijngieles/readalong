@@ -37,13 +37,7 @@ const audioFile = document.querySelector('audio'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
       themeColorEl = document.querySelector("meta[name=theme-color]"),
-      timestamps = {
-        'pepijn': [0,5.6,9.4,13,18.6,26.9,29.1,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7],
-        'annelinn': [0,7.1,10.8,14.5,20.5,28.5,31.3,35.5,38.7,45.1,49.9,55.3,59.9,64.1,67.1,71.7,74.3,83,85.6,88.7,91.4]
-      },
-      parameterList = new URLSearchParams (window.location.search),
-      storyID = 'two_frogs',
-      languageCode = 'nl'
+      parameterList = new URLSearchParams (window.location.search)
 
 let   started = false,
       playing = false,
@@ -51,11 +45,11 @@ let   started = false,
       sentencePause = 0,
       currentSentence = 0, // TODO: get current sentence from localStorage
       currentSentenceEl = sentences[0],
-      voice = 'annelinn', // TODO: change audio file on selection
       interval,
       sentencePauseTimeout,
       showTranslation = true,
-      popoverOffset = 0,
+      popoverOffsetY = 0,
+      popoverOffsetX = 0,
       playbackRate = 1,
       volume = 1,
       themeColorValue = '#ffffff'
@@ -72,14 +66,19 @@ for (sentence of sentences) {
 ---------------------------------------------------------------------------- */
 function secondsToHms(d) {
     d = Number(d)
-    var h = Math.floor(d / 3600)
-    var m = Math.floor(d % 3600 / 60)
-    var s = Math.floor(d % 3600 % 60)
+    let h = Math.floor(d / 3600)
+    let m = Math.floor(d % 3600 / 60)
+    let s = Math.floor(d % 3600 % 60)
 
-    var hDisplay = h > 0 ? (h < 10 ? '0' : '') + h + ':' : ''
-    var mDisplay = m > 0 ? (m < 10 ? '0' : '') + m + ':' : '00:'
-    var sDisplay = s > 0 ? (s < 10 ? '0' : '') + s : '00'
+    let hDisplay = h > 0 ? (h < 10 ? '0' : '') + h + ':' : ''
+    let mDisplay = m > 0 ? (m < 10 ? '0' : '') + m + ':' : '00:'
+    let sDisplay = s > 0 ? (s < 10 ? '0' : '') + s : '00'
     return hDisplay + mDisplay + sDisplay 
+}
+
+function findAncestor(element, selector){
+  while ((element = element.parentElement) && !element.matches(selector));
+  return element;
 }
 
 
@@ -182,13 +181,30 @@ function changeSentence() {
     // Replace the text
     translationText.innerHTML = currentSentenceEl.dataset.translation
     // Calculate the right Y-position for the popover
-    popoverOffset = currentSentenceEl.offsetHeight - 8
-    popoverOffset += currentSentenceEl.offsetTop
+    popoverOffsetY = currentSentenceEl.offsetHeight - 8
+    popoverOffsetY += currentSentenceEl.offsetTop
     // Convert pixel-value to rem
-    popoverOffset /= 16
-    // Update transform property
+    popoverOffsetY /= 16
+    popoverTransform = 'translateY(' + popoverOffsetY + 'rem) translateZ(0)';
+
+    // For dialogue stories, the popover is positioned differently
+    if (storyType == 'dialogue'){
+      // Get the list item element to relatively position popover to
+      let listItem = findAncestor(currentSentenceEl, 'li')
+      // Calculate transform and text align values
+      popoverOffsetY++
+      popoverOffsetX = (listItem.classList.contains('right')) ? 2.75 : -2.75
+      popoverTransform += ' translateX(' + popoverOffsetX + 'rem)';
+      popoverTextAlign = (listItem.classList.contains('right')) ? 'right' : 'left'
+      // Set the text align and max width values
+      // A max-width is set to prevent popover from transforming out of the viewport
+      translationPopover.style.textAlign = popoverTextAlign
+      translationPopover.style.maxWidth = currentSentenceEl.offsetWidth / 16 + 2 + 'rem'
+    }
+
+    // Update the position
     // Added translateZ(0) to prevent laggy animation of drop-shadow filter
-    translationPopover.style.transform = 'translateY(' + popoverOffset + 'rem) translateZ(0)'
+    translationPopover.style.transform = 'translateX(' + popoverOffsetX + 'rem) translateY(' + popoverOffsetY + 'rem) translateZ(0)'    
   }
 
   /* 5.3 Check if auto-scrolling is needed --------------------------------- */
@@ -201,8 +217,8 @@ function changeSentence() {
     }
 
     let contentHeight = window.innerHeight - navHeight
-    let popoverOffset = translationPopover.getBoundingClientRect()
-    let offsetBottom = (showTranslation) ? popoverOffset.bottom + 48 : sentenceOffset.bottom + 12
+    let popoverOffsetY = translationPopover.getBoundingClientRect()
+    let offsetBottom = (showTranslation) ? popoverOffsetY.bottom + 48 : sentenceOffset.bottom + 12
     
     if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - 12)
   }

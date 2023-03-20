@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no">
 	<meta name="theme-color" content="#ffffff" />
 
-	<title>The story of two frogs</title>
+	<title>What's your favorite food?</title>
 
 	<script type="module">
 		document.documentElement.classList.remove('no-js');
@@ -62,24 +62,20 @@
 
 	<main>
 
-		<article class=story lang=nl translate=no>
+		<article class="story dialogue" lang=nl translate=no>
 
-			<h1>Het verhaal van twee kikkers</h1>
+			<h1>Wat is je lievelingseten?</h1>
 
 			<div class=selection-row lang=en translate=yes>
 				<div class=voice>
 					<label for=voice>Voice</label>
-					<select id=voice name=voice class=quiet data-voice>
-						<option value=annelinn selected>AnneLinn</option>
-						<option value=pepijn>Pepijn</option>
+					<select id=voice name=voice class=quiet data-voice disabled>
+						<option value=pepijn-and-annelinn selected>Pepijn & AnneLinn</option>
 					</select>
-					<svg width=16 height=16 class=icon aria-hidden=true>
-						<use xlink:href=#chevron-down></use>
-					</svg>
 				</div>
 				<dl class=duration>
 					<dt>Duration</dt>
-					<dd data-duration>01:36</dd>
+					<dd data-duration>01:04</dd>
 				</dl>
 			</div>
 
@@ -87,24 +83,141 @@
 				It seems like javascript is turned off. You can still hit play and read along. When you turn on javascript you can easily replay sentences, change the playback speed or add pauses in between sentences.
 			</noscript>
 
-			<p>
-				<span tabindex=1 data-sentence=0 data-translation="Once upon a time there was a large group of frogs who always went to the forest to hang out and have fun.">Er was eens een grote groep kikkers die altijd naar het bos ging om rond te hangen en zich te vermaken.</span> <span tabindex=1 data-sentence=1 data-translation="They all sang and jumped until nightfall.">Ze zongen en sprongen allemaal tot de avond viel.</span> <span tabindex=1 data-sentence=2 data-translation="They always laughed really hard and were inseparable.">Ze lachten altijd heel hard en waren onafscheidelijk.</span>
-			</p>
-			<p>
-				<span tabindex=1 data-sentence=3 data-translation="One day, during their usual outing, they decided to go to a new forest.">Op een dag, tijdens hun gebruikelijke uitje, besloten ze naar een nieuw bos te gaan.</span> <span tabindex=1 data-sentence=4 data-translation="In the middle of their usual games, three of the frogs fell into a deep pit that none of them had noticed before.">In het midden van hun gebruikelijke spelletjes vielen drie van de kikkers in een diepe put die niemand van hen eerder had opgemerkt.</span> <span tabindex=1 data-sentence=5 data-translation="The rest were shocked.">De rest was geschokt.</span> <span tabindex=1 data-sentence=6 data-translation="They looked at the bottom of the well and saw that it was too deep.">Ze keken naar de bodem van de put en zagen dat die te diep was.</span> <span tabindex=1 data-sentence=7 data-translation="“We lost them,” they said.">“We zijn ze kwijt,” zeiden ze.</span>
-			</p>
-			<p>
-				<span tabindex=1 data-sentence=8 data-translation="The three fallen frogs tried to climb the walls of the pit, but it was very difficult.">De drie gevallen kikkers probeerden de wanden van de put te beklimmen, maar het was erg moeilijk.</span> <span tabindex=1 data-sentence=9 data-translation="They barely rose an inch and then fell back down.">Ze kwamen amper een centimeter omhoog en vielen dan weer naar beneden.</span>
-			</p>
-			<p>
-				<span tabindex=1 data-sentence=10 data-translation="The others began to notice that their efforts were futile.">De anderen begonnen op te merken dat hun inspanningen nutteloos waren.</span> <span tabindex=1 data-sentence=11 data-translation="How would they ever manage to climb such a high wall?">Hoe zouden ze er ooit in slagen om zo’n hoge wand te beklimmen?</span> <span tabindex=1 data-sentence=12 data-translation="They thought they should just give up.">Ze dachten dat ze het gewoon moesten opgeven.</span> <span tabindex=1 data-sentence=13 data-translation="There was nothing that could be done.">Er was niets aan te doen.</span>
-			</p>
-			<p>
-				<span tabindex=1 data-sentence=14 data-translation="Two of the frogs heard those comments and gave up.">Twee van de kikkers hoorden die opmerkingen en gaven het op.</span> <span tabindex=1 data-sentence=15 data-translation="They thought the others were right.">Ze dachten dat de anderen gelijk hadden.</span> <span tabindex=1 data-sentence=16 data-translation="The third frog, on the other hand, continued to climb and fall, but after a few hours it managed to surface.">De derde kikker daarentegen bleef klimmen en vallen, maar na een paar uur slaagde hij erin om naar de oppervlakte te komen.</span>
-			</p>
-			<p>
-				<span tabindex=1 data-sentence=17 data-translation="The others were amazed.">De anderen waren verbaasd.</span> <span tabindex=1 data-sentence=18 data-translation="One of them asked, “How did you do it?”">Een van hen vroeg: “Hoe heb je het gedaan?”</span> <span tabindex=1 data-sentence=19 data-translation="The frog, however, did not answer.">De kikker gaf echter geen antwoord.</span> <span tabindex=1 data-sentence=20 data-translation="He was deaf.">Hij was doof.</span>
-			</p>
+			<ul class=styled-list>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=0 data-translation="What's your favorite food?">
+							Wat is jouw favoriete eten?
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=1 data-translation="Pizza!">
+							Pizza!
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=2 data-translation="Oh pizza, that's cool! Why do you like it so much?">
+							Oh pizza, dat is cool! Waarom vind je dat zo lekker?
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=3 data-translation="Because it's warm and cheesy, it just makes me happy!">
+							Omdat het warm en kaasachtig is, het maakt me gewoon heel blij!
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=4 data-translation="That is nice! Have you always loved pizza?">
+							Dat is fijn! Heb je altijd al van pizza gehouden?
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=5 data-translation="Yes, ever since I was a little kid.">
+							Ja, al sinds ik een klein kind was.
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=6 data-translation="Wow, that's a long time! Do you remember the first time you ate pizza?">
+							Wow, dat is lang! Weet je nog de eerste keer dat je pizza at?
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=7 data-translation="I don't remember the first time, but I know I liked it right away.">
+							Ik herinner het me niet, maar ik weet wel dat ik het meteen heel lekker vond.
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=8 data-translation="Nice! What other food do you like?">
+							Nice! Welk ander eten vind je lekker?
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=9 data-translation="Spaghetti and meatballs.">
+							Spaghetti en gehaktballen.
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=10 data-translation="Oh yes, spaghetti is good too. And what do you like about that?">
+							Oh ja, spaghetti is ook goed. En wat vind je daar lekker aan?
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=11 data-translation="It's fun to twirl on my fork and I like the sauce. What do you actually like?">
+							Het leuk is om op mijn vork te draaien en ik houd van de saus. Wat vind jij eigenlijk lekker?
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=12 data-translation="I like chicken nuggets and fries.">
+							Ik vind kipnuggets en frietjes lekker.
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=13 data-translation="Yes, those are tasty too. And do you like to drink something with your food?">
+							Ja, die zijn ook lekker. En drink je graag iets bij je eten?
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=14 data-translation="I like a coke with dinner.">
+							Doe mij maar een cola bij het avondeten.
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=15 data-translation="I don't drink anything when I eat. Because it wouldn't be healthy.">
+							Ik drink niets als ik eet. Omdat dat niet gezond zou zijn.
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=16 data-translation="Oh, would you mind telling me more about that?">
+							Oh, zou je me daar meer over willen vertellen?
+						</span>
+					</p>
+				</li>
+				<li class=right>
+					<p data-name=AnneLinn>
+						<span tabindex=1 data-sentence=17 data-translation="That's allright, but another time. Now I'm going to cook something for you first.">
+							Ja, dat is goed. Maar wel een andere keer. Nu ga ik eerst iets voor jou koken.
+						</span>
+					</p>
+				</li>
+				<li class=left>
+					<p data-name=Pepijn>
+						<span tabindex=1 data-sentence=16 data-translation="Oh nice. Then I lie down on the couch for a moment.">
+							Oh lekker. Dan ga ik even op de bank liggen.
+						</span>
+					</p>
+				</li>
+			</ul>
 
 		</article>
 
@@ -143,7 +256,7 @@
 			</a>
 		</div>
 		<audio class=no-js-only onended="end()" controls>
-			<source src="../../audio/two_frogs/nl/annelinn.mp3" type="audio/mpeg">
+			<source src="../../audio/favorite_food/nl/annelinn-and-pepijn.mp3" type="audio/mpeg">
 		</audio>
 		<script type="text/javascript">
 			document.querySelector('audio').removeAttribute('controls')
@@ -226,14 +339,13 @@
 
 	<script type="text/javascript">
 		const timestamps = {
-				'pepijn': [0,5.6,9.4,13,18.6,26.9,29.1,32,35.2,40.1,44.8,48.1,52.1,56,59.1,62.4,65.2,73,75,77.7,79.7],
-				'annelinn': [0,7.1,10.8,14.5,20.5,28.5,31.3,35.5,38.7,45.1,49.9,55.3,59.9,64.1,67.1,71.7,74.3,83,85.6,88.7,91.4]
-				},
-			storyID = 'two_frogs',
-			languageCode = 'nl',
-			storyType = 'default'
+				  'annelinn-and-pepijn': [0,2.1,3.5,5.9,10.2,12.9,15.0,18.5,22.6,24.8,26.9,30.4,36.0,38.6,43.1,45.8,49.7,53.0,58.1]
+			  },
+			  storyID = 'favorite_food',
+			  languageCode = 'nl',
+			  storyType = 'dialogue'
 
-		let voice = 'annelinn' // TODO: change audio file on selection
+		let voice = 'annelinn-and-pepijn' // TODO: change audio file on selection
 	</script>
 
 	<script type="text/javascript" src="../../assets/scripts.js?v=8"></script>

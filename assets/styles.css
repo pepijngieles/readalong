@@ -14,9 +14,11 @@
   10. Progress bar
   11. Popovers
   12. Info blocks
-  13. Voice selection
-  14. Loading state
-  15. Developer controls
+  13. Stories
+  14. Settings
+  15. Voice & language selection
+  16. Loading state
+  17. Developer controls
 
 */
 
@@ -26,7 +28,7 @@
 :root{
   --accent-yellow: #ecbf4b;
 
-  --shade-default: rgba(0,0,0,.02);
+  --shade-default: rgba(0,0,0,.03);
   --shade-dark: rgba(0,0,0,.08);
 
   --background-primary: #ffffff;
@@ -46,7 +48,7 @@
   --border-default: rgba(0,0,0,.12);
   --border-strong: rgba(0,0,0,.16);
 
-  --page-width: 56ch;
+  --page-width: 34rem;
 
   --font-size: 100%;
   --line-height: 1.5;
@@ -167,13 +169,6 @@ h1 + p{
   margin-block-start: .25rem;
 }
 
-.story p{
-  margin: 1.25rem 0;
-  margin: calc(var(--line-height) * 0.8333rem) 0;
-  font-size: var(--font-size);
-  line-height: var(--line-height);
-}
-
 a{
   color: var(--text-secondary);
 }
@@ -185,7 +180,8 @@ a:visited{
 dt,
 label,
 small,
-.small{
+.small-text,
+.story.dialogue [data-name]::before{
   font-size: .875rem;
   line-height: 1rem;
   color: var(--text-tertiary);
@@ -211,6 +207,14 @@ body.started [data-sentence]:not([aria-current]){
   color: var(--text-tertiary);
 }
 
+body.started .story.dialogue p:has([aria-current]){
+  background-color: var(--background-yellow);
+}
+
+body.started .story.dialogue p:not(:has([aria-current])){
+  background-color: var(--shade-default);
+}
+
 
 
 /* 5. Lists
@@ -227,18 +231,15 @@ dl dt{
   padding-block-end: .25rem;
 }
 
-.list{
+.list,
+.styled-list{
   list-style: none;
   padding: 0;
   margin-block: 0 1.5rem;
 }
 
-.list li:not(:first-of-type){
-  padding-block-start: 1rem;
-}
-
-.list li:not(:last-of-type){
-  padding-block-end: 1rem;
+.list li{
+  padding-block: 1rem;
 }
 
 .list a{
@@ -608,7 +609,67 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 
-/* X. Settings
+/* 13. Stories
+---------------------------------------------------------------------------- */
+.story p{
+  margin: 1.25rem 0;
+  margin: calc(var(--line-height) * 0.8333rem) 0;
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+}
+
+.story.dialogue p{
+  display: inline-block;
+  max-width: 24rem;
+  padding: .75rem 1rem;
+  margin-inline-start: -1rem;
+  margin-block-end: 0;
+  border-radius: .75rem .75rem .75rem 0;
+  background-color: var(--shade-default);
+}
+
+.story.dialogue .right{
+  text-align: right;
+}
+
+.story.dialogue .right p{
+  margin-inline-end: -1rem;
+  border-radius: .75rem .75rem 0 .75rem;
+}
+
+.story.dialogue .left + .left p,
+.story.dialogue .right + .right p{
+  margin-block-start: .25rem;
+}
+
+.story.dialogue [data-name]::before{
+  content: attr(data-name);
+  display: block;
+  margin-block-end: 0.125rem;
+  color: var(--text-tertiary);
+}
+
+.story.dialogue .left + .left [data-name]::before,
+.story.dialogue .right + .right [data-name]::before{
+  display: none;
+}
+
+@media screen and (max-width: 30rem){
+  .story.dialogue p{
+    max-width: 75%;
+  }
+
+  .story.dialogue p{
+    border-radius: 0 .75rem .75rem 0;
+  }
+
+  .story.dialogue .right p{
+    border-radius: .75rem 0 0 .75rem;
+  }
+}
+
+
+/* 14. Settings
 ---------------------------------------------------------------------------- */
 .settings-popover{
   z-index: 5;
@@ -630,7 +691,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 13. Voice & language selection
+/* 15. Voice & language selection
 ---------------------------------------------------------------------------- */
 .selection-row{
   display: flex;
@@ -644,7 +705,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 14. Loading state
+/* 16. Loading state
 ---------------------------------------------------------------------------- */
 html.loading{
   cursor: progress;
@@ -660,7 +721,7 @@ html.loading body{
 
 
 
-/* 15. Developer controls
+/* 17. Developer controls
 ---------------------------------------------------------------------------- */
 .developer-controls{
   grid-column: 1 / span 3;
