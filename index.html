@@ -32,8 +32,12 @@
 				<path d="M7.5 10.5L10.5 7.5" class="round"/>
 			</symbol>
 			<symbol id="close" viewBox="0 0 24 24">
-				<path d="M4.5 19.5L19.5 4.5" class="round"/>
-				<path d="M19.5 19.5L4.5 4.5" class="round"/>
+				<path d="M5.5 18.5L18.5 5.5" class="round"/>
+				<path d="M18.5 18.5L5.5 5.5" class="round"/>
+			</symbol>
+			<symbol id="close-small" viewBox="0 0 24 24">
+				<path d="M7.5 16.5L16.5 7.5" class="round"/>
+				<path d="M16.5 16.5L7.5 7.5" class="round"/>
 			</symbol>
 			<symbol id="curve" viewBox="0 0 80 24">
 				<path d="M21.1 14.8a24 24 0 0 0 37.8 0C64.3 8 71.2 0 80 0H0c8.8 0 15.7 7.9 21.1 14.8Z" class="fill no-stroke"/>
@@ -57,10 +61,46 @@
 				<path d="M20 7.2a1.9 1.9 0 0 0 1 2.6l1.3.4a1.9 1.9 0 0 1 0 3.6l-1.3.4a1.9 1.9 0 0 0-1 2.6l.5 1.2a1.9 1.9 0 0 1-2.5 2.5l-1.2-.6a1.9 1.9 0 0 0-2.6 1l-.4 1.4a1.9 1.9 0 0 1-3.6 0L9.8 21a1.9 1.9 0 0 0-2.6-1l-1.2.5A1.9 1.9 0 0 1 3.5 18l.6-1.2a1.9 1.9 0 0 0-1-2.6l-1.4-.4a1.9 1.9 0 0 1 0-3.6L3 9.8a1.9 1.9 0 0 0 1-2.6L3.6 6A1.9 1.9 0 0 1 6 3.5l1.2.6a1.9 1.9 0 0 0 2.6-1l.4-1.4a1.9 1.9 0 0 1 3.6 0l.4 1.3a1.9 1.9 0 0 0 2.6 1l1.2-.5A1.9 1.9 0 0 1 20.5 6l-.6 1.2Z"/>
 				<path d="M8.5 12a3.5 3.5 0 1 0 7 0 3.5 3.5 0 0 0-7 0v0Z"/>
 			</symbol>
+			<symbol id="share-ios" viewBox="0 0 24 24">
+				<path d="M8.5 6.5L11.5 3.5" class="round"/>
+				<path d="M14.5 6.5L11.5 3.5" class="round"/>
+				<path d="M9 9.5H6.5V19.5H16.5V9.5H14" class="round"/>
+				<path d="M11.5 14.5V4.5" class="round"/>
+			</symbol>
 		</defs>
 	</svg>
 
 	<main>
+
+		<div class="add-app-popover velvet hide-on-standalone js-only ios-only">
+			<button class="close-button quiet icon-only" onclick="hideAppBanner()">
+				<span class=visually-hidden>Close banner</span>
+				<svg width=24 height=24 class=icon aria-hidden=true>
+					<use xlink:href=#close-small></use>
+				</svg>
+			</button>
+			<img src="assets/favicons/favicon.svg" class=app-icon width=40>
+			<div class=text>
+				<h3>Readalong</h3>
+				<small>Use the app</small>
+			</div>
+			<button class="primary small" onclick="toggleExplanationPopover()">View</button>
+		</div>
+
+		<script type="text/javascript">
+			const appBanner = document.querySelector('.add-app-popover');
+
+			function hideAppBanner() {
+				document.body.classList.add('hide-app-banner')
+				let bannerTimeOut = setTimeout(function(){
+					appBanner.remove()
+				}, 200)
+			}
+
+			function toggleExplanationPopover() {
+				document.body.classList.toggle('show-install-explanation')
+			}
+		</script>
 
 		<h1>Readalong <sup style="color:var(--text-tertiary)">b&egrave;ta</sup></h1>
 		<p>Read foreign languages along with native speakers. No tests, no rankings, no gamification. Just read along at your pace.</p>
@@ -102,7 +142,7 @@
 			<li>
 				<a href="stories/story-two/index.html">
 					<p>What's your favorite food?</p>
-					<small>01:22</small>
+					<small>01:04</small>
 				</a>
 			</li>
 		</ul>
@@ -111,15 +151,23 @@
 			Your feedback is appreciated! Please <a href="mailto:pepijngieles@proton.me?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">send an email</a> to pepijngieles@proton.me or <a href="https://github.com/pepijngieles/read-along" target="_blank" rel="noopener">report an issue on GitHub</a>.
 		</p>
 
-		<p class="info velvet hide-on-standalone">
-			Want to use the mobile app? Select “Add to Home Screen” or “Add Page Shortcut” in your browser menu.
-		</p>
-
 		<hr>
 
-		<small>Version 2 – Mar 19, 2023 – <a href=../>View all versions</a></small>
+		<small>Latest version – Mar 19, 2023 – <a href=../>View all versions</a></small>
 
 	</main>
+
+	<div class="explanation-popover ios-only" onclick="toggleExplanationPopover()">
+		<h3>Add to your home screen</h3>
+		<small>Access Readalong easily with a web app on your home screen:</small>
+		<ol>
+			<li>Open in Safari</li>
+			<li>
+				Tap the share icon<svg width=24 height=24 class=icon aria-hidden=true style=color:#036EFC><use xlink:href=#share-ios></use></svg>
+			</li>
+			<li>Select 'Add to Home Screen'</li>
+		</ol>
+	</div>
 
 </body>
 </html>

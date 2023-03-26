@@ -14,11 +14,12 @@
   10. Progress bar
   11. Popovers
   12. Info blocks
-  13. Stories
-  14. Settings
-  15. Voice & language selection
-  16. Loading state
-  17. Developer controls
+  13. App banners
+  14. Stories
+  15. Settings
+  16. Voice & language selection
+  17. Loading state
+  18. Developer controls
 
 */
 
@@ -28,8 +29,9 @@
 :root{
   --accent-yellow: #ecbf4b;
 
+  --shade-subtle: rgba(0,0,0,.01);
   --shade-default: rgba(0,0,0,.03);
-  --shade-dark: rgba(0,0,0,.08);
+  --shade-strong: rgba(0,0,0,.08);
 
   --background-primary: #ffffff;
   --background-secondary: #fafafa;
@@ -87,6 +89,7 @@ body{
 
 [hidden],
 .ios .hide-on-ios,
+body:not(.ios) .ios-only,
 .no-js .js-only,
 .js .no-js-only{
   display: none !important;
@@ -165,6 +168,12 @@ h2{
   margin-block-start: 1.25rem;
 }
 
+h3{
+  font-size: .9375rem;
+  line-height: 1.25rem;
+  color: var(--text-secondary);
+}
+
 h1 + p{
   margin-block-start: .25rem;
 }
@@ -219,7 +228,8 @@ body.started .story.dialogue p:not(:has([aria-current])){
 
 /* 5. Lists
 ---------------------------------------------------------------------------- */
-ul{
+ul,
+ol{
   padding-inline-start: 1.5rem;
 }
 
@@ -238,13 +248,15 @@ dl dt{
   margin-block: 0 1.5rem;
 }
 
-.list li{
-  padding-block: 1rem;
-}
-
 .list a{
   display: block;
+  padding-block: .5rem;
   text-decoration: none;
+}
+
+.list li:first-of-type a,
+.list li:last-of-type a{
+  padding-block-start: 1rem;
 }
 
 .list a p{
@@ -259,6 +271,10 @@ dl dt{
 
 /* 6. Icons
 ---------------------------------------------------------------------------- */
+.icon{
+  vertical-align: bottom;
+}
+
 .icon-sprite path,
 .icon-sprite .stroke{
   stroke: currentColor;
@@ -294,14 +310,19 @@ dl dt{
   button,
   .button{
     display: inline-block;
-    border: 1px solid transparent;
     padding: 1.25rem;
     padding: calc(1.25rem - 1px); /* exclude border */
-    background: var(--background-primary);
+    border: 1px solid var(--border-default);
     border-radius: .75rem;
+
     font: inherit;
-    color: var(--text-primary);
+    line-height: 1.5rem;
     text-align: center;
+    color: var(--text-primary);
+    white-space: nowrap;
+
+    background-color: var(--background-popover);
+    box-shadow: inset .125rem -.25rem .5rem rgba(0, 0, 0, 0.01);
   }
 
   @media screen and (max-width: 370px){
@@ -320,8 +341,11 @@ dl dt{
   }
 
   button:active:not([disabled]),
-  .button:active:not([disabled]){
+  button.pressed:not([disabled]),
+  .button:active:not([disabled]),
+  .button.pressed:not([disabled]){
     filter: brightness(.97);
+    box-shadow: inset .125rem .25rem .5rem rgba(0, 0, 0, 0.02);
   }
 
   button:disabled{
@@ -330,36 +354,58 @@ dl dt{
   }
 
 
-  /* 7.2 Secondary button -------------------------------------------------- */
-  button.secondary{
-    border-color: #e8e8e8;
-    box-shadow: inset .125rem -.25rem .5rem rgba(0, 0, 0, 0.01);
-  }
-
-  button.secondary:active,
-  button.secondary.pressed{
-    box-shadow: inset .125rem .25rem .5rem rgba(0, 0, 0, 0.02);
+  /* 7.2 Primary button -------------------------------------------------- */
+  button.primary{
+    border-color: transparent;
+    color: var(--text-velvet);
+    background-color: var(--background-yellow);
   }
 
 
   /* 7.3 Quiet button ------------------------------------------------------ */
-  button.quiet{
+  button.quiet,
+  .button.quiet{
+    border-color: transparent;
     color: var(--text-secondary);
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  @media (hover: hover) {
+    button.quiet:hover,
+    .button.quiet:hover{
+      background-color: var(--background-primary);
+    }
   }
 
 
   /* 7.4 Small button ------------------------------------------------------ */
-  button.small{
+  button.small,
+  .button.small{
     padding: .75rem;
     padding: calc(.75rem - 1px); /* exclude border */
+  }
+
+  @media screen and (max-width: 370px){
+    button.small,
+    .button.small{
+      padding: .5rem .75rem;
+      padding: calc(.5rem - 1px) calc(.75rem - 1px); /* exclude border */
+      border-radius: .5rem;
+    }
   }
 
   /* 7.5 Icon only --------------------------------------------------------- */
   button.icon-only,
   .button.icon-only{
     line-height: 0;
-    border-radius: 50%;
     color: var(--icon-default);
+  }
+
+  /* 7.5 Icon only --------------------------------------------------------- */
+  button.rounded,
+  .button.rounded{
+    border-radius: 50%;
   }
 
   /* 7.6 Play and pause ------------------------------------------------------ */
@@ -436,7 +482,7 @@ select + .icon{
   accent-color: var(--accent-yellow);
   height: .25rem;
   border-radius: .125rem;
-  background: var(--shade-dark);
+  background: var(--shade-strong);
   cursor: col-resize;
 }
 
@@ -454,7 +500,7 @@ input[type=range]::-webkit-slider-runnable-track,
 input[type=range]::-moz-range-track,
 input[type=range]::-ms-track{
   appearance: none;
-  background: var(--shade-dark)!important;
+  background: var(--shade-strong)!important;
 }*/
 
 
@@ -591,6 +637,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 
+
 /* 12. Info Blocks
 ---------------------------------------------------------------------------- */
 .info{
@@ -609,7 +656,85 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 
-/* 13. Stories
+
+/* 13. App banners
+---------------------------------------------------------------------------- */
+body.ios{
+  transition: padding-top ease-out .2s .1s;
+}
+
+body.ios:not(.hide-app-banner){
+  padding-top: 4.5rem;
+}
+
+.add-app-popover{
+  overflow: hidden; /* hide close-button background */
+  position: fixed;
+  right: 0;
+  top: 1rem;
+  left: 0;
+  display: grid;
+  grid-template-columns: auto 2.5rem 1fr auto;
+  align-items: center;
+  width: fit-content;
+  min-width: 18rem;
+  padding-inline: 0 .5rem;
+  margin-block: 0 2.5rem;
+  margin-inline: auto;
+  border-radius: 1rem;
+  transition: transform ease-out .2s;
+  user-select: none;
+}
+
+.hide-app-banner .add-app-popover{
+  transform: translateY(-8rem);
+}
+
+.add-app-popover .close-button{
+  padding-inline: .5rem .25rem;
+  border-radius: .1875rem;
+}
+
+.add-app-popover .app-icon{
+  border-radius: .5rem;
+}
+
+.add-app-popover .text{
+  flex-grow: 1;
+  padding-block: .5rem;
+  margin-inline: .75rem;
+  line-height: 1.2;
+}
+
+.explanation-popover{
+  position: sticky;
+  bottom: 1rem;
+  transform: translateY(2rem);
+  opacity: 0;
+  transition:
+    opacity ease-out .1s,
+    transform ease-out .1s;
+  width: fit-content;
+  margin: 1rem auto;
+  padding: 1rem;
+  user-select: none;
+}
+
+.show-install-explanation .explanation-popover{
+  transform: none;
+  opacity: 1;
+}
+
+.explanation-popover small{
+  display: block;
+  margin-block: 0.25rem .5rem;
+}
+
+/* Eventually support beyond iOS @media (hover:none) and (pointer:coarse) {} */
+
+
+
+/* 14. Stories
 ---------------------------------------------------------------------------- */
 .story p{
   margin: 1.25rem 0;
@@ -669,7 +794,8 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 
-/* 14. Settings
+
+/* 15. Settings
 ---------------------------------------------------------------------------- */
 .settings-popover{
   z-index: 5;
@@ -691,7 +817,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 15. Voice & language selection
+/* 16. Voice & language selection
 ---------------------------------------------------------------------------- */
 .selection-row{
   display: flex;
@@ -705,7 +831,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 16. Loading state
+/* 17. Loading state
 ---------------------------------------------------------------------------- */
 html.loading{
   cursor: progress;
@@ -721,7 +847,7 @@ html.loading body{
 
 
 
-/* 17. Developer controls
+/* 18. Developer controls
 ---------------------------------------------------------------------------- */
 .developer-controls{
   grid-column: 1 / span 3;

@@ -208,19 +208,21 @@ function changeSentence() {
   }
 
   /* 5.3 Check if auto-scrolling is needed --------------------------------- */
+  let scrollMargin = (storyType == 'dialogue') ? 48 : 12
+  
   function checkForScroll() {
 
     let sentenceOffset = currentSentenceEl.getBoundingClientRect()
-    if (sentenceOffset.top < 12) {
-      window.scrollBy(0, sentenceOffset.top - 12)
+    if (sentenceOffset.top < scrollMargin) {
+      window.scrollBy(0, sentenceOffset.top - scrollMargin)
       return
     }
 
     let contentHeight = window.innerHeight - navHeight
     let popoverOffsetY = translationPopover.getBoundingClientRect()
-    let offsetBottom = (showTranslation) ? popoverOffsetY.bottom + 48 : sentenceOffset.bottom + 12
+    let offsetBottom = (showTranslation) ? popoverOffsetY.bottom + 48 : sentenceOffset.bottom + scrollMargin
     
-    if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - 12)
+    if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - scrollMargin)
   }
 
   /* 5.4 Update the progress bar ------------------------------------------- */
@@ -231,7 +233,7 @@ function changeSentence() {
     progressBar.value = (audioFile.currentTime * 100 / audioFile.duration).toFixed(0)
   }
 
-  /* 4.5 Disable rewind/forward button if needed --------------------------- */
+  /* 5.5 Disable rewind/forward button if needed --------------------------- */
   function disableButtons(button){
     if (currentSentence == 0) rewindButton.disabled = true
     else if (rewindButton.disabled) rewindButton.disabled = false
