@@ -659,75 +659,93 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 /* 13. App banners
 ---------------------------------------------------------------------------- */
-body.ios{
-  transition: padding-top ease-out .2s .1s;
-}
+@media screen and (display-mode: browser){
+  body.ios{
+    transition: padding-top ease-out .2s .1s;
+  }
 
-body.ios:not(.hide-app-banner){
-  padding-top: 4.5rem;
-}
+  body.ios:not(.hide-app-banner){
+    padding-top: 6rem;
+  }
 
-.add-app-popover{
-  overflow: hidden; /* hide close-button background */
-  position: fixed;
-  right: 0;
-  top: 1rem;
-  left: 0;
-  display: grid;
-  grid-template-columns: auto 2.5rem 1fr auto;
-  align-items: center;
-  width: fit-content;
-  min-width: 18rem;
-  padding-inline: 0 .5rem;
-  margin-block: 0 2.5rem;
-  margin-inline: auto;
-  border-radius: 1rem;
-  transition: transform ease-out .2s;
-  user-select: none;
-}
+  .add-app-popover{
+    position: fixed;
+    right: 0;
+    top: 1rem;
+    left: 0;
+    display: grid;
+    grid-template-columns: auto 2.5rem 1fr auto;
+    align-items: center;
+    width: fit-content;
+    min-width: 18rem;
+    padding-inline: 0 .5rem;
+    margin-block: 0 2.5rem;
+    margin-inline: auto;
+    border-radius: 1rem;
+    transition: transform ease-out .2s;
+    user-select: none;
+  }
 
-.hide-app-banner .add-app-popover{
-  transform: translateY(-8rem);
-}
+  .hide-app-banner .add-app-popover{
+    transform: translateY(-8rem);
+  }
 
-.add-app-popover .close-button{
-  padding-inline: .5rem .25rem;
-  border-radius: .1875rem;
-}
+  .add-app-popover .close-button{
+    padding-inline: .5rem .25rem;
+    border-radius: 1rem 0 0 1rem;
+  }
 
-.add-app-popover .app-icon{
-  border-radius: .5rem;
-}
+  .add-app-popover .app-icon{
+    border-radius: .5rem;
+  }
 
-.add-app-popover .text{
-  flex-grow: 1;
-  padding-block: .5rem;
-  margin-inline: .75rem;
-  line-height: 1.2;
-}
+  .add-app-popover .text{
+    flex-grow: 1;
+    padding-block: .5rem;
+    margin-inline: .75rem;
+    line-height: 1.2;
+  }
 
-.explanation-popover{
-  position: sticky;
-  bottom: 1rem;
-  transform: translateY(2rem);
-  opacity: 0;
-  transition:
-    opacity ease-out .1s,
-    transform ease-out .1s;
-  width: fit-content;
-  margin: 1rem auto;
-  padding: 1rem;
-  user-select: none;
-}
+  .explanation-popover{
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    transform: translateY(2rem);
+    opacity: 0;
+    transition:
+      opacity ease-out .1s,
+      transform ease-out .1s;
+    width: fit-content;
+    max-width: 100%;
+    margin: 1rem auto;
+    padding: 1rem;
+    user-select: none;
+  }
 
-.show-install-explanation .explanation-popover{
-  transform: none;
-  opacity: 1;
-}
+  .explanation-popover::after{
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: -.5rem;
+    left: 50%;
+    right: 0;
+    transform: rotate(45deg);
+    width: 1rem;
+    height: 1rem;
+    margin-left: -.5rem;
+    background-color: var(--background-popover);
+  }
 
-.explanation-popover small{
-  display: block;
-  margin-block: 0.25rem .5rem;
+  .show-install-explanation .explanation-popover{
+    transform: none;
+    opacity: 1;
+  }
+
+  .explanation-popover small{
+    display: block;
+    margin-block: 0.25rem .5rem;
+  }
 }
 
 /* Eventually support beyond iOS @media (hover:none) and (pointer:coarse) {} */

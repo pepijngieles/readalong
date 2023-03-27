@@ -153,11 +153,11 @@
 
 		<hr>
 
-		<small>Latest version – Mar 19, 2023 – <a href=../>View all versions</a></small>
+		<small>Latest version – Mar 26, 2023 – <a href=../>View all versions</a></small>
 
 	</main>
 
-	<div class="explanation-popover ios-only" onclick="toggleExplanationPopover()">
+	<div class="explanation-popover hide-on-standalone ios-only" onclick="toggleExplanationPopover()">
 		<h3>Add to your home screen</h3>
 		<small>Access Readalong easily with a web app on your home screen:</small>
 		<ol>
@@ -168,6 +168,23 @@
 			<li>Select 'Add to Home Screen'</li>
 		</ol>
 	</div>
+
+	<script type="text/javascript">
+		function iOS() {
+		  return [
+		    'iPad Simulator',
+		    'iPhone Simulator',
+		    'iPod Simulator',
+		    'iPad',
+		    'iPhone',
+		    'iPod'
+		  ].includes(navigator.platform)
+		  // iPad on iOS 13 detection
+		  || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+		}
+
+		if (iOS()) document.body.classList.add('ios')
+	</script>
 
 </body>
 </html>
