@@ -1,0 +1,20 @@
+<?php
+$story = [
+  'title'        => 'The story of two frogs',
+  'heading'      => 'Het verhaal van twee kikkers',
+  'storyID'      => 'two_frogs',
+  'languageCode' => 'nl',
+  'storyType'    => 'default',
+  'duration'     => '01:36',
+  'voices'       => [
+    ['value' => 'annelinn', 'label' => 'AnneLinn', 'default' => true],
+    ['value' => 'pepijn', 'label' => 'Pepijn'],
+  ],
+  'timestamps'   => [
+    'pepijn'   => [0, 5.6, 9.4, 13, 18.6, 26.9, 29.1, 32, 35.2, 40.1, 44.8, 48.1, 52.1, 56, 59.1, 62.4, 65.2, 73, 75, 77.7, 79.7],
+    'annelinn' => [0, 7.1, 10.8, 14.5, 20.5, 28.5, 31.3, 35.5, 38.7, 45.1, 49.9, 55.3, 59.9, 64.1, 67.1, 71.7, 74.3, 83, 85.6, 88.7, 91.4],
+  ],
+];
+$base = '../../';
+$content = __DIR__ . '/content.php';
+include __DIR__ . '/../../assets/story-shell.php';
