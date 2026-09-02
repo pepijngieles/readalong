@@ -1,6 +1,5 @@
-'use strict'
-
 /*
+
   Index
 
   1. Define variables
@@ -8,10 +7,15 @@
   3. Start, Play, Pause & End
   4. Automatically change sentence based on timestamps
   5. Change a sentence
+    5.1 Highlight a sentence
+    5.2 Update the translation
+    5.3 Check if auto-scrolling is needed
+    5.4 Update the progress bar
   6. Play a sentence when clicking on it
   7. Toggle the translation on/off
   8. Switch voice
-  9. Settings & storage
+  9. Settings
+  10. Detect iOS
   X. Developer controls
 
 */
@@ -22,80 +26,38 @@
 ---------------------------------------------------------------------------- */
 const audioFile = document.querySelector('audio'),
       audioSource = document.querySelector('audio source'),
-      audioBase = document.body.dataset.audioBase || '../../audio/',
       rewindButton = document.querySelector('[data-rewind]'),
       fastForwardButton = document.querySelector('[data-fast-forward]'),
       progressBar = document.querySelector('progress'),
       sentences = document.querySelectorAll('[data-sentence]'),
-      timeInput = document.querySelector('input[name=currentSentenceTime]'),
+      textarea = document.querySelector('textarea'), // For developer purposes
+      timeInput =  document.querySelector('input[name=currentSentenceTime]'), // For developer purposes
       translationPopover = document.querySelector('[data-translation-popover]'),
       translationText = document.querySelector('[data-translation-text]'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
-      durationEl = document.querySelector('[data-duration]'),
-      voiceSelect = document.querySelector('[data-voice]'),
-      playMessageEl = document.querySelector('[data-message]')
-
-const STORAGE_PREFIX = 'readalong:v1:'
-const SETTINGS_KEYS = {
-  playbackRate: STORAGE_PREFIX + 'settings:playbackRate',
-  sentencePause: STORAGE_PREFIX + 'settings:sentencePause',
-  fontSize: STORAGE_PREFIX + 'settings:fontSize',
-  lineHeight: STORAGE_PREFIX + 'settings:lineHeight',
-  showTranslation: STORAGE_PREFIX + 'settings:showTranslation'
-}
+      themeColorEl = document.querySelector("meta[name=theme-color]"),
+      parameterList = new URLSearchParams (window.location.search)
 
 let   started = false,
       playing = false,
       time = 0,
       sentencePause = 0,
-      currentSentence = 0,
+      currentSentence = 0, // TODO: get current sentence from localStorage
       currentSentenceEl = sentences[0],
       interval,
       sentencePauseTimeout,
-      inSentencePause = false,
       showTranslation = true,
       popoverOffsetY = 0,
       popoverOffsetX = 0,
-      wasPlaying = false,
-      storageWriteBlocked = false,
-      audioReadyHandled = false,
-      audioReadyTimeout = null,
-      previousVoice = null
+      playbackRate = 1,
+      volume = 1,
+      themeColorValue = '#ffffff'
 
-function storyKey(name) {
-  return STORAGE_PREFIX + 'story:' + storyID + ':' + name
-}
-
-function migrateStorage() {
-  // Reserved for future v2 migrations
-}
-
-function saveSetting(key, value) {
-  if (storageWriteBlocked) return
-  try {
-    localStorage.setItem(key, String(value))
-  } catch (e) {
-    storageWriteBlocked = true
-    console.warn('[readalong] localStorage write blocked:', e)
-  }
-}
-
-function readShowTranslationSetting() {
-  try {
-    const stored = localStorage.getItem(SETTINGS_KEYS.showTranslation)
-    if (stored === null) return true
-    return stored !== 'false' && stored !== '0'
-  } catch (e) {
-    return true
-  }
-}
-
-showTranslation = readShowTranslationSetting()
-
-for (const sentence of sentences) {
+// Make all sentences clickable
+for (sentence of sentences) {
+  // TODO: use event delegation instead of separate event listeners
   sentence.addEventListener('click', playSentence, false)
-  sentence.addEventListener('keydown', onSentenceKeydown, false)
 }
 
 
@@ -103,34 +65,20 @@ for (const sentence of sentences) {
 /* 2. Generic functions
 ---------------------------------------------------------------------------- */
 function secondsToHms(d) {
-  d = Number(d)
-  if (!Number.isFinite(d) || d < 0) return '--:--'
-  const h = Math.floor(d / 3600)
-  const m = Math.floor(d % 3600 / 60)
-  const s = Math.floor(d % 3600 % 60)
-  const hDisplay = h > 0 ? (h < 10 ? '0' : '') + h + ':' : ''
-  const mDisplay = m > 0 ? (m < 10 ? '0' : '') + m + ':' : '00:'
-  const sDisplay = s > 0 ? (s < 10 ? '0' : '') + s : '00'
-  return hDisplay + mDisplay + sDisplay
+    d = Number(d)
+    let h = Math.floor(d / 3600)
+    let m = Math.floor(d % 3600 / 60)
+    let s = Math.floor(d % 3600 % 60)
+
+    let hDisplay = h > 0 ? (h < 10 ? '0' : '') + h + ':' : ''
+    let mDisplay = m > 0 ? (m < 10 ? '0' : '') + m + ':' : '00:'
+    let sDisplay = s > 0 ? (s < 10 ? '0' : '') + s : '00'
+    return hDisplay + mDisplay + sDisplay 
 }
 
-function onSentenceKeydown(event) {
-  if (event.key !== 'Enter' && event.key !== ' ') return
-  event.preventDefault()
-  playSentence.call(this, event)
-}
-
-function requestPlay() {
-  const result = audioFile.play()
-  if (result && typeof result.catch === 'function') {
-    result.catch(function (error) {
-      if (error && error.name === 'AbortError') return
-      pause()
-      if (typeof showMessage === 'function' && playMessageEl) {
-        showMessage(playMessageEl, 'Tap play to continue', 'info')
-      }
-    })
-  }
+function findAncestor(element, selector){
+  while ((element = element.parentElement) && !element.matches(selector));
+  return element;
 }
 
 
@@ -139,27 +87,26 @@ function requestPlay() {
 ---------------------------------------------------------------------------- */
 function start() {
   started = true
-  setThemeColor('#fafafa')
-  document.body.classList.add('started', 'paused')
+  themeColorEl.setAttribute("content", "#fafafa")
+  document.body.classList.add('started','paused')
   currentSentenceEl.setAttribute('aria-current', 'true')
   updateTranslation()
 }
 
 function play() {
   if (!started) start()
-  clearInterval(interval)
   playing = true
   document.body.classList.remove('paused')
-  requestPlay()
+  audioFile.play()
   checkForScroll()
-  interval = setInterval(function () {
-    if (playing) autoPlay()
+  // Start interval to check every 0.1s if the next sentence should be shown
+  interval = setInterval(function() {
+    if(playing) autoPlay()
   }, 100)
 }
 
 function pause() {
   clearTimeout(sentencePauseTimeout)
-  inSentencePause = false
   playing = false
   document.body.classList.add('paused')
   audioFile.pause()
@@ -167,17 +114,14 @@ function pause() {
 }
 
 function end() {
-  clearInterval(interval)
   audioFile.currentTime = 0
   currentSentence = 0
-  saveSetting(storyKey('sentence'), 0)
-  setThemeColor('#ffffff')
-  document.body.classList.remove('started', 'paused')
+  themeColorEl.setAttribute("content", "#ffffff")
+  document.body.classList.remove('started')
   changeSentence()
   time = 0
   playing = false
   started = false
-  inSentencePause = false
 }
 
 
@@ -185,20 +129,17 @@ function end() {
 /* 4. Automatically change sentence based on timestamps
 ---------------------------------------------------------------------------- */
 function autoPlay() {
-  if (inSentencePause) {
-    updateProgressBar()
-    return
-  }
-  const currentTime = audioFile.currentTime
-  if (currentTime >= timestamps[voice][currentSentence + 1]) {
+  // If the current time is equal to, or greater than the starting time
+  // of the next sentence, move to the next sentence
+  if (time >= timestamps[voice][currentSentence + 1]) {
     currentSentence++
+    // Change to next sentence if no pause was set
     if (sentencePause == 0) changeSentence()
+    // Else, pause the audio file for as long as sentencePause
     else {
-      inSentencePause = true
       audioFile.pause()
-      sentencePauseTimeout = setTimeout(function () {
-        inSentencePause = false
-        requestPlay()
+      sentencePauseTimeout = setTimeout(function(){
+        audioFile.play()
         changeSentence()
       }, sentencePause)
     }
@@ -213,87 +154,106 @@ function autoPlay() {
 function changeSentence() {
   currentSentenceEl = sentences[currentSentence]
   highlightSentence()
+  // The updateTranslation function is also triggered when the translation
+  // is not visible. This prevents the distance of the animation to grow very
+  // large, which could lead to an uneasy transition when toggled on again
   updateTranslation()
   updateProgressBar()
   disableButtons()
-  saveSetting(storyKey('sentence'), currentSentence)
-  if (timeInput) timeInput.value = timestamps[voice][currentSentence]
-  setTimeout(function () {
+  // Dev thinghies
+  timeInput.value = timestamps[voice][currentSentence]
+  // A little timeOut is needed so the function uses the updated values
+  setTimeout(function(){
     checkForScroll()
   }, 240)
 }
 
-function highlightSentence() {
-  if (!started) start()
-  const current = document.querySelector('[data-sentence][aria-current]')
-  if (current) current.removeAttribute('aria-current')
-  currentSentenceEl.setAttribute('aria-current', 'true')
-}
-
-function updateTranslation() {
-  translationText.innerHTML = currentSentenceEl.dataset.translation
-  popoverOffsetY = currentSentenceEl.offsetHeight - 8
-  popoverOffsetY += currentSentenceEl.offsetTop
-  popoverOffsetY /= 16
-
-  if (storyType == 'dialogue') {
-    const listItem = currentSentenceEl.closest('li')
-    popoverOffsetY++
-    popoverOffsetX = (listItem.classList.contains('right')) ? 2.75 : -2.75
-    const popoverTextAlign = (listItem.classList.contains('right')) ? 'right' : 'left'
-    translationPopover.style.textAlign = popoverTextAlign
-    translationPopover.style.maxWidth = currentSentenceEl.offsetWidth / 16 + 2 + 'rem'
+  /* 5.1 Highlight a sentence ---------------------------------------------- */
+  function highlightSentence(number) {
+    if (!started) start()
+    document.querySelector('[data-sentence][aria-current]').removeAttribute('aria-current')
+    currentSentenceEl.setAttribute('aria-current', 'true')
+    // TODO: find out how to cope with focus()
   }
 
-  translationPopover.style.transform = 'translateX(' + popoverOffsetX + 'rem) translateY(' + popoverOffsetY + 'rem) translateZ(0)'
-}
+  /* 5.2 Update the translation -------------------------------------------- */
+  function updateTranslation() {
+    // Replace the text
+    translationText.innerHTML = currentSentenceEl.dataset.translation
+    // Calculate the right Y-position for the popover
+    popoverOffsetY = currentSentenceEl.offsetHeight - 8
+    popoverOffsetY += currentSentenceEl.offsetTop
+    // Convert pixel-value to rem
+    popoverOffsetY /= 16
+    popoverTransform = 'translateY(' + popoverOffsetY + 'rem) translateZ(0)';
 
-let scrollMargin = (storyType == 'dialogue') ? 48 : 12
+    // For dialogue stories, the popover is positioned differently
+    if (storyType == 'dialogue'){
+      // Get the list item element to relatively position popover to
+      let listItem = findAncestor(currentSentenceEl, 'li')
+      // Calculate transform and text align values
+      popoverOffsetY++
+      popoverOffsetX = (listItem.classList.contains('right')) ? 2.75 : -2.75
+      popoverTransform += ' translateX(' + popoverOffsetX + 'rem)';
+      popoverTextAlign = (listItem.classList.contains('right')) ? 'right' : 'left'
+      // Set the text align and max width values
+      // A max-width is set to prevent popover from transforming out of the viewport
+      translationPopover.style.textAlign = popoverTextAlign
+      translationPopover.style.maxWidth = currentSentenceEl.offsetWidth / 16 + 2 + 'rem'
+    }
 
-function checkForScroll() {
-  const sentenceOffset = currentSentenceEl.getBoundingClientRect()
-  if (sentenceOffset.top < scrollMargin) {
-    window.scrollBy(0, sentenceOffset.top - scrollMargin)
-    return
+    // Update the position
+    // Added translateZ(0) to prevent laggy animation of drop-shadow filter
+    translationPopover.style.transform = 'translateX(' + popoverOffsetX + 'rem) translateY(' + popoverOffsetY + 'rem) translateZ(0)'    
   }
-  const contentHeight = window.innerHeight - navHeight
-  const popoverRect = translationPopover.getBoundingClientRect()
-  const offsetBottom = (showTranslation) ? popoverRect.bottom + 48 : sentenceOffset.bottom + scrollMargin
-  if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - scrollMargin)
-}
 
-function updateProgressBar() {
-  time = audioFile.currentTime
-  if (Number.isFinite(audioFile.duration) && audioFile.duration > 0) {
+  /* 5.3 Check if auto-scrolling is needed --------------------------------- */
+  let scrollMargin = (storyType == 'dialogue') ? 48 : 12
+  
+  function checkForScroll() {
+
+    let sentenceOffset = currentSentenceEl.getBoundingClientRect()
+    if (sentenceOffset.top < scrollMargin) {
+      window.scrollBy(0, sentenceOffset.top - scrollMargin)
+      return
+    }
+
+    let contentHeight = window.innerHeight - navHeight
+    let popoverOffsetY = translationPopover.getBoundingClientRect()
+    let offsetBottom = (showTranslation) ? popoverOffsetY.bottom + 48 : sentenceOffset.bottom + scrollMargin
+    
+    if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - scrollMargin)
+  }
+
+  /* 5.4 Update the progress bar ------------------------------------------- */
+  function updateProgressBar() {
+    // Update the time
+    time = audioFile.currentTime.toFixed(1)
+    // Update the progress bar value
     progressBar.value = (audioFile.currentTime * 100 / audioFile.duration).toFixed(0)
   }
-}
 
-function disableButtons() {
-  if (currentSentence == 0) rewindButton.disabled = true
-  else if (rewindButton.disabled) rewindButton.disabled = false
-  if (currentSentence == sentences.length - 1) fastForwardButton.disabled = true
-  else if (fastForwardButton.disabled) fastForwardButton.disabled = false
-}
+  /* 5.5 Disable rewind/forward button if needed --------------------------- */
+  function disableButtons(button){
+    if (currentSentence == 0) rewindButton.disabled = true
+    else if (rewindButton.disabled) rewindButton.disabled = false
+    if (currentSentence == sentences.length - 1) fastForwardButton.disabled = true
+    else if (fastForwardButton.disabled) fastForwardButton.disabled = false
+  }
 
 
 
 /* 6. Play a sentence when clicking on it
 ---------------------------------------------------------------------------- */
 function playSentence(number) {
+  // 1. Check if the number parameter is filled, else use the clicked sentence
   if (number === parseInt(number, 10)) currentSentence = number
   else currentSentence = parseInt(this.dataset.sentence)
+  // 2. Get the right timestamp and play the audio file from there
   time = timestamps[voice][currentSentence]
   audioFile.currentTime = time
+  // 3. After the audio file time-change, the UI can be updated accordingly
   changeSentence()
-}
-
-function rewind() {
-  playSentence(currentSentence - 1)
-}
-
-function forward() {
-  playSentence(currentSentence + 1)
 }
 
 
@@ -302,8 +262,8 @@ function forward() {
 ---------------------------------------------------------------------------- */
 function toggleTranslation() {
   showTranslation = !showTranslation
-  saveSetting(SETTINGS_KEYS.showTranslation, showTranslation)
-  setThemeColor(showTranslation ? '#fafafa' : '#ffffff')
+  themeColorValue = (showTranslation) ? "#fafafa" : "#ffffff"
+  themeColorEl.setAttribute("content", themeColorValue)
   document.body.classList.toggle('show-translation')
 }
 
@@ -311,161 +271,68 @@ function toggleTranslation() {
 
 /* 8. Switch voice
 ---------------------------------------------------------------------------- */
-function clearAudioReadyListeners() {
-  audioFile.removeEventListener('canplaythrough', onAudioReady)
-  audioFile.removeEventListener('loadedmetadata', onAudioReady)
-  audioFile.removeEventListener('error', onAudioError)
-  if (audioReadyTimeout) {
-    clearTimeout(audioReadyTimeout)
-    audioReadyTimeout = null
-  }
-}
+let wasPlaying = playing
+const voiceSelect = document.querySelector('[data-voice]')
+const durationEl = document.querySelector('[data-duration]')
+voiceSelect.addEventListener('change', switchVoice, false)
 
-function onAudioError() {
-  if (audioReadyHandled) return
-  audioReadyHandled = true
-  clearAudioReadyListeners()
-  document.documentElement.classList.remove('loading')
-  wasPlaying = false
-  if (previousVoice && voiceSelect) {
-    voice = previousVoice
-    voiceSelect.value = previousVoice
-    audioSource.src = audioBase + storyID + '/' + languageCode + '/' + previousVoice + '.mp3'
-    audioFile.load()
-  }
-}
-
-function onAudioReady() {
-  if (audioReadyHandled) return
-  audioReadyHandled = true
-  clearAudioReadyListeners()
-  document.documentElement.classList.remove('loading')
-  durationEl.innerHTML = secondsToHms(audioFile.duration)
-  if (started) {
-    time = timestamps[voice][currentSentence]
-    audioFile.currentTime = time
-    playSentence(currentSentence)
-  }
-  if (wasPlaying && audioFile.paused) requestPlay()
-}
-
-function bindAudioReady() {
-  audioReadyHandled = false
-  clearAudioReadyListeners()
-  audioFile.addEventListener('canplaythrough', onAudioReady, { once: true })
-  audioFile.addEventListener('loadedmetadata', onAudioReady, { once: true })
-  audioFile.addEventListener('error', onAudioError, { once: true })
-  audioReadyTimeout = setTimeout(function () {
-    if (!audioReadyHandled) onAudioReady()
-  }, 8000)
-}
-
-function switchVoice(el) {
-  wasPlaying = playing
-  previousVoice = voice
+function switchVoice() {
+  wasPlaying = (playing == true) ? true : false
   pause()
-  voice = el.value
-  saveSetting(storyKey('voice'), voice)
-  audioSource.src = audioBase + storyID + '/' + languageCode + '/' + el.value + '.mp3'
+  voice = this.value
+  audioSource.src = '../../audio/' + storyID + '/' + languageCode + '/' + this.value + '.mp3'
   document.documentElement.classList.add('loading')
   audioFile.load()
-  bindAudioReady()
-  if (wasPlaying) requestPlay()
+  audioFile.addEventListener('canplaythrough', audioReady)
+}
+
+// TODO: rename this function to an active variant
+function audioReady() {
+  document.documentElement.classList.remove('loading')
+  durationEl.innerHTML = secondsToHms(audioFile.duration)
+  if (started) playSentence(currentSentence)
+  if (wasPlaying) play()
+  audioFile.removeEventListener('canplaythrough', audioReady)
 }
 
 
 
-/* 9. Settings & storage
+/* 9. Settings
 ---------------------------------------------------------------------------- */
-function settingsOpened() {
-  setThemeColor('#fafafa')
+function toggleSettings() {
+  settingsPopover.hidden = !settingsPopover.hidden
+  themeColorValue = (settingsPopover.hidden || !started) ? "#ffffff" : "#fafafa"
+  themeColorEl.setAttribute("content", themeColorValue)
+  document.body.classList.toggle('show-settings')
 }
-
-if (settingsPopover) {
-  settingsPopover.addEventListener('close', function () {
-    document.body.classList.remove('show-settings')
-    setThemeColor(started ? '#fafafa' : '#ffffff')
-  })
-}
-
-const persistSettings = debounce(function () {
-  const form = document.forms.settings
-  saveSetting(SETTINGS_KEYS.playbackRate, form.playbackRate.value)
-  saveSetting(SETTINGS_KEYS.sentencePause, form.sentencePause.value)
-  saveSetting(SETTINGS_KEYS.fontSize, form.fontSize.value)
-  saveSetting(SETTINGS_KEYS.lineHeight, form.lineHeight.value)
-}, 250)
 
 function updateSettings() {
-  const form = document.forms.settings
-  audioFile.playbackRate = form.playbackRate.value
-  sentencePause = form.sentencePause.value
-  document.documentElement.style.setProperty('--font-size', form.fontSize.value + '%')
-  document.querySelector('.story').style.setProperty('--line-height', form.lineHeight.value)
+  audioFile.playbackRate = document.forms.settings.playbackRate.value
+  sentencePause = document.forms.settings.sentencePause.value
+  // audioFile.volume = document.forms.settings.volume.value
+  document.documentElement.style.setProperty('--font-size', document.forms.settings.fontSize.value + '%')
+  document.querySelector('.story').style.setProperty('--line-height', document.forms.settings.lineHeight.value)
   updateTranslation()
-  persistSettings()
 }
 
-function clampSentenceIndex(index) {
-  const parsed = parseInt(index, 10)
-  if (!Number.isFinite(parsed)) return 0
-  return Math.min(Math.max(parsed, 0), sentences.length - 1)
+
+
+/* 10. Detect iOS
+---------------------------------------------------------------------------- */
+function iOS() {
+  return [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ].includes(navigator.platform)
+  // iPad on iOS 13 detection
+  || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
 }
 
-function restoreVoice() {
-  if (!voiceSelect) return
-  const defaultVoice = voiceSelect.querySelector('option[selected]')?.value || voiceSelect.options[0]?.value
-  let storedVoice = getStorageItem(storyKey('voice'), defaultVoice)
-  const valid = [...voiceSelect.options].some((option) => option.value === storedVoice)
-  if (!valid) {
-    try { localStorage.removeItem(storyKey('voice')) } catch (e) {}
-    storedVoice = defaultVoice
-  }
-  voice = storedVoice
-  voiceSelect.value = storedVoice
-  audioSource.src = audioBase + storyID + '/' + languageCode + '/' + storedVoice + '.mp3'
-}
-
-function restoreState() {
-  migrateStorage()
-
-  const form = document.forms.settings
-  if (form) {
-    form.playbackRate.value = getStorageItem(SETTINGS_KEYS.playbackRate, form.playbackRate.defaultValue)
-    form.sentencePause.value = getStorageItem(SETTINGS_KEYS.sentencePause, form.sentencePause.defaultValue)
-    form.fontSize.value = getStorageItem(SETTINGS_KEYS.fontSize, form.fontSize.defaultValue)
-    form.lineHeight.value = getStorageItem(SETTINGS_KEYS.lineHeight, form.lineHeight.defaultValue)
-    updateSettings()
-    if (typeof refreshBindings === 'function') refreshBindings()
-  }
-
-  restoreVoice()
-
-  currentSentence = clampSentenceIndex(getStorageItem(storyKey('sentence'), '0'))
-  currentSentenceEl = sentences[currentSentence]
-
-  showTranslation = readShowTranslationSetting()
-  document.body.classList.toggle('show-translation', showTranslation)
-
-  function applyStoredSentenceTime() {
-    if (currentSentence > 0 && timestamps[voice][currentSentence] != null) {
-      time = timestamps[voice][currentSentence]
-      audioFile.currentTime = time
-    }
-    if (durationEl && Number.isFinite(audioFile.duration)) {
-      durationEl.innerHTML = secondsToHms(audioFile.duration)
-    }
-  }
-
-  if (audioFile.readyState >= 1) applyStoredSentenceTime()
-  else {
-    audioFile.addEventListener('loadedmetadata', function onInitMetadata() {
-      applyStoredSentenceTime()
-    }, { once: true })
-  }
-}
-
-restoreState()
+if (iOS()) document.body.classList.add('ios')
 
 
 
@@ -473,7 +340,7 @@ restoreState()
 ---------------------------------------------------------------------------- */
 function addTimestamp() {
   timestamps[voice].push(time)
-  if (timeInput) timeInput.value = time
+  timeInput.value = time
 }
 
 function updateTimestamps() {
@@ -486,7 +353,8 @@ function copyTimestamps() {
   navigator.clipboard.writeText(timestamps[voice])
 }
 
-const parameterList = new URLSearchParams(window.location.search)
-for (const parameter of parameterList) {
+for (parameter of parameterList) {
   if (parameter[0] == 'devmode' && parameter[1] == 'on') document.body.classList.add('devmode')
 }
+
+

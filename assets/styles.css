@@ -53,8 +53,6 @@
 
   --page-width: 34rem;
 
-  --brio-backdrop: transparent;
-
   --font-size: 100%;
   --line-height: 1.5;
 }
@@ -62,7 +60,6 @@
 .show-settings,
 .started.show-translation{
   --background-primary: var(--background-secondary);
-  --brio-backdrop: rgba(0, 0, 0, 0.24);
 }
 
 
@@ -852,12 +849,6 @@ body.ios:not(.started.show-translation) .translation-popover{
   margin: 0 auto;
   border-radius: 1rem 1rem 0 0;
   user-select: none;
-  background: var(--background-primary);
-  color: var(--text-secondary);
-}
-
-dialog.settings-popover{
-  border: none;
 }
 
 .settings-popover input[type=range]{
