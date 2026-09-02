@@ -16,10 +16,11 @@
   12. Info blocks
   13. App banners
   14. Stories
-  15. Settings
-  16. Voice & language selection
-  17. Loading state
-  18. Developer controls
+  15. Translation popover
+  16. Settings
+  17. Voice & language selection
+  18. Loading state
+  19. Developer controls
 
 */
 
@@ -254,9 +255,12 @@ dl dt{
   text-decoration: none;
 }
 
-.list li:first-of-type a,
-.list li:last-of-type a{
+.list li:first-of-type a{
   padding-block-start: 1rem;
+}
+
+.list li:last-of-type a{
+  padding-block-end: 1rem;
 }
 
 .list a p{
@@ -571,69 +575,25 @@ progress::-moz-progress-bar{
   border-radius: 1rem;
 }
 
-.translation-popover{
-  z-index: 2;
+[class*=popover].pointer::after{
+  content: '';
+  display: block;
   position: absolute;
-  top: 1rem;
-  right: 0;
-  left: 0;
-  width: fit-content;
-  max-width: calc(var(--page-width) - 1rem);
-  min-width: 6rem;
-  padding: 1rem 1rem 1.25rem;
-  margin: 0 auto;
-  overflow: visible; /* for the close button to be visible */
-  font-size: var(--font-size);
-  line-height: var(--line-height);
-  transition: transform .4s cubic-bezier(0,1.3,.8,1);
-}
-
-.translation-popover [data-translation-text]{
-  position: relative;
-  z-index: 1; /* So the button's background doesn't cover the text */
-}
-
-body.show-translation [data-show-translation],
-body.show-translation:not(.started) .translation-popover,
-body:not(.show-translation) [data-translation-text],
-body:not(.show-translation) [data-hide-translation]{
-  display: none;
-}
-
-body:not(.started.show-translation) .translation-popover{
-  position: fixed;
-  top: auto;
-  bottom: 8rem;
-  padding: 0;
-  transform: none!important;
-}
-
-body.ios:not(.started.show-translation) .translation-popover{
-  bottom: 11rem;
-}
-
-.translation-popover button[data-hide-translation]{
-  color: var(--text-secondary);
-  position: absolute;
-  bottom: -1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  transform: rotate(45deg);
+  width: 1rem;
+  height: 1rem;
   background-color: var(--background-popover);
 }
 
-.translation-popover button[data-hide-translation]::before{
-  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCA4MCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxLjEzNzQgMTQuODQwOEMyNS41MzIxIDIwLjQxODcgMzIuMzQ3OCAyNCA0MCAyNEM0Ny42NTIyIDI0IDU0LjQ2NzkgMjAuNDE4NyA1OC44NjI2IDE0Ljg0MDlDNjQuMzMxMyA3Ljg5OTc5IDcxLjE2MzQgMCA4MCAwSDBDOC44MzY1NiAwIDE1LjY2ODcgNy44OTk3OCAyMS4xMzc0IDE0Ljg0MDhaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)
+[class*=popover].pointer.top-right::after{
+  top: -.5rem;
+  right: 1.5rem;
 }
 
-.translation-popover button .curve{
-  z-index: -1;
-  position: absolute;
-  bottom: -1px;
-  left: -1rem;
-  width: 5rem;
-  height: 1.5rem;
-  color: var(--background-popover);
-  pointer-events: none;
+[class*=popover].pointer.bottom-center::after{
+  bottom: -.5rem;
+  left: 50%;
+  margin-left: -.5rem;
 }
 
 
@@ -668,6 +628,10 @@ body.ios:not(.started.show-translation) .translation-popover{
     padding-top: 6rem;
   }
 
+  body.show-install-explanation{
+    --background-primary: var(--background-secondary);
+  }
+
   .add-app-popover{
     position: fixed;
     right: 0;
@@ -690,6 +654,10 @@ body.ios:not(.started.show-translation) .translation-popover{
     transform: translateY(-8rem);
   }
 
+  .show-install-explanation .add-app-popover{
+    opacity: .5;
+  }
+
   .add-app-popover .close-button{
     padding-inline: .5rem .25rem;
     border-radius: 1rem 0 0 1rem;
@@ -708,33 +676,18 @@ body.ios:not(.started.show-translation) .translation-popover{
 
   .explanation-popover{
     position: fixed;
-    right: 1rem;
+    right: .75rem;
     bottom: 1rem;
-    left: 1rem;
-    transform: translateY(2rem);
+    left: .75rem;
+    transform: translateY(-1.5rem);
     opacity: 0;
     transition:
       opacity ease-out .1s,
       transform ease-out .1s;
-    width: fit-content;
-    max-width: 100%;
-    margin: 1rem auto;
+    max-width: fit-content;
+    margin: 0 auto;
     padding: 1rem;
     user-select: none;
-  }
-
-  .explanation-popover::after{
-    content: '';
-    display: block;
-    position: absolute;
-    bottom: -.5rem;
-    left: 50%;
-    right: 0;
-    transform: rotate(45deg);
-    width: 1rem;
-    height: 1rem;
-    margin-left: -.5rem;
-    background-color: var(--background-popover);
   }
 
   .show-install-explanation .explanation-popover{
@@ -742,7 +695,7 @@ body.ios:not(.started.show-translation) .translation-popover{
     opacity: 1;
   }
 
-  .explanation-popover small{
+  .explanation-popover .description{
     display: block;
     margin-block: 0.25rem .5rem;
   }
@@ -813,7 +766,76 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 15. Settings
+/* 15. Translation popover
+---------------------------------------------------------------------------- */
+.translation-popover{
+  z-index: 2;
+  position: absolute;
+  top: 1rem;
+  right: 0;
+  left: 0;
+  width: fit-content;
+  max-width: calc(var(--page-width) - 1rem);
+  min-width: 6rem;
+  padding: 1rem 1rem 1.25rem;
+  margin: 0 auto;
+  overflow: visible; /* for the close button to be visible */
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  transition: transform .4s cubic-bezier(0,1.3,.8,1);
+}
+
+.translation-popover [data-translation-text]{
+  position: relative;
+  z-index: 1; /* So the button's background doesn't cover the text */
+}
+
+body.show-translation [data-show-translation],
+body.show-translation:not(.started) .translation-popover,
+body:not(.show-translation) [data-translation-text],
+body:not(.show-translation) [data-hide-translation]{
+  display: none;
+}
+
+body:not(.started.show-translation) .translation-popover{
+  position: fixed;
+  top: auto;
+  bottom: 8rem;
+  padding: 0;
+  transform: none!important;
+}
+
+body.ios:not(.started.show-translation) .translation-popover{
+  bottom: 11rem;
+}
+
+.translation-popover button[data-hide-translation]{
+  color: var(--text-secondary);
+  position: absolute;
+  bottom: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background-popover);
+}
+
+.translation-popover button[data-hide-translation]::before{
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCA4MCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxLjEzNzQgMTQuODQwOEMyNS41MzIxIDIwLjQxODcgMzIuMzQ3OCAyNCA0MCAyNEM0Ny42NTIyIDI0IDU0LjQ2NzkgMjAuNDE4NyA1OC44NjI2IDE0Ljg0MDlDNjQuMzMxMyA3Ljg5OTc5IDcxLjE2MzQgMCA4MCAwSDBDOC44MzY1NiAwIDE1LjY2ODcgNy44OTk3OCAyMS4xMzc0IDE0Ljg0MDhaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)
+}
+
+.translation-popover button .curve{
+  z-index: -1;
+  position: absolute;
+  bottom: -1px;
+  left: -1rem;
+  width: 5rem;
+  height: 1.5rem;
+  color: var(--background-popover);
+  pointer-events: none;
+}
+
+
+
+/* 16. Settings
 ---------------------------------------------------------------------------- */
 .settings-popover{
   z-index: 5;
@@ -835,7 +857,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 16. Voice & language selection
+/* 17. Voice & language selection
 ---------------------------------------------------------------------------- */
 .selection-row{
   display: flex;
@@ -849,7 +871,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 
 
-/* 17. Loading state
+/* 18. Loading state
 ---------------------------------------------------------------------------- */
 html.loading{
   cursor: progress;
@@ -865,7 +887,7 @@ html.loading body{
 
 
 
-/* 18. Developer controls
+/* 19. Developer controls
 ---------------------------------------------------------------------------- */
 .developer-controls{
   grid-column: 1 / span 3;

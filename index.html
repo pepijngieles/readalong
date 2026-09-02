@@ -64,8 +64,13 @@
 			<symbol id="share-ios" viewBox="0 0 24 24">
 				<path d="M8.5 6.5L11.5 3.5" class="round"/>
 				<path d="M14.5 6.5L11.5 3.5" class="round"/>
-				<path d="M9 9.5H6.5V19.5H16.5V9.5H14" class="round"/>
+				<path d="M9 8.5H7C6.17157 8.5 5.5 9.17157 5.5 10V18C5.5 18.8284 6.17157 19.5 7 19.5H16C16.8284 19.5 17.5 18.8284 17.5 18V10C17.5 9.17157 16.8284 8.5 16 8.5H14" class="round"/>
 				<path d="M11.5 14.5V4.5" class="round"/>
+			</symbol>
+			<symbol id="add-ios" viewBox="0 0 24 24">
+				<rect x="5.5" y="6.5" width="12" height="12" rx="1.5" class="round no-fill stroke"/>
+				<path d="M11.5 15.5V9.5" class="round"/>
+				<path d="M8.5 12.5H14.5" class="round"/>
 			</symbol>
 		</defs>
 	</svg>
@@ -157,15 +162,15 @@
 
 	</main>
 
-	<div class="explanation-popover hide-on-standalone ios-only" onclick="toggleExplanationPopover()">
+	<div class="explanation-popover pointer bottom-center hide-on-standalone js-only ios-only" onclick="toggleExplanationPopover()">
 		<h3>Add to your home screen</h3>
-		<small>Access Readalong easily with a web app on your home screen:</small>
+		<small class=description>Access Readalong easily with a web app on your home screen:</small>
 		<ol>
 			<li>Open in Safari</li>
 			<li>
 				Tap the share icon<svg width=24 height=24 class=icon aria-hidden=true style=color:#036EFC><use xlink:href=#share-ios></use></svg>
 			</li>
-			<li>Select 'Add to Home Screen'</li>
+			<li>Select Add to Home Screen<svg width=24 height=24 class=icon aria-hidden=true><use xlink:href=#add-ios></use></svg></li>
 		</ol>
 	</div>
 
