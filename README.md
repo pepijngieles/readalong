@@ -11,13 +11,13 @@ php -S 0.0.0.0:8000
 
 Then open http://localhost:8000/ in your browser. The site does not work via `file://` or on static hosts such as GitHub Pages.
 
-Before deploying to pepijngieles.nl, upload `php-check.php` and confirm it prints `php-ok` with a PHP version. Apache should serve directory URLs (for example `stories/story-one/`) and allow `.htaccess` rewrites for legacy `index.html` links.
+Before deploying to [readalong.io](https://readalong.io/), upload `php-check.php` to the site root and confirm it prints `php-ok` with a PHP version. Apache should serve directory URLs (for example `stories/story-one/`) and allow `.htaccess` rewrites for legacy `index.html` links.
 
 ## How to contribute
 Your feedback is much appreciated! When trying out the Readalong bèta version you probably have some questions and suggestions. If you're familiar with GitHub you can create a new issue or upvote an existing one. Not sure how this works? You can always send an email to <a href="mailto:pepijngieles@proton.me?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">pepijngieles@proton.me</a>.
 
 ## Download the mobile app
-The Readalong app is made as a website that can be added to your mobile device's home screen. By doing this, you'll get a dedicated app icon and a full-screen experience, instead of using it in a browser tab. You can do this by opening <a href="https://pepijngieles.nl/readalong/latest-version">pepijngieles.nl/readalong/latest-version</a> and:
+The Readalong app is made as a website that can be added to your mobile device's home screen. By doing this, you'll get a dedicated app icon and a full-screen experience, instead of using it in a browser tab. You can do this by opening [readalong.io](https://readalong.io/) and:
 
 ### On iOS in Safari
 - Click on the share icon (arrow up in a box)
