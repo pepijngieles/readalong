@@ -19,4 +19,7 @@ if ($meta['id'] !== $slug) {
   exit('Story not found');
 }
 
-story_render($storyDir, '../../');
+$translationLangs = story_translation_languages(__DIR__);
+$translationLang = lang_pref('translate', $translationLangs, 'en');
+
+story_render($storyDir, '../../', $translationLang);

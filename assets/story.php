@@ -89,7 +89,7 @@ function story_load($storyDir, $translationLang = 'en', $voiceId = null) {
     'storyType' => $meta['type'],
     'duration' => format_duration($activeVoice['duration']),
     'voices' => $voices,
-    'source' => $meta['source'] ?? null,
+    'attribution' => story_attribution($meta),
   ];
 
   $voiceConfig = [];
@@ -119,7 +119,67 @@ function story_load($storyDir, $translationLang = 'en', $voiceId = null) {
   );
 }
 
-function story_list($storiesDir, $translationLang = 'en') {
+function story_published_dirs($storiesDir) {
+  $dirs = [];
+
+  foreach (glob($storiesDir . '/*/story.json') as $storyJsonPath) {
+    $meta = read_json($storyJsonPath);
+    if (!empty($meta['published'])) {
+      $dirs[] = dirname($storyJsonPath);
+    }
+  }
+
+  return $dirs;
+}
+
+function story_source_languages($storiesDir) {
+  $languages = [];
+
+  foreach (story_published_dirs($storiesDir) as $storyDir) {
+    $meta = read_json($storyDir . '/story.json');
+    $languages[$meta['language']] = true;
+  }
+
+  $codes = array_keys($languages);
+  sort($codes);
+  return $codes;
+}
+
+function story_translation_languages($storiesDir) {
+  $languages = [];
+
+  foreach (story_published_dirs($storiesDir) as $storyDir) {
+    foreach (glob($storyDir . '/translations/*.json') as $translationPath) {
+      $languages[pathinfo($translationPath, PATHINFO_FILENAME)] = true;
+    }
+  }
+
+  $codes = array_keys($languages);
+  sort($codes);
+  return $codes;
+}
+
+function story_level_tiers($storiesDir) {
+  $tiers = [];
+
+  foreach (story_published_dirs($storiesDir) as $storyDir) {
+    $meta = read_json($storyDir . '/story.json');
+    if (empty($meta['level'])) {
+      continue;
+    }
+    $tier = level_tier($meta['level']);
+    if ($tier !== null) {
+      $tiers[$tier] = true;
+    }
+  }
+
+  $codes = array_values(array_filter(level_tiers(), function ($tier) use ($tiers) {
+    return !empty($tiers[$tier]);
+  }));
+  return $codes;
+}
+
+function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null, $levelTier = null) {
   $stories = [];
 
   foreach (glob($storiesDir . '/*/story.json') as $storyJsonPath) {
@@ -128,6 +188,16 @@ function story_list($storiesDir, $translationLang = 'en') {
 
     if (empty($meta['published'])) {
       continue;
+    }
+
+    if ($readAlongLang !== null && $meta['language'] !== $readAlongLang) {
+      continue;
+    }
+
+    if ($levelTier !== null && $levelTier !== '') {
+      if (empty($meta['level']) || level_tier($meta['level']) !== $levelTier) {
+        continue;
+      }
     }
 
     $translationPath = $storyDir . '/translations/' . $translationLang . '.json';
@@ -143,6 +213,8 @@ function story_list($storiesDir, $translationLang = 'en') {
       'order' => $meta['order'] ?? 0,
       'title' => $translation['title'],
       'duration' => format_duration($defaultVoice['duration']),
+      'level' => $meta['level'] ?? null,
+      'levelLabel' => !empty($meta['level']) ? level_label($meta['level']) : null,
     ];
   }
 

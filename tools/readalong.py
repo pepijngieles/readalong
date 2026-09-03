@@ -32,6 +32,15 @@ Voorbeelden:
         --voice-id kari --voice-name Kari --language no
 
     python3 tools/readalong.py check
+
+Bij verwerking schat de agent het CEFR-niveau per bron (--level B1-B2) en vult
+attribution (publiek) en rights (intern) in. Voorbeeld:
+
+    python3 tools/readalong.py from-audio \\
+        --audio opname.mp3 --script tekst.txt --slug mitt-eventyr \\
+        --heading "Mitt eventyr" --voice-id kari --voice-name Kari --language no \\
+        --level B1 --attribution-title "Mitt eventyr" --attribution-url https://... \\
+        --rights-audio-reader Kari --rights-audio-license "CC BY 4.0"
 """
 
 import argparse
@@ -80,12 +89,61 @@ LEAD_IN = 0.6
 
 # Licenties die geen extra toestemming vereisen voor publicatie.
 FREE_LICENSE_HINTS = (
-    "public domain", "publiek domein", "cc0", "cc-by", "creative commons",
+    "public domain", "publiek domein", "cc0", "cc-by", "cc by", "creative commons",
 )
+
+LEVEL_SCORES = {"A1": 1, "A2": 2, "B1": 3, "B2": 4, "C1": 5, "C2": 6}
+LEVEL_SINGLE = re.compile(r"^(A[12]|B[12]|C[12])$")
+LEVEL_RANGE = re.compile(r"^(A[12]|B[12]|C[12])-(A[12]|B[12]|C[12])$")
 
 
 def parse_csv(value):
     return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def level_valid(level):
+    if not level:
+        return False
+    level = level.upper().strip()
+    if LEVEL_SINGLE.match(level):
+        return True
+    match = LEVEL_RANGE.match(level)
+    return bool(match and match.group(1) in LEVEL_SCORES and match.group(2) in LEVEL_SCORES)
+
+
+def level_average_score(level):
+    level = level.upper().strip()
+    if LEVEL_SINGLE.match(level):
+        return float(LEVEL_SCORES[level])
+    match = LEVEL_RANGE.match(level)
+    if not match:
+        return None
+    low, high = match.group(1), match.group(2)
+    return (LEVEL_SCORES[low] + LEVEL_SCORES[high]) / 2
+
+
+def level_tier(level):
+    score = level_average_score(level)
+    if score is None:
+        return None
+    if score <= 2.5:
+        return "beginner"
+    if score <= 4.5:
+        return "intermediate"
+    return "advanced"
+
+
+def rights_licenses(meta):
+    licenses = []
+    rights = meta.get("rights") or {}
+    for section in ("text", "audio"):
+        license_value = (rights.get(section) or {}).get("license")
+        if license_value:
+            licenses.append(license_value)
+    source = meta.get("source") or {}
+    if source.get("license"):
+        licenses.append(source["license"])
+    return licenses
 
 
 # --------------------------------------------------------------------------
@@ -572,7 +630,8 @@ def next_order(stories_dir):
 
 
 def write_story(slug, heading, language, story_type, blocks, translation_sets, titles,
-                voice, order=None, published=False, speakers=None, source=None):
+                voice, order=None, published=False, speakers=None, level=None,
+                attribution=None, rights=None):
     story_dir = REPO / "stories" / slug
     sentences = flatten(blocks)
 
@@ -590,8 +649,12 @@ def write_story(slug, heading, language, story_type, blocks, translation_sets, t
         meta = {"id": slug, "type": story_type, "language": language,
                 "order": order if order is not None else next_order(REPO / "stories"),
                 "published": published, "voices": [voice]}
-    if source:
-        meta["source"] = source
+    if level:
+        meta["level"] = level.upper().strip()
+    if attribution:
+        meta["attribution"] = attribution
+    if rights:
+        meta["rights"] = rights
     write_json(story_json, meta)
 
     text = {"heading": heading}
@@ -625,11 +688,16 @@ def check_stories():
         if meta.get("id") != story_dir.name:
             issues.append(f"id '{meta.get('id')}' wijkt af van de map")
 
-        source = meta.get("source")
-        if source and source.get("license"):
-            lic = source["license"].lower()
+        level = meta.get("level")
+        if level and not level_valid(level):
+            issues.append(f"level '{level}' is geen geldig CEFR-formaat (bijv. B1 of B1-B2)")
+        elif meta.get("published") and not level:
+            issues.append("gepubliceerd maar zonder level — zet --level bij verwerking")
+
+        for license_value in rights_licenses(meta):
+            lic = license_value.lower()
             if not any(hint in lic for hint in FREE_LICENSE_HINTS):
-                issues.append(f"bron: '{source['license']}' — controleer toestemming vóór publicatie")
+                issues.append(f"licentie '{license_value}' — controleer toestemming vóór publicatie")
 
         for voice in meta.get("voices", []):
             text_key = voice.get("text", meta["language"])
@@ -682,19 +750,66 @@ def report(slug, blocks, timestamps, translation_sets, duration):
     print("Zet published op true in story.json als het klopt.")
 
 
-def build_source(args):
-    if not getattr(args, "source_title", None):
+def build_attribution(args):
+    title = getattr(args, "attribution_title", None) or getattr(args, "source_title", None)
+    url = getattr(args, "attribution_url", None) or getattr(args, "source_url", None)
+    if not title and not url:
         return None
-    source = {"title": args.source_title}
-    if getattr(args, "source_author", None):
-        source["author"] = args.source_author
-    if getattr(args, "source_url", None):
-        source["url"] = args.source_url
-    if getattr(args, "source_license", None):
-        source["license"] = args.source_license
-    if getattr(args, "source_note", None):
-        source["note"] = args.source_note
-    return source
+    attribution = {}
+    if title:
+        attribution["title"] = title
+    if url:
+        attribution["url"] = url
+    return attribution
+
+
+def build_rights(args):
+    rights = {}
+    text = {}
+    audio = {}
+
+    text_source = getattr(args, "rights_text_source", None)
+    text_license = getattr(args, "rights_text_license", None) or getattr(args, "source_license", None)
+    text_url = getattr(args, "rights_text_url", None) or getattr(args, "source_url", None)
+    if text_source:
+        text["source"] = text_source
+    if text_license:
+        text["license"] = text_license
+    if text_url:
+        text["url"] = text_url
+    if text:
+        rights["text"] = text
+
+    audio_reader = getattr(args, "rights_audio_reader", None) or getattr(args, "source_author", None)
+    audio_recorded = getattr(args, "rights_audio_recorded", None)
+    audio_license = getattr(args, "rights_audio_license", None) or getattr(args, "source_license", None)
+    audio_url = getattr(args, "rights_audio_url", None)
+    if audio_reader:
+        audio["reader"] = audio_reader
+    if audio_recorded:
+        audio["recorded"] = audio_recorded
+    if audio_license:
+        audio["license"] = audio_license
+    if audio_url:
+        audio["url"] = audio_url
+    if audio:
+        rights["audio"] = audio
+
+    note = getattr(args, "rights_note", None) or getattr(args, "source_note", None)
+    if note:
+        rights["note"] = note
+
+    return rights or None
+
+
+def story_metadata(args):
+    level = getattr(args, "level", None)
+    if level and not level_valid(level):
+        sys.exit(f"Ongeldig level '{level}'. Gebruik bijv. A2, B1-B2 of C1.")
+    if level:
+        tier = level_tier(level)
+        print(f"  level: {level.upper()} ({tier})")
+    return level, build_attribution(args), build_rights(args)
 
 
 def build_titles(args):
@@ -736,11 +851,22 @@ def add_common(parser):
     parser.add_argument("--title", help="titel in de standaardvertaling (default: heading)")
     parser.add_argument("--title-nl", help="Nederlandse titel voor translations/nl.json")
     parser.add_argument("--title-en", help="Engelse titel voor translations/en.json")
-    parser.add_argument("--source-title", help="titel van het bronmateriaal")
-    parser.add_argument("--source-author", help="maker van het bronmateriaal")
-    parser.add_argument("--source-url", help="link naar het bronmateriaal")
-    parser.add_argument("--source-license", help="licentie van het bronmateriaal")
-    parser.add_argument("--source-note", help="extra opmerking bij de bron")
+    parser.add_argument("--level", help="CEFR-niveau, bijv. A2, B1-B2 of C1 (agent-inschatting)")
+    parser.add_argument("--attribution-title", help="titel voor publieke bronvermelding")
+    parser.add_argument("--attribution-url", help="link voor publieke bronvermelding")
+    parser.add_argument("--rights-text-source", help="intern: bron van de tekst")
+    parser.add_argument("--rights-text-license", help="intern: licentie van de tekst")
+    parser.add_argument("--rights-text-url", help="intern: url van de tekstbron")
+    parser.add_argument("--rights-audio-reader", help="intern: voorlezer/opnamestem")
+    parser.add_argument("--rights-audio-recorded", help="intern: opnamedatum (YYYY-MM-DD)")
+    parser.add_argument("--rights-audio-license", help="intern: licentie van de audio")
+    parser.add_argument("--rights-audio-url", help="intern: url van de audiobron")
+    parser.add_argument("--rights-note", help="intern: extra opmerking")
+    parser.add_argument("--source-title", help="alias voor --attribution-title")
+    parser.add_argument("--source-author", help="alias voor --rights-audio-reader")
+    parser.add_argument("--source-url", help="alias voor --attribution-url en --rights-text-url")
+    parser.add_argument("--source-license", help="alias voor --rights-text-license en --rights-audio-license")
+    parser.add_argument("--source-note", help="alias voor --rights-note")
 
 
 def resolve_type(requested, speakers):
@@ -815,10 +941,11 @@ def cmd_from_audio(args):
     translation_sets = translate_all(sentences, args.language, langs)
 
     print("Wegschrijven")
+    level, attribution, rights = story_metadata(args)
     write_story(args.slug, args.heading, args.language,
                 resolve_type(args.type, speakers), blocks, translation_sets,
                 build_titles(args), voice_entry(args, timestamps, duration),
-                args.order, args.publish, speakers, build_source(args))
+                args.order, args.publish, speakers, level, attribution, rights)
     report(args.slug, blocks, timestamps, translation_sets, duration)
 
 
@@ -846,10 +973,11 @@ def cmd_from_text(args):
     translation_sets = translate_all(sentences, args.language, langs)
 
     print("Wegschrijven")
+    level, attribution, rights = story_metadata(args)
     write_story(args.slug, args.heading, args.language,
                 resolve_type(args.type, speakers), blocks, translation_sets,
                 build_titles(args), voice_entry(args, timestamps, duration),
-                args.order, args.publish, speakers, build_source(args))
+                args.order, args.publish, speakers, level, attribution, rights)
     report(args.slug, blocks, timestamps, translation_sets, duration)
 
 

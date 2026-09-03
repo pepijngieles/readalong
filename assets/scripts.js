@@ -36,6 +36,7 @@ const audioFile = document.querySelector('audio'),
       translationText = document.querySelector('[data-translation-text]'),
       navHeight = document.querySelector('nav').offsetHeight,
       settingsPopover = document.querySelector('.settings-popover'),
+      settingsScrim = document.querySelector('.settings-scrim'),
       themeColorEl = document.querySelector("meta[name=theme-color]"),
       parameterList = new URLSearchParams (window.location.search)
 
@@ -94,7 +95,7 @@ function findAncestor(element, selector){
 ---------------------------------------------------------------------------- */
 function start() {
   started = true
-  themeColorEl.setAttribute("content", "#fafafa")
+  updateThemeColor()
   document.body.classList.add('started','paused')
   currentSentenceEl.setAttribute('aria-current', 'true')
   updateTranslation()
@@ -132,7 +133,7 @@ function pause() {
 function end() {
   audioFile.currentTime = 0
   currentSentence = 0
-  themeColorEl.setAttribute("content", "#ffffff")
+  updateThemeColor()
   document.body.classList.remove('started')
   changeSentence()
   time = 0
@@ -283,9 +284,8 @@ function playSentence(number) {
 ---------------------------------------------------------------------------- */
 function toggleTranslation() {
   showTranslation = !showTranslation
-  themeColorValue = (showTranslation) ? "#fafafa" : "#ffffff"
-  themeColorEl.setAttribute("content", themeColorValue)
   document.body.classList.toggle('show-translation')
+  updateThemeColor()
 }
 
 
@@ -329,21 +329,174 @@ function audioReady() {
 
 /* 9. Settings
 ---------------------------------------------------------------------------- */
+const SETTINGS_KEY = 'readalong-settings'
+const SETTINGS_DEFAULTS = {
+  fontFamily: 'sans',
+  fontSize: 100,
+  lineHeight: 1.5,
+  playbackRate: 1,
+  sentencePause: 0,
+  theme: 'light',
+  layout: 'start'
+}
+const THEME_META_COLORS = {
+  light: { primary: '#ffffff', secondary: '#fafafa' },
+  cream: { primary: '#fef5e5', secondary: '#f5ebd5' },
+  dark: { primary: '#333333', secondary: '#2a2a2a' }
+}
+const FONT_FAMILIES = {
+  sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif',
+  serif: 'Georgia, "Times New Roman", Times, serif',
+  mono: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
+}
+
+let currentTheme = 'light'
+
+function updateThemeColor() {
+  const colors = THEME_META_COLORS[currentTheme] || THEME_META_COLORS.light
+  if (!settingsPopover.hidden && started) themeColorValue = colors.secondary
+  else if (started && showTranslation) themeColorValue = colors.secondary
+  else themeColorValue = colors.primary
+  themeColorEl.setAttribute('content', themeColorValue)
+}
+
+function formatSpeed(value) {
+  const rate = parseFloat(value)
+  if (rate === 1) return '1×'
+  return rate.toFixed(2).replace(/\.?0+$/, '') + '×'
+}
+
+function formatPause(ms) {
+  const seconds = parseInt(ms, 10) / 1000
+  if (seconds === 0) return '0s'
+  if (Number.isInteger(seconds)) return seconds + 's'
+  return seconds.toFixed(1).replace(/\.0$/, '') + 's'
+}
+
+function applyFontFamily(value) {
+  document.documentElement.style.setProperty(
+    '--font-family-story',
+    FONT_FAMILIES[value] || FONT_FAMILIES.sans
+  )
+}
+
+function applyTheme(value) {
+  document.body.classList.remove('theme-light', 'theme-cream', 'theme-dark')
+  if (value !== 'light') document.body.classList.add('theme-' + value)
+  currentTheme = value
+  updateThemeColor()
+}
+
+function applyLayout(value) {
+  document.body.classList.remove('layout-start', 'layout-justify', 'layout-dense', 'layout-spaced')
+  if (value === 'justify') document.body.classList.add('layout-justify')
+}
+
+function updateRangeProgress(input) {
+  const min = parseFloat(input.min)
+  const max = parseFloat(input.max)
+  const value = parseFloat(input.value)
+  const progress = ((value - min) / (max - min)) * 100
+  input.style.setProperty('--range-progress', progress + '%')
+}
+
+function updateAllRangeProgress() {
+  document.querySelectorAll('.settings-slider input[type=range]').forEach(updateRangeProgress)
+}
+
+function getSettingsFromForm() {
+  const form = document.forms.settings
+  return {
+    fontFamily: form.fontFamily.value,
+    fontSize: parseInt(form.fontSize.value, 10),
+    lineHeight: parseFloat(form.lineHeight.value),
+    playbackRate: parseFloat(form.playbackRate.value),
+    sentencePause: parseInt(form.sentencePause.value, 10),
+    theme: form.theme.value,
+    layout: form.layout.value
+  }
+}
+
+function saveSettings() {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(getSettingsFromForm()))
+}
+
+function applySettingsFromForm(save) {
+  const form = document.forms.settings
+  audioFile.playbackRate = form.playbackRate.value
+  sentencePause = form.sentencePause.value
+  document.documentElement.style.setProperty('--font-size', form.fontSize.value + '%')
+  document.querySelector('.story').style.setProperty('--line-height', form.lineHeight.value)
+  applyFontFamily(form.fontFamily.value)
+  applyTheme(form.theme.value)
+  applyLayout(form.layout.value)
+  form.playbackRateOut.value = formatSpeed(form.playbackRate.value)
+  form.sentencePauseOut.value = formatPause(form.sentencePause.value)
+  updateAllRangeProgress()
+  updateTranslation()
+  if (save !== false) saveSettings()
+}
+
+function loadSettings() {
+  if (!document.forms.settings) return
+  let settings = SETTINGS_DEFAULTS
+  try {
+    const stored = localStorage.getItem(SETTINGS_KEY)
+    if (stored) settings = Object.assign({}, SETTINGS_DEFAULTS, JSON.parse(stored))
+  } catch (error) {}
+  if (settings.layout === 'dense') settings.layout = 'start'
+  if (settings.layout === 'spaced') settings.layout = 'justify'
+  const form = document.forms.settings
+  form.fontFamily.value = settings.fontFamily
+  form.fontSize.value = settings.fontSize
+  form.lineHeight.value = settings.lineHeight
+  form.playbackRate.value = settings.playbackRate
+  form.sentencePause.value = settings.sentencePause
+  form.theme.value = settings.theme
+  form.layout.value = settings.layout
+  applySettingsFromForm(false)
+}
+
+function initSettingsControls() {
+  if (!settingsPopover) return
+  document.querySelectorAll('.settings-segment, .settings-themes, .settings-layouts').forEach(function(fieldset) {
+    const inputs = Array.from(fieldset.querySelectorAll('input[type=radio]'))
+    inputs.forEach(function(input, index) {
+      input.addEventListener('keydown', function(event) {
+        let nextIndex = index
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          nextIndex = (index + 1) % inputs.length
+          event.preventDefault()
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          nextIndex = (index - 1 + inputs.length) % inputs.length
+          event.preventDefault()
+        } else return
+        inputs[nextIndex].checked = true
+        inputs[nextIndex].focus()
+        updateSettings()
+      })
+    })
+  })
+  loadSettings()
+}
+
+function closeSettings() {
+  if (settingsPopover.hidden) return
+  toggleSettings()
+}
+
 function toggleSettings() {
   settingsPopover.hidden = !settingsPopover.hidden
-  themeColorValue = (settingsPopover.hidden || !started) ? "#ffffff" : "#fafafa"
-  themeColorEl.setAttribute("content", themeColorValue)
+  if (settingsScrim) settingsScrim.hidden = settingsPopover.hidden
   document.body.classList.toggle('show-settings')
+  updateThemeColor()
 }
 
 function updateSettings() {
-  audioFile.playbackRate = document.forms.settings.playbackRate.value
-  sentencePause = document.forms.settings.sentencePause.value
-  // audioFile.volume = document.forms.settings.volume.value
-  document.documentElement.style.setProperty('--font-size', document.forms.settings.fontSize.value + '%')
-  document.querySelector('.story').style.setProperty('--line-height', document.forms.settings.lineHeight.value)
-  updateTranslation()
+  applySettingsFromForm(true)
 }
+
+initSettingsControls()
 
 
 

@@ -4,6 +4,7 @@
   "language": "no",
   "order": 3,
   "published": true,
+  "level": "B1",
   "voices": [
     {
       "id": "marius",
@@ -26,11 +27,20 @@
       ]
     }
   ],
-  "source": {
+  "attribution": {
     "title": "Fordeler med å bo i byen",
-    "author": "Marius Stangeland",
-    "url": "https://laernorsknaa.com/fordeler-med-a-bo-i-byen/",
-    "license": "Alle rechten voorbehouden",
+    "url": "https://laernorsknaa.com/fordeler-med-a-bo-i-byen/"
+  },
+  "rights": {
+    "text": {
+      "source": "Lær norsk nå",
+      "license": "Alle rechten voorbehouden",
+      "url": "https://laernorsknaa.com/fordeler-med-a-bo-i-byen/"
+    },
+    "audio": {
+      "reader": "Marius Stangeland",
+      "license": "Alle rechten voorbehouden"
+    },
     "note": "Eerste minuut. Toestemming nog niet gevraagd."
   }
 }

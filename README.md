@@ -10,7 +10,7 @@ Or: `php -S localhost:8765 router.php`
 Story URLs work via `.htaccess` on Hostinger (LiteSpeed), or via the thin `index.php` stubs in each story folder when using plain `php -S`.
 
 ## How to contribute
-Your feedback is much appreciated! When trying out the Readalong bèta version you probably have some questions and suggestions. If you're familiar with GitHub you can create a new issue or upvote an existing one. Not sure how this works? You can always send an email to <a href="mailto:pepijngieles@proton.me?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">pepijngieles@proton.me</a>.
+Your feedback is much appreciated! When trying out the Readalong bèta version you probably have some questions and suggestions. If you're familiar with GitHub you can create a new issue or upvote an existing one. Not sure how this works? You can always send an email to <a href="mailto:support@readalong.io?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">support@readalong.io</a>.
 
 ## Download the mobile app
 The Readalong app is made as a website that can be added to your mobile device's home screen. By doing this, you'll get a dedicated app icon and a full-screen experience, instead of using it in a browser tab. You can do this by opening <a href="https://readalong.io">readalong.io</a> and:
