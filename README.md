@@ -5,7 +5,7 @@ Read foreign languages along with native speakers. No tests, no rankings, no gam
 Your feedback is much appreciated! When trying out the Readalong bèta version you probably have some questions and suggestions. If you're familiar with GitHub you can create a new issue or upvote an existing one. Not sure how this works? You can always send an email to <a href="mailto:pepijngieles@proton.me?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">pepijngieles@proton.me</a>.
 
 ## Download the mobile app
-The Readalong app is made as a website that can be added to your mobile device's home screen. By doing this, you'll get a dedicated app icon and a full-screen experience, instead of using it in a browser tab. You can do this by opening <a href="https://pepijngieles.nl/readalong/latest-version">pepijngieles.nl/readalong/latest-version</a> and:
+The Readalong app is made as a website that can be added to your mobile device's home screen. By doing this, you'll get a dedicated app icon and a full-screen experience, instead of using it in a browser tab. You can do this by opening <a href="https://readalong.io">readalong.io</a> and:
 
 ### On iOS in Safari
 - Click on the share icon (arrow up in a box)
