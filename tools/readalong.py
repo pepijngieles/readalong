@@ -177,7 +177,21 @@ def split_long(words, max_words, min_words):
         mid = len(words) // 2
         return [words[:mid], words[mid:]]
 
+    # Prioriteit: voorkeur voor komma's boven voegwoorden (lagere priority = beter)
+    # en splits zo dicht mogelijk bij het midden, maar maak kleinere stukken
+    # als dat beter leesbaar is
     target = len(words) / 2
+    
+    # Als de zin erg lang is (>1.5x max), probeer dan dichter bij 1/3 of 2/3 te splitsen
+    # voor betere leesbaarheid
+    if len(words) > max_words * 1.5:
+        # Zoek het eerste goede split-punt na min_words dat tot twee behapbare delen leidt
+        for idx, priority in sorted(candidates, key=lambda c: (c[1], c[0])):
+            if idx >= min_words and len(words) - idx >= min_words:
+                return (split_long(words[:idx], max_words, min_words)
+                        + split_long(words[idx:], max_words, min_words))
+    
+    # Anders, splits dicht bij het midden
     idx, _ = min(candidates, key=lambda c: (c[1], abs(c[0] - target)))
     return (split_long(words[:idx], max_words, min_words)
             + split_long(words[idx:], max_words, min_words))
@@ -274,12 +288,15 @@ def scribe(audio, language, cache=None):
     return result
 
 
-def sentence_times_from_words(sentences, asr_words, lead_in):
+def sentence_times_from_words(sentences, asr_words, lead_in, allow_intro=False):
     """Geef per zin een starttijd, via globale alignment script <-> transcript.
 
     Doortellen op woordaantal loopt scheef zodra de voorlezer een woord
     overslaat of toevoegt, dus we aligneren de twee woordenreeksen en lezen
     de tijd af bij het eerste woord van elke zin dat matcht.
+    
+    Met allow_intro=True mag de eerste zin op zijn natuurlijke tijd beginnen,
+    handig voor opnames met intro-audio die niet in de tekst staat.
     """
     tokens = [w for w in asr_words
               if w.get("type") == "word" and normalise_word(w.get("text", ""))]
@@ -315,9 +332,28 @@ def sentence_times_from_words(sentences, asr_words, lead_in):
             continue
         word_start = float(tokens[asr_index]["start"])
         prev_end = float(tokens[asr_index - 1]["end"]) if asr_index > 0 else 0.0
-        # Zet de timestamp in de stilte vóór de zin, maar nooit over het
-        # laatste woord van de vorige zin heen.
-        timestamps.append(0.0 if index == 0 else round(max(prev_end, word_start - lead_in), 1))
+        
+        if index == 0:
+            # Voor de eerste zin: start op 0.0, tenzij allow_intro=True
+            # Dan laten we de eerste zin op zijn natuurlijke tijd beginnen
+            if allow_intro and word_start > 0.1:
+                # Zet de timestamp iets voor de audio (maar maximaal op 0.0)
+                timestamps.append(round(max(0.0, word_start - lead_in), 1))
+            else:
+                timestamps.append(0.0)
+        else:
+            # Bereken de beschikbare ruimte tussen het einde van de vorige zin
+            # en het begin van de huidige zin
+            gap = word_start - prev_end
+            
+            # Als er genoeg ruimte is (>= lead_in), plaats dan de timestamp
+            # lead_in seconden voor de audio begint
+            if gap >= lead_in:
+                timestamps.append(round(word_start - lead_in, 1))
+            # Anders, plaats de timestamp in het midden van de beschikbare ruimte
+            # Dit zorgt ervoor dat de UI altijd verspringt vóór de audio begint
+            else:
+                timestamps.append(round(prev_end + gap / 2, 1))
 
     for index in unresolved:
         prev = next((timestamps[i] for i in range(index - 1, -1, -1)
@@ -384,7 +420,22 @@ def sentence_times_from_chars(sentences, full_text, alignment, lead_in):
 
         word_start = float(starts[min(position, len(starts) - 1)])
         prev_end = float(ends[position - 1]) if position > 0 else 0.0
-        timestamps.append(0.0 if index == 0 else round(max(prev_end, word_start - lead_in), 1))
+        
+        if index == 0:
+            timestamps.append(0.0)
+        else:
+            # Bereken de beschikbare ruimte tussen het einde van de vorige zin
+            # en het begin van de huidige zin
+            gap = word_start - prev_end
+            
+            # Als er genoeg ruimte is (>= lead_in), plaats dan de timestamp
+            # lead_in seconden voor de audio begint
+            if gap >= lead_in:
+                timestamps.append(round(word_start - lead_in, 1))
+            # Anders, plaats de timestamp in het midden van de beschikbare ruimte
+            # Dit zorgt ervoor dat de UI altijd verspringt vóór de audio begint
+            else:
+                timestamps.append(round(prev_end + gap / 2, 1))
 
     return timestamps, float(ends[-1])
 
@@ -672,6 +723,8 @@ def add_common(parser):
     parser.add_argument("--publish", action="store_true", help="zet published op true")
     parser.add_argument("--lead-in", type=float, default=LEAD_IN,
                         help=f"seconden voor het eerste woord (default {LEAD_IN})")
+    parser.add_argument("--allow-intro", action="store_true",
+                        help="laat de eerste zin op zijn natuurlijke tijd beginnen (handig voor intro-audio)")
     parser.add_argument("--max-words", type=int, default=16,
                         help="langer wordt in halfzinnen gesplitst (0 = nooit)")
     parser.add_argument("--min-words", type=int, default=4)
@@ -727,18 +780,19 @@ def cmd_from_audio(args):
     result = scribe(dest, args.language, args.cache)
 
     max_words = args.max_words if args.max_words > 0 else 10 ** 6
+    allow_intro = getattr(args, 'allow_intro', False)
     if args.script:
         raw = Path(args.script).expanduser().read_text(encoding="utf-8")
         blocks, speakers = build_blocks(raw, max_words, args.min_words, args.lines)
         sentences = flatten(blocks)
         timestamps, sentence_ends, last_end = sentence_times_from_words(
-            sentences, result["words"], args.lead_in)
+            sentences, result["words"], args.lead_in, allow_intro)
     else:
         print("  geen --script: de transcriptie wordt de tekst")
         blocks, speakers = build_blocks(result["text"], max_words, args.min_words)
         sentences = flatten(blocks)
         timestamps, sentence_ends, last_end = sentence_times_from_words(
-            sentences, result["words"], args.lead_in)
+            sentences, result["words"], args.lead_in, allow_intro)
         # Eén alinea per block in de UI; zonder script alles in één <p> tenzij
         # --split-on-pauses (pauzes zijn in leer-podcasts te kort om op te splitsen).
         if args.split_on_pauses:
@@ -814,8 +868,9 @@ def cmd_add_voice(args):
 
     print("Transcriberen")
     result = scribe(dest, language, args.cache)
+    allow_intro = getattr(args, 'allow_intro', False)
     timestamps, sentence_ends, last_end = sentence_times_from_words(
-        sentences, result["words"], args.lead_in)
+        sentences, result["words"], args.lead_in, allow_intro)
     duration = probe_duration(dest) or (last_end + 1)
 
     meta["voices"] = [v for v in meta["voices"] if v["id"] != args.voice_id]
