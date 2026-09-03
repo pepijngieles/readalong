@@ -28,7 +28,12 @@ python3 tools/readalong.py from-audio \
   --rights-audio-url "https://commons.wikimedia.org/wiki/File:No-VIKTORIA_AV_HESSEN-DARMSTADT.ogg" \
   --source-license "CC BY-SA 4.0 (audio en tekst)" \
   --source-note "Audio: https://commons.wikimedia.org/wiki/File:No-VIKTORIA_AV_HESSEN-DARMSTADT.ogg" \
+  --allow-intro \
   --cache "$CACHE" \
   "$@"
+
+# Zet de zinsstructuur terug op Wikipedia-niveau (126 zinnen) en hermap timestamps.
+# De bestaande EN/NL-vertalingen blijven dan geldig.
+python3 tools/fix_viktoria.py
 
 python3 tools/readalong.py check
