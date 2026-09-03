@@ -29,3 +29,23 @@ function read_json($path) {
   }
   return $data;
 }
+
+function lang_labels() {
+  return [
+    'en' => 'English (UK)',
+    'nl' => 'Nederlands',
+    'no' => 'Norwegian',
+    'es' => 'Espa&ntilde;ol',
+    'hu' => 'Magyar',
+  ];
+}
+
+function lang_label($code) {
+  $labels = lang_labels();
+  return $labels[$code] ?? strtoupper($code);
+}
+
+function lang_pref($key, array $allowed, $default) {
+  $value = $_GET[$key] ?? $_COOKIE['readalong-' . $key] ?? $default;
+  return in_array($value, $allowed, true) ? $value : $default;
+}
