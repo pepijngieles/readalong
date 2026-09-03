@@ -100,6 +100,9 @@ function play() {
   document.body.classList.remove('paused')
   audioFile.play()
   checkForScroll()
+  // Callers can reach play() without pausing first, which would leave the
+  // previous interval running alongside the new one
+  clearInterval(interval)
   // Start interval to check every 0.1s if the next sentence should be shown
   interval = setInterval(function() {
     if(playing) autoPlay()
@@ -129,6 +132,7 @@ function end() {
   time = 0
   playing = false
   started = false
+  clearInterval(interval)
 }
 
 
