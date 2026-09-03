@@ -55,6 +55,12 @@ let   started = false,
       volume = 1,
       themeColorValue = '#ffffff'
 
+const storyConfig = JSON.parse(document.getElementById('story-config').textContent)
+const timestamps = Object.fromEntries(
+  Object.entries(storyConfig.voices).map(([id, v]) => [id, v.timestamps]))
+const storyType = storyConfig.type
+let voice = storyConfig.voice
+
 // Make all sentences clickable
 for (sentence of sentences) {
   // TODO: use event delegation instead of separate event listeners
@@ -292,10 +298,19 @@ const durationEl = document.querySelector('[data-duration]')
 voiceSelect.addEventListener('change', switchVoice, false)
 
 function switchVoice() {
+  const newVoice = this.value
+  const currentText = storyConfig.voices[voice].text
+  const newText = storyConfig.voices[newVoice].text
+  if (currentText !== newText) {
+    const url = new URL(window.location.href)
+    url.searchParams.set('voice', newVoice)
+    window.location.href = url.toString()
+    return
+  }
   wasPlaying = (playing == true) ? true : false
   pause()
-  voice = this.value
-  audioSource.src = '../../audio/' + storyID + '/' + languageCode + '/' + this.value + '.mp3'
+  voice = newVoice
+  audioSource.src = storyConfig.audioBase + newVoice + '.mp3'
   document.documentElement.classList.add('loading')
   audioFile.load()
   audioFile.addEventListener('canplaythrough', audioReady)
@@ -365,7 +380,7 @@ function updateTimestamps() {
 }
 
 function copyTimestamps() {
-  navigator.clipboard.writeText(timestamps[voice])
+  navigator.clipboard.writeText(JSON.stringify(timestamps[voice]))
 }
 
 for (parameter of parameterList) {

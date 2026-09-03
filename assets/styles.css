@@ -279,27 +279,27 @@ dl dt{
   vertical-align: bottom;
 }
 
-.icon-sprite path,
-.icon-sprite .stroke{
+[data-icon] path,
+[data-icon] .stroke{
   stroke: currentColor;
 }
 
-.icon-sprite rect,
-.icon-sprite .fill{
+[data-icon] rect,
+[data-icon] .fill{
   fill: currentColor;
 }
 
-.icon-sprite rect,
-.icon-sprite .no-stroke{
+[data-icon] rect,
+[data-icon] .no-stroke{
   stroke: none;
 }
 
-.icon-sprite path,
-.icon-sprite .no-fill{
+[data-icon] path,
+[data-icon] .no-fill{
   fill: none;
 }
 
-.icon-sprite .round{
+[data-icon] .round{
   stroke-linecap: round;
   stroke-linejoin: round;
 }

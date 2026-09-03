@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+
+# Story pages: /stories/{slug}/ → central router
+# Only exact slug URLs; subpaths (story.json, text/nl.json) stay static
+RewriteRule ^stories/([a-z0-9-]+)/?$ stories/view.php?slug=$1 [L,QSA]
+</IfModule>
+
+Options -Indexes
+
+# Serve existing files and directories normally
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]

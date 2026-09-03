@@ -1,0 +1,35 @@
+{
+  "id": "bo-i-byen",
+  "type": "default",
+  "language": "no",
+  "order": 3,
+  "published": true,
+  "voices": [
+    {
+      "id": "marius",
+      "name": "Marius Stangeland",
+      "duration": 56,
+      "timestamps": [
+        0.0,
+        1.3,
+        3.8,
+        9.8,
+        16.2,
+        22.1,
+        28.6,
+        31.2,
+        37.1,
+        40.6,
+        44.6,
+        49.3
+      ]
+    }
+  ],
+  "source": {
+    "title": "Fordeler med å bo i byen",
+    "author": "Marius Stangeland",
+    "url": "https://laernorsknaa.com/fordeler-med-a-bo-i-byen/",
+    "license": "Alle rechten voorbehouden",
+    "note": "Eerste minuut. Toestemming nog niet gevraagd."
+  }
+}
