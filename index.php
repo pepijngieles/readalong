@@ -7,9 +7,11 @@ $story = ['title' => 'Readalong'];
 $storiesDir = __DIR__ . '/stories';
 $sourceLangs = story_source_languages($storiesDir);
 $translationLangs = story_translation_languages($storiesDir);
+$levelTiers = story_level_tiers($storiesDir);
 $readAlongLang = lang_pref('read', $sourceLangs, 'nl');
 $translationLang = lang_pref('translate', $translationLangs, 'en');
-$stories = story_list($storiesDir, $translationLang, $readAlongLang);
+$levelFilter = lang_pref('level', array_merge([''], $levelTiers), '');
+$stories = story_list($storiesDir, $translationLang, $readAlongLang, $levelFilter ?: null);
 $partials = __DIR__ . '/assets/partials';
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -67,6 +69,18 @@ $partials = __DIR__ . '/assets/partials';
 				</select>
 				<?php icon('chevron-down', ['size' => 16]); ?>
 			</div>
+<?php if ($levelTiers): ?>
+			<div class=story-level>
+				<label for=story-level>Level</label>
+				<select id=story-level name=story-level class=quiet data-story-level>
+					<option value=""<?= $levelFilter === '' ? ' selected' : '' ?>>All levels</option>
+<?php foreach ($levelTiers as $tier): ?>
+					<option value=<?= e($tier) ?><?= $tier === $levelFilter ? ' selected' : '' ?>><?= e(level_tier_label($tier)) ?></option>
+<?php endforeach; ?>
+				</select>
+				<?php icon('chevron-down', ['size' => 16]); ?>
+			</div>
+<?php endif; ?>
 		</div>
 
 		<ul class=list>
@@ -74,14 +88,14 @@ $partials = __DIR__ . '/assets/partials';
 			<li>
 				<a href="stories/<?= e($item['slug']) ?>/">
 					<p><?= e($item['title']) ?></p>
-					<small><?= e($item['duration']) ?></small>
+					<small><?= e($item['duration']) ?><?php if (!empty($item['levelLabel'])): ?> · <?= e($item['levelLabel']) ?><?php endif; ?></small>
 				</a>
 			</li>
 <?php endforeach; ?>
 		</ul>
 
 		<p class="info velvet">
-			Your feedback is appreciated! Please <a href="mailto:pepijngieles@proton.me?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">send an email</a> to pepijngieles@proton.me or <a href="https://github.com/pepijngieles/read-along" target="_blank" rel="noopener">report an issue on GitHub</a>.
+			Your feedback is appreciated! Please <a href="mailto:support@readalong.io?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">send an email</a> to support@readalong.io or <a href="https://github.com/pepijngieles/read-along" target="_blank" rel="noopener">report an issue on GitHub</a>.
 		</p>
 
 	</main>
@@ -117,7 +131,7 @@ $partials = __DIR__ . '/assets/partials';
 			const params = new URLSearchParams(location.search);
 			let shouldReload = false;
 
-			['read', 'translate'].forEach(function (key) {
+			['read', 'translate', 'level'].forEach(function (key) {
 				if (params.has(key)) return;
 				const value = localStorage.getItem('readalong-' + key);
 				if (!value) return;
@@ -132,6 +146,7 @@ $partials = __DIR__ . '/assets/partials';
 
 		document.querySelector('[data-read-along]')?.addEventListener('change', onLangChange('read'));
 		document.querySelector('[data-app-language]')?.addEventListener('change', onLangChange('translate'));
+		document.querySelector('[data-story-level]')?.addEventListener('change', onLangChange('level'));
 
 		function iOS() {
 		  return [
