@@ -47,6 +47,7 @@ let   started = false,
       currentSentenceEl = sentences[0],
       interval,
       sentencePauseTimeout,
+      inSentencePause = false,
       showTranslation = true,
       popoverOffsetY = 0,
       popoverOffsetX = 0,
@@ -107,6 +108,12 @@ function play() {
 
 function pause() {
   clearTimeout(sentencePauseTimeout)
+  // currentSentence was already advanced, but changeSentence() was still
+  // waiting on the timeout. Catch the UI up, or the sentence gets skipped
+  if (inSentencePause) {
+    inSentencePause = false
+    changeSentence()
+  }
   playing = false
   document.body.classList.add('paused')
   audioFile.pause()
@@ -131,14 +138,18 @@ function end() {
 function autoPlay() {
   // If the current time is equal to, or greater than the starting time
   // of the next sentence, move to the next sentence
-  if (time >= timestamps[voice][currentSentence + 1]) {
+  // The interval keeps running while the audio is paused between sentences,
+  // so without this guard currentSentence would advance on a frozen time
+  if (!inSentencePause && time >= timestamps[voice][currentSentence + 1]) {
     currentSentence++
     // Change to next sentence if no pause was set
     if (sentencePause == 0) changeSentence()
     // Else, pause the audio file for as long as sentencePause
     else {
+      inSentencePause = true
       audioFile.pause()
       sentencePauseTimeout = setTimeout(function(){
+        inSentencePause = false
         audioFile.play()
         changeSentence()
       }, sentencePause)
