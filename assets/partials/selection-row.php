@@ -3,14 +3,12 @@
 				<div class=voice>
 					<label for=voice>Voice</label>
 					<select id=voice name=voice class=quiet data-voice<?= $locked ? ' disabled' : '' ?>>
-<?php foreach ($story['voices'] as $i => $v): ?>
-						<option value=<?= $v['value'] ?><?= $i === 0 ? ' selected' : '' ?>><?= e($v['label']) ?></option>
+<?php foreach ($story['voices'] as $v): ?>
+						<option value=<?= $v['value'] ?><?= $v['value'] === $activeVoiceId ? ' selected' : '' ?>><?= e($v['label']) ?></option>
 <?php endforeach; ?>
 					</select>
 <?php if (!$locked): ?>
-					<svg width=16 height=16 class=icon aria-hidden=true>
-						<use xlink:href=#chevron-down></use>
-					</svg>
+					<?php icon('chevron-down', ['size' => 16]); ?>
 <?php endif; ?>
 				</div>
 				<dl class=duration>

@@ -1,0 +1,15 @@
+{
+  "id": "favorite-food",
+  "type": "dialogue",
+  "language": "nl",
+  "order": 2,
+  "published": true,
+  "voices": [
+    {
+      "id": "annelinn-and-pepijn",
+      "name": "Pepijn & AnneLinn",
+      "duration": 64,
+      "timestamps": [0, 2.1, 3.5, 5.9, 10.2, 12.9, 15.0, 18.5, 22.6, 24.8, 26.9, 30.4, 36.0, 38.6, 43.1, 45.8, 49.7, 53.0, 58.1]
+    }
+  ]
+}

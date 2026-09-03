@@ -9,11 +9,9 @@ if (!empty($story['storyType']) && $story['storyType'] !== 'default') {
 <?php include $partials . '/head.php'; ?>
 <body class=show-translation>
 
-<?php include $partials . '/icon-sprite.php'; ?>
-
 	<main>
 
-		<article class="<?= e($storyClass) ?>" lang=nl translate=no>
+		<article class="<?= e($storyClass) ?>" lang=<?= e($story['languageCode']) ?> translate=no>
 
 			<h1><?= e($story['heading']) ?></h1>
 
@@ -21,7 +19,7 @@ if (!empty($story['storyType']) && $story['storyType'] !== 'default') {
 
 <?php include $partials . '/noscript-info.php'; ?>
 
-<?php include $content; ?>
+<?php include $partials . '/story-content.php'; ?>
 
 		</article>
 
@@ -37,7 +35,7 @@ if (!empty($story['storyType']) && $story['storyType'] !== 'default') {
 
 <?php include $partials . '/settings-dialog.php'; ?>
 
-<?php include $storyData; ?>
+<?php include $partials . '/story-config.php'; ?>
 
 <?php include $partials . '/scripts.php'; ?>
 

@@ -1,6 +1,14 @@
 # Readalong <sup>bèta</sup>
 Read foreign languages along with native speakers. No tests, no rankings, no gamification. No nonsense. Just read along at your pace. That's it.
 
+## Run locally
+```bash
+./serve.sh
+```
+Or: `php -S localhost:8765 router.php`
+
+Story URLs work via `.htaccess` on Hostinger (LiteSpeed), or via the thin `index.php` stubs in each story folder when using plain `php -S`.
+
 ## How to contribute
 Your feedback is much appreciated! When trying out the Readalong bèta version you probably have some questions and suggestions. If you're familiar with GitHub you can create a new issue or upvote an existing one. Not sure how this works? You can always send an email to <a href="mailto:pepijngieles@proton.me?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">pepijngieles@proton.me</a>.
 

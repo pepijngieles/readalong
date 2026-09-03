@@ -6,11 +6,7 @@
 
 			<button onclick="toggleTranslation()" data-hide-translation class="quiet icon-only small rounded">
 				<span class=visually-hidden>Hide translation</span>
-				<svg width=24 height=24 class=icon aria-hidden=true>
-					<use xlink:href=#close></use>
-				</svg>
-				<svg width=80 height=24 class=curve aria-hidden=true>
-					<use xlink:href=#curve></use>
-				</svg>
+				<?php icon('close'); ?>
+				<?php icon('curve', ['width' => 80, 'height' => 24, 'class' => 'curve']); ?>
 			</button>
 		</div>

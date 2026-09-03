@@ -1,0 +1,25 @@
+{
+  "heading": "Wat is je lievelingseten?",
+  "speakers": ["Pepijn", "AnneLinn"],
+  "blocks": [
+    { "speaker": "Pepijn", "sentences": ["Wat is jouw favoriete eten?"] },
+    { "speaker": "AnneLinn", "sentences": ["Pizza!"] },
+    { "speaker": "Pepijn", "sentences": ["Oh pizza, dat is cool! Waarom vind je dat zo lekker?"] },
+    { "speaker": "AnneLinn", "sentences": ["Omdat het warm en kaasachtig is, het maakt me gewoon heel blij!"] },
+    { "speaker": "Pepijn", "sentences": ["Dat is fijn! Heb je altijd al van pizza gehouden?"] },
+    { "speaker": "AnneLinn", "sentences": ["Ja, al sinds ik een klein kind was."] },
+    { "speaker": "Pepijn", "sentences": ["Wow, dat is lang! Weet je nog de eerste keer dat je pizza at?"] },
+    { "speaker": "AnneLinn", "sentences": ["Ik herinner het me niet, maar ik weet wel dat ik het meteen heel lekker vond."] },
+    { "speaker": "Pepijn", "sentences": ["Nice! Welk ander eten vind je lekker?"] },
+    { "speaker": "AnneLinn", "sentences": ["Spaghetti en gehaktballen."] },
+    { "speaker": "Pepijn", "sentences": ["Oh ja, spaghetti is ook goed. En wat vind je daar lekker aan?"] },
+    { "speaker": "AnneLinn", "sentences": ["Het leuk is om op mijn vork te draaien en ik houd van de saus. Wat vind jij eigenlijk lekker?"] },
+    { "speaker": "Pepijn", "sentences": ["Ik vind kipnuggets en frietjes lekker."] },
+    { "speaker": "AnneLinn", "sentences": ["Ja, die zijn ook lekker. En drink je graag iets bij je eten?"] },
+    { "speaker": "Pepijn", "sentences": ["Doe mij maar een cola bij het avondeten."] },
+    { "speaker": "AnneLinn", "sentences": ["Ik drink niets als ik eet. Omdat dat niet gezond zou zijn."] },
+    { "speaker": "Pepijn", "sentences": ["Oh, zou je me daar meer over willen vertellen?"] },
+    { "speaker": "AnneLinn", "sentences": ["Ja, dat is goed. Maar wel een andere keer. Nu ga ik eerst iets voor jou koken."] },
+    { "speaker": "Pepijn", "sentences": ["Oh lekker. Dan ga ik even op de bank liggen."] }
+  ]
+}
