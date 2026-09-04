@@ -25,7 +25,6 @@
 /* 1. Define variables
 ---------------------------------------------------------------------------- */
 const audioFile = document.querySelector('audio'),
-      audioSource = document.querySelector('audio source'),
       rewindButton = document.querySelector('[data-rewind]'),
       fastForwardButton = document.querySelector('[data-fast-forward]'),
       progressBar = document.querySelector('progress'),
@@ -147,11 +146,11 @@ function end() {
 /* 4. Automatically change sentence based on timestamps
 ---------------------------------------------------------------------------- */
 function autoPlay() {
-  // If the current time is equal to, or greater than the starting time
-  // of the next sentence, move to the next sentence
-  // The interval keeps running while the audio is paused between sentences,
-  // so without this guard currentSentence would advance on a frozen time
-  if (!inSentencePause && time >= timestamps[voice][currentSentence + 1]) {
+  // Read from the element, not the cached `time` variable. After a seek,
+  // updateProgressBar can still hold the previous position for one tick
+  // and would skip or stick on the wrong sentence.
+  const currentTime = audioFile.currentTime
+  if (!inSentencePause && currentTime >= timestamps[voice][currentSentence + 1]) {
     currentSentence++
     // Change to next sentence if no pause was set
     if (sentencePause == 0) changeSentence()
@@ -249,10 +248,11 @@ function changeSentence() {
 
   /* 5.4 Update the progress bar ------------------------------------------- */
   function updateProgressBar() {
-    // Update the time
-    time = audioFile.currentTime.toFixed(1)
-    // Update the progress bar value
-    progressBar.value = (audioFile.currentTime * 100 / audioFile.duration).toFixed(0)
+    // Keep time numeric so sentence-boundary compares stay reliable
+    time = audioFile.currentTime
+    if (Number.isFinite(audioFile.duration) && audioFile.duration > 0) {
+      progressBar.value = (audioFile.currentTime * 100 / audioFile.duration).toFixed(0)
+    }
   }
 
   /* 5.5 Disable rewind/forward button if needed --------------------------- */
@@ -270,12 +270,22 @@ function changeSentence() {
 function playSentence(number) {
   // 1. Check if the number parameter is filled, else use the clicked sentence
   if (number === parseInt(number, 10)) currentSentence = number
-  else currentSentence = parseInt(this.dataset.sentence)
-  // 2. Get the right timestamp and play the audio file from there
-  time = timestamps[voice][currentSentence]
-  audioFile.currentTime = time
+  else currentSentence = parseInt(this.dataset.sentence, 10)
+  // 2. Seek the audio. Pause first: WebKit often ignores currentTime while
+  // playing, especially when the element is visually hidden.
+  const start = Number(timestamps[voice][currentSentence])
+  time = start
+  const wasPlaying = playing
+  clearTimeout(sentencePauseTimeout)
+  inSentencePause = false
+  if (!audioFile.paused) audioFile.pause()
+  try {
+    audioFile.currentTime = start
+  } catch (error) {}
   // 3. After the audio file time-change, the UI can be updated accordingly
   changeSentence()
+  time = start
+  if (wasPlaying) play()
 }
 
 
@@ -310,7 +320,7 @@ function switchVoice() {
   wasPlaying = (playing == true) ? true : false
   pause()
   voice = newVoice
-  audioSource.src = storyConfig.audioBase + newVoice + '.mp3'
+  audioFile.src = storyConfig.audioBase + newVoice + '.mp3'
   document.documentElement.classList.add('loading')
   audioFile.load()
   audioFile.addEventListener('canplaythrough', audioReady)

@@ -136,6 +136,23 @@ body:not(.ios) .ios-only,
   display: none !important;
 }
 
+/* Safari ignores currentTime on display:none media. Keep the element in
+   the render tree so sentence seeks actually move playback. */
+audio.native-audio{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.no-js audio.native-audio{
+  position: static;
+  width: auto;
+  height: auto;
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media screen and (display-mode: standalone){
   .hide-on-standalone{
     display: none !important;
