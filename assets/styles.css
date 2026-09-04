@@ -136,21 +136,15 @@ body:not(.ios) .ios-only,
   display: none !important;
 }
 
-/* Safari ignores currentTime on display:none media. Keep the element in
-   the render tree so sentence seeks actually move playback. */
-audio.native-audio{
+/* Safari ignores currentTime when audio is display:none — including the
+   UA rule for audio:not([controls]). Keep it in the render tree. */
+.js audio.native-audio{
+  display: block !important;
   position: absolute;
   width: 1px;
   height: 1px;
   opacity: 0;
   pointer-events: none;
-}
-.no-js audio.native-audio{
-  position: static;
-  width: auto;
-  height: auto;
-  opacity: 1;
-  pointer-events: auto;
 }
 
 @media screen and (display-mode: standalone){

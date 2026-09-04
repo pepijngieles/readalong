@@ -6,9 +6,6 @@
 			</a>
 		</div>
 		<audio class="native-audio" src="<?= e($base) ?>audio/<?= e($story['storyID']) ?>/<?= e($story['languageCode']) ?>/<?= e($activeVoiceId) ?>.mp3" preload="metadata" playsinline onended="end()" controls></audio>
-		<script type="text/javascript">
-			document.querySelector('audio').removeAttribute('controls')
-		</script>
 		<div class="audio-controls js-only">
 			<button class="rewind quiet icon-only rounded" data-rewind onclick="playSentence(currentSentence - 1)" disabled>
 				<span class=visually-hidden>Rewind</span>
