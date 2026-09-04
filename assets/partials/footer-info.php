@@ -1,6 +1,6 @@
 <?php if (!empty($story['attribution'])): ?>
 		<p class="info source">
-			Source:
+			<?= e(t('story.source')) ?>
 <?php
   $a = $story['attribution'];
   if (!empty($a['title'])):
@@ -14,5 +14,6 @@
 		</p>
 <?php endif; ?>
 		<p class=info>
-			More content will follow soon. Do you want to request a new story or conversation? Please <a href="mailto:support@readalong.io?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">send an email</a> to support@readalong.io
+			<?= e(t('story.more_content')) ?>
+			<a href="mailto:support@readalong.io?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A"><?= e(t('story.more_content_email')) ?></a>.
 		</p>

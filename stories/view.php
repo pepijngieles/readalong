@@ -20,6 +20,6 @@ if ($meta['id'] !== $slug) {
 }
 
 $translationLangs = story_translation_languages(__DIR__);
-$translationLang = lang_pref('translate', $translationLangs, 'en');
+$translationLang = lang_pref('translate', $translationLangs, ui_locale());
 
 story_render($storyDir, '../../', $translationLang);

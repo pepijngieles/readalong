@@ -5,6 +5,7 @@ function e($value) {
 }
 
 require_once __DIR__ . '/icons.php';
+require_once __DIR__ . '/i18n.php';
 
 function format_duration($seconds) {
   $seconds = (int) $seconds;
@@ -34,16 +35,62 @@ function configured_languages() {
   return ['de', 'en', 'es', 'fr', 'nl', 'no'];
 }
 
+function detect_browser_locale(array $allowed, $default = 'en') {
+  $header = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+  if (preg_match_all('/\b([a-z]{2})(?:-[a-z]{2})?\b/i', $header, $matches)) {
+    foreach ($matches[1] as $code) {
+      $code = strtolower($code);
+      if (in_array($code, $allowed, true)) {
+        return $code;
+      }
+    }
+  }
+  return $default;
+}
+
+function ui_locale() {
+  static $locale = null;
+  if ($locale !== null) {
+    return $locale;
+  }
+
+  $allowed = configured_languages();
+  if (!empty($_COOKIE['readalong-translate']) && in_array($_COOKIE['readalong-translate'], $allowed, true)) {
+    return $locale = $_COOKIE['readalong-translate'];
+  }
+
+  return $locale = detect_browser_locale($allowed);
+}
+
+function t($key, array $replacements = [], $locale = null) {
+  $locale = $locale ?? ui_locale();
+  $strings = ui_strings();
+  $text = $strings[$locale][$key] ?? $strings['en'][$key] ?? $key;
+
+  foreach ($replacements as $name => $value) {
+    $text = str_replace('{' . $name . '}', $value, $text);
+  }
+
+  return $text;
+}
+
+function needs_onboarding() {
+  if (!empty($_COOKIE['readalong-onboarding-complete'])) {
+    return false;
+  }
+  if (!empty($_COOKIE['readalong-read'])) {
+    return false;
+  }
+  return true;
+}
+
 function lang_labels() {
-  return [
-    'de' => 'Deutsch',
-    'en' => 'English (UK)',
-    'es' => 'Espa&ntilde;ol',
-    'fr' => 'Fran&ccedil;ais',
-    'hu' => 'Magyar',
-    'nl' => 'Nederlands',
-    'no' => 'Norsk',
-  ];
+  $labels = [];
+  foreach (configured_languages() as $code) {
+    $labels[$code] = t('lang.' . $code);
+  }
+  $labels['hu'] = 'Magyar';
+  return $labels;
 }
 
 function lang_label($code) {
@@ -94,9 +141,9 @@ function level_tiers() {
 
 function level_tier_labels() {
   return [
-    'beginner' => 'Beginner',
-    'intermediate' => 'Intermediate',
-    'advanced' => 'Advanced',
+    'beginner' => t('level.beginner'),
+    'intermediate' => t('level.intermediate'),
+    'advanced' => t('level.advanced'),
   ];
 }
 
