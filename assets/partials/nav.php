@@ -5,12 +5,7 @@
 				<?php icon('back'); ?>
 			</a>
 		</div>
-		<audio class=no-js-only onended="end()" controls>
-			<source src="<?= e($base) ?>audio/<?= e($story['storyID']) ?>/<?= e($story['languageCode']) ?>/<?= e($activeVoiceId) ?>.mp3" type="audio/mpeg">
-		</audio>
-		<script type="text/javascript">
-			document.querySelector('audio').removeAttribute('controls')
-		</script>
+		<audio class="native-audio" src="<?= e($base) ?>audio/<?= e($story['storyID']) ?>/<?= e($story['languageCode']) ?>/<?= e($activeVoiceId) ?>.mp3" preload="metadata" playsinline onended="end()" controls></audio>
 		<div class="audio-controls js-only">
 			<button class="rewind quiet icon-only rounded" data-rewind onclick="playSentence(currentSentence - 1)" disabled>
 				<span class=visually-hidden>Rewind</span>

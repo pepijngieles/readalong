@@ -136,6 +136,17 @@ body:not(.ios) .ios-only,
   display: none !important;
 }
 
+/* Safari ignores currentTime when audio is display:none — including the
+   UA rule for audio:not([controls]). Keep it in the render tree. */
+.js audio.native-audio{
+  display: block !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media screen and (display-mode: standalone){
   .hide-on-standalone{
     display: none !important;
