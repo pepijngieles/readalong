@@ -318,11 +318,13 @@ dl dt{
   text-decoration: none;
 }
 
-.list li:first-of-type a{
+.list li:first-of-type a,
+.list li:first-of-type .dummy-story-item{
   padding-block-start: 1rem;
 }
 
-.list li:last-of-type a{
+.list li:last-of-type a,
+.list li:last-of-type .dummy-story-item{
   padding-block-end: 1rem;
 }
 
@@ -1223,6 +1225,107 @@ body.theme-dark .settings-segment__preview{
 
 [data-duration]{
   font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+
+
+/* 17b. Onboarding
+---------------------------------------------------------------------------- */
+.show-onboarding main{
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.onboarding-scrim{
+  z-index: 6;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .32);
+}
+
+.onboarding-popover{
+  z-index: 7;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: min(calc(100% - 2rem), 22rem);
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, .12),
+    0 0 1.5px rgba(0, 0, 0, .24);
+  transform: translate(-50%, -50%);
+}
+
+.onboarding-popover h2{
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.onboarding-intro{
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.onboarding-field{
+  position: relative;
+}
+
+.onboarding-field label{
+  display: block;
+  margin-block-end: .375rem;
+  font-weight: 600;
+}
+
+.onboarding-field select{
+  width: 100%;
+}
+
+.onboarding-note{
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: .875rem;
+  line-height: 1.45;
+}
+
+.onboarding-translate-label{
+  display: inline;
+  margin-inline-start: .25rem;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.onboarding-note select{
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  margin-inline-start: .25rem;
+  font-size: inherit;
+  vertical-align: baseline;
+}
+
+.onboarding-continue{
+  align-self: stretch;
+  margin-block-start: .25rem;
+}
+
+.dummy-content-notice{
+  margin-block: 1rem 0;
+}
+
+.dummy-story-item{
+  display: block;
+  padding-block: .5rem;
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.dummy-story-item p{
   color: var(--text-secondary);
 }
 

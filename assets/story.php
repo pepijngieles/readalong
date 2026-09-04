@@ -133,7 +133,7 @@ function story_published_dirs($storiesDir) {
 }
 
 function story_source_languages($storiesDir) {
-  $languages = [];
+  $languages = array_fill_keys(configured_languages(), true);
 
   foreach (story_published_dirs($storiesDir) as $storyDir) {
     $meta = read_json($storyDir . '/story.json');
@@ -146,7 +146,7 @@ function story_source_languages($storiesDir) {
 }
 
 function story_translation_languages($storiesDir) {
-  $languages = [];
+  $languages = array_fill_keys(configured_languages(), true);
 
   foreach (story_published_dirs($storiesDir) as $storyDir) {
     foreach (glob($storyDir . '/translations/*.json') as $translationPath) {
@@ -219,8 +219,16 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
   }
 
   usort($stories, function ($a, $b) {
-    return ($a['order'] <=> $b['order']) ?: strcmp($a['slug'], $b['slug']);
+    $order = $a['order'] <=> $b['order'];
+    if ($order !== 0) {
+      return $order;
+    }
+    return strcmp($a['slug'] ?? $a['id'], $b['slug'] ?? $b['id']);
   });
+
+  if ($readAlongLang !== null) {
+    $stories = array_merge($stories, dummy_stories($readAlongLang));
+  }
 
   return $stories;
 }
