@@ -229,7 +229,7 @@ if (!$needsOnboarding) {
 
 		if (iOS()) document.body.classList.add('ios')
 	</script>
-	<script type="text/javascript" src="assets/home.js?v=4"></script>
+	<script type="text/javascript" src="assets/home.js?v=5"></script>
 
 <?php endif; ?>
 

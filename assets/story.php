@@ -267,11 +267,21 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
     $defaultVoice = $meta['voices'][0];
 
     $kind = $meta['kind'] ?? null;
+    $textKey = $defaultVoice['text'] ?? $meta['language'];
+    $sourceTitle = $translation['title'];
+    $textPath = $storyDir . '/text/' . $textKey . '.json';
+    if (is_readable($textPath)) {
+      $textData = read_json($textPath);
+      if (!empty($textData['heading'])) {
+        $sourceTitle = $textData['heading'];
+      }
+    }
     $stories[] = [
       'id' => $meta['id'],
       'slug' => basename($storyDir),
       'order' => $meta['order'] ?? 0,
       'title' => $translation['title'],
+      'sourceTitle' => $sourceTitle,
       'duration' => format_duration($defaultVoice['duration']),
       'durationSeconds' => (int) $defaultVoice['duration'],
       'level' => $meta['level'] ?? null,
@@ -333,7 +343,7 @@ function story_list_item(array $item) {
     $classes[] = 'dummy-story';
   }
 
-  $search = trim($item['title'] . ' ' . ($item['kindLabel'] ?? ''));
+  $search = trim($item['title'] . ' ' . ($item['sourceTitle'] ?? '') . ' ' . ($item['kindLabel'] ?? ''));
   $attrs = ' data-id="' . e($item['id']) . '"';
   $attrs .= ' data-kind="' . e($item['kind'] ?? '') . '"';
   $attrs .= ' data-kind-label="' . e($item['kindLabel'] ?? '') . '"';

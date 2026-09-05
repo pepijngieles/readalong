@@ -356,6 +356,7 @@ function dummy_stories($readAlongLang, $titleLang = null) {
       'slug' => null,
       'order' => 1000 + $index,
       'title' => $title,
+      'sourceTitle' => $titles[$readAlongLang] ?? $title,
       'duration' => format_duration($seconds),
       'durationSeconds' => $seconds,
       'level' => null,
