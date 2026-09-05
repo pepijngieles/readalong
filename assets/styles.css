@@ -1259,18 +1259,6 @@ body.theme-dark .settings-segment__preview{
   text-align: center;
 }
 
-.onboarding-title{
-  margin: 0;
-  font-size: 1.25rem;
-  text-align: center;
-}
-
-.onboarding-intro{
-  margin: 0;
-  color: var(--text-secondary);
-  text-align: center;
-}
-
 .onboarding-languages{
   min-width: 0;
   padding: 0;
@@ -1294,62 +1282,75 @@ body.theme-dark .settings-segment__preview{
   cursor: pointer;
 }
 
-.onboarding-language input{
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
 .onboarding-language__button{
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 3rem;
+  min-height: 3.5rem;
   padding: .75rem 1rem;
   border-radius: .75rem;
   background-color: var(--background-popover);
   box-shadow: inset 0 0 0 1px var(--border-warm);
-  text-align: center;
   transition: box-shadow ease-out .15s;
 }
 
-.onboarding-language input:checked + .onboarding-language__button{
+.onboarding-language__radio{
+  position: absolute;
+  top: .625rem;
+  left: .625rem;
+  margin: 0;
+  accent-color: var(--text-velvet);
+}
+
+.onboarding-language__label{
+  text-align: center;
+}
+
+.onboarding-language:has(.onboarding-language__radio:checked) .onboarding-language__button{
   box-shadow: inset 0 0 0 2px var(--accent-yellow);
 }
 
-.onboarding-language input:focus-visible + .onboarding-language__button{
+.onboarding-language__radio:focus-visible{
   outline: 2px solid var(--accent-yellow);
   outline-offset: 2px;
 }
 
-.onboarding-note{
-  margin: 0;
+.onboarding-translations{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .375rem .5rem;
   color: var(--text-secondary);
   font-size: .875rem;
-  line-height: 1.45;
-  text-align: center;
 }
 
-.onboarding-translate-label{
-  display: inline;
-  margin-inline-start: .25rem;
-  color: var(--text-tertiary);
-  font-weight: 400;
+.onboarding-translations label{
+  margin: 0;
 }
 
-.onboarding-note select{
-  display: inline-block;
+.onboarding-translations select{
   width: auto;
   max-width: 100%;
-  margin-inline-start: .25rem;
   font-size: inherit;
-  vertical-align: baseline;
 }
 
 .onboarding-continue{
   align-self: stretch;
   margin-block-start: .25rem;
+  border-color: transparent;
+  color: var(--background-yellow);
+  background-color: var(--text-velvet);
+}
+
+@media (hover: hover) {
+  .onboarding-continue:hover:not([disabled]){
+    filter: brightness(1.08);
+  }
+}
+
+.onboarding-continue:active:not([disabled]){
+  filter: brightness(.95);
 }
 
 .onboarding-continue:disabled{

@@ -36,13 +36,6 @@
     document.querySelectorAll('[data-i18n]').forEach(function (element) {
       const key = element.getAttribute('data-i18n');
       if (!key) return;
-
-      if (element.hasAttribute('data-i18n-template')) {
-        const languageName = translate('lang.' + locale, locale);
-        element.textContent = translate(key, locale, { language: languageName });
-        return;
-      }
-
       element.textContent = translate(key, locale);
     });
 
