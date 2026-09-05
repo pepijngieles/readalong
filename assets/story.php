@@ -101,6 +101,8 @@ function story_load($storyDir, $translationLang = 'en', $voiceId = null) {
   }
 
   $storyConfig = [
+    'id' => $meta['id'],
+    'slug' => basename($storyDir),
     'type' => $meta['type'],
     'audioBase' => null,
     'voice' => $activeVoiceId,
@@ -207,14 +209,18 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
     $translation = read_json($translationPath);
     $defaultVoice = $meta['voices'][0];
 
+    $kind = $meta['kind'] ?? null;
     $stories[] = [
       'id' => $meta['id'],
       'slug' => basename($storyDir),
       'order' => $meta['order'] ?? 0,
       'title' => $translation['title'],
       'duration' => format_duration($defaultVoice['duration']),
+      'durationSeconds' => (int) $defaultVoice['duration'],
       'level' => $meta['level'] ?? null,
       'levelLabel' => !empty($meta['level']) ? level_label($meta['level']) : null,
+      'kind' => $kind,
+      'kindLabel' => story_kind_label($kind),
     ];
   }
 
@@ -241,4 +247,71 @@ function story_render($storyDir, $base, $translationLang = 'en') {
 
   $partials = __DIR__ . '/partials';
   include __DIR__ . '/story-shell.php';
+}
+
+function story_search_text($title) {
+  if (function_exists('mb_strtolower')) {
+    return mb_strtolower((string) $title, 'UTF-8');
+  }
+  return strtolower((string) $title);
+}
+
+function story_item_meta(array $item) {
+  $parts = [];
+  if (!empty($item['duration']) && $item['duration'] !== '&mdash;') {
+    $parts[] = $item['duration'];
+  }
+  if (!empty($item['kindLabel'])) {
+    $parts[] = $item['kindLabel'];
+  }
+  if (!empty($item['dummy'])) {
+    $parts[] = t('home.placeholder');
+  } elseif (!empty($item['levelLabel'])) {
+    $parts[] = $item['levelLabel'];
+  }
+  return implode(' · ', $parts);
+}
+
+function story_list_item(array $item) {
+  $classes = [];
+  if (!empty($item['dummy'])) {
+    $classes[] = 'dummy-story';
+  }
+
+  $attrs = ' data-id="' . e($item['id']) . '"';
+  $attrs .= ' data-kind="' . e($item['kind'] ?? '') . '"';
+  $attrs .= ' data-duration-seconds="' . e((string) ($item['durationSeconds'] ?? '')) . '"';
+  $attrs .= ' data-title="' . e(story_search_text($item['title'])) . '"';
+  if (!empty($item['slug'])) {
+    $attrs .= ' data-slug="' . e($item['slug']) . '"';
+  }
+  if (!empty($item['hidden'])) {
+    $attrs .= ' hidden';
+  }
+
+  $classAttr = $classes ? ' class="' . e(implode(' ', $classes)) . '"' : '';
+  $meta = story_item_meta($item);
+
+  $html = "\t\t\t<li" . $classAttr . $attrs . ">\n";
+  if (!empty($item['dummy'])) {
+    $html .= "\t\t\t\t<span class=dummy-story-item aria-disabled=true>\n";
+    $html .= "\t\t\t\t\t<p>" . e($item['title']) . "</p>\n";
+    $html .= "\t\t\t\t\t<small>" . e($meta) . "</small>\n";
+    $html .= "\t\t\t\t</span>\n";
+  } else {
+    $html .= "\t\t\t\t<a href=\"stories/" . e($item['slug']) . "/\">\n";
+    $html .= "\t\t\t\t\t<p>" . e($item['title']) . "</p>\n";
+    $html .= "\t\t\t\t\t<small>" . e($meta) . "</small>\n";
+    $html .= "\t\t\t\t</a>\n";
+  }
+  $html .= "\t\t\t</li>\n";
+  return $html;
+}
+
+function render_story_list(array $items, $extraAttrs = '') {
+  echo "\t\t<ul class=list" . ($extraAttrs !== '' ? ' ' . $extraAttrs : '') . ">\n";
+  foreach ($items as $item) {
+    echo story_list_item($item);
+  }
+  echo "\t\t</ul>\n";
 }

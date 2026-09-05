@@ -1,6 +1,7 @@
 {
   "id": "bo-i-byen",
   "type": "default",
+  "kind": "news",
   "language": "no",
   "order": 3,
   "published": true,

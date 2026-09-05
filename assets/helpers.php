@@ -103,31 +103,211 @@ function lang_pref($key, array $allowed, $default) {
   return in_array($value, $allowed, true) ? $value : $default;
 }
 
-function dummy_story_titles($lang) {
-  $titles = [
-    'de' => ['Morgen in Berlin', 'Die kleine Buchhandlung', 'Regen und Kaffee', 'Sommerabend am Wasser', 'Ein Spaziergang im Park'],
-    'en' => ['Morning in London', 'The little bookshop', 'Rain and coffee', 'Summer evening by the water', 'A walk in the park'],
-    'es' => ['Mañana en Madrid', 'La pequeña librería', 'Lluvia y café', 'Noche de verano junto al agua', 'Un paseo por el parque'],
-    'fr' => ['Matin à Paris', 'La petite librairie', 'Pluie et café', 'Soir d\'été au bord de l\'eau', 'Une promenade au parc'],
-    'nl' => ['Ochtend in Amsterdam', 'De kleine boekwinkel', 'Regen en kaffie', 'Zomeravond aan het water', 'Een wandeling in het park'],
-    'no' => ['Morgen i Oslo', 'Den lille bokhandelen', 'Regn og kaffe', 'Sommerkveld ved vannet', 'En tur i parken'],
-  ];
+function story_filter_kinds() {
+  return ['podcast', 'news', 'book', 'email'];
+}
 
-  return $titles[$lang] ?? $titles['en'];
+function story_kind_label($kind) {
+  if (!$kind) {
+    return null;
+  }
+  $key = 'home.kind.' . $kind;
+  $label = t($key);
+  return $label === $key ? null : $label;
+}
+
+function dummy_story_catalog() {
+  return [
+    [
+      'kind' => 'weather',
+      'duration' => 95,
+      'titles' => [
+        'de' => 'Wetterbericht für heute',
+        'en' => 'Today’s weather report',
+        'es' => 'El tiempo de hoy',
+        'fr' => 'La météo du jour',
+        'nl' => 'Weerbericht van vandaag',
+        'no' => 'Værmeldingen for i dag',
+      ],
+    ],
+    [
+      'kind' => 'weather',
+      'duration' => 210,
+      'titles' => [
+        'de' => 'Das Wetter am Wochenende',
+        'en' => 'The weekend forecast',
+        'es' => 'El tiempo del fin de semana',
+        'fr' => 'La météo du week-end',
+        'nl' => 'Het weekendweer',
+        'no' => 'Helgeværet',
+      ],
+    ],
+    [
+      'kind' => 'weather',
+      'duration' => 400,
+      'titles' => [
+        'de' => 'Der Wochenrückblick aufs Wetter',
+        'en' => 'This week’s weather in review',
+        'es' => 'El tiempo de la semana',
+        'fr' => 'La semaine météo',
+        'nl' => 'Het weer van deze week',
+        'no' => 'Ukeværet',
+      ],
+    ],
+    [
+      'kind' => 'podcast',
+      'duration' => 110,
+      'titles' => [
+        'de' => 'Guten Morgen, kurz erzählt',
+        'en' => 'Morning notes',
+        'es' => 'Notas de la mañana',
+        'fr' => 'Notes du matin',
+        'nl' => 'Ochtendnotities',
+        'no' => 'Morgennotater',
+      ],
+    ],
+    [
+      'kind' => 'podcast',
+      'duration' => 280,
+      'titles' => [
+        'de' => 'Im Gespräch über den Alltag',
+        'en' => 'A chat about everyday life',
+        'es' => 'Una charla sobre el día a día',
+        'fr' => 'Une discussion sur le quotidien',
+        'nl' => 'Een gesprek over alledag',
+        'no' => 'En prat om hverdagen',
+      ],
+    ],
+    [
+      'kind' => 'podcast',
+      'duration' => 520,
+      'titles' => [
+        'de' => 'Lange Folge: Reisen und Sprache',
+        'en' => 'Long episode: travel and language',
+        'es' => 'Episodio largo: viajes e idioma',
+        'fr' => 'Épisode long : voyage et langue',
+        'nl' => 'Lange aflevering: reizen en taal',
+        'no' => 'Lang episode: reise og språk',
+      ],
+    ],
+    [
+      'kind' => 'news',
+      'duration' => 100,
+      'titles' => [
+        'de' => 'Kurznachrichten am Morgen',
+        'en' => 'Morning headlines',
+        'es' => 'Titulares de la mañana',
+        'fr' => 'Les titres du matin',
+        'nl' => 'Ochtendnieuws',
+        'no' => 'Morgennyheter',
+      ],
+    ],
+    [
+      'kind' => 'news',
+      'duration' => 250,
+      'titles' => [
+        'de' => 'Nachrichten aus der Stadt',
+        'en' => 'News from the city',
+        'es' => 'Noticias de la ciudad',
+        'fr' => 'Infos de la ville',
+        'nl' => 'Nieuws uit de stad',
+        'no' => 'Nyheter fra byen',
+      ],
+    ],
+    [
+      'kind' => 'news',
+      'duration' => 390,
+      'titles' => [
+        'de' => 'Die Woche in Nachrichten',
+        'en' => 'The week in news',
+        'es' => 'La semana en noticias',
+        'fr' => 'La semaine en infos',
+        'nl' => 'De week in het nieuws',
+        'no' => 'Uken i nyheter',
+      ],
+    ],
+    [
+      'kind' => 'book',
+      'duration' => 180,
+      'titles' => [
+        'de' => 'Erstes Kapitel',
+        'en' => 'Chapter one',
+        'es' => 'Capítulo uno',
+        'fr' => 'Premier chapitre',
+        'nl' => 'Hoofdstuk één',
+        'no' => 'Kapittel én',
+      ],
+    ],
+    [
+      'kind' => 'book',
+      'duration' => 540,
+      'titles' => [
+        'de' => 'Ein Nachmittag in der Bibliothek',
+        'en' => 'An afternoon in the library',
+        'es' => 'Una tarde en la biblioteca',
+        'fr' => 'Un après-midi à la bibliothèque',
+        'nl' => 'Een middag in de bibliotheek',
+        'no' => 'En ettermiddag på biblioteket',
+      ],
+    ],
+    [
+      'kind' => 'email',
+      'duration' => 85,
+      'titles' => [
+        'de' => 'Eine kurze Terminmail',
+        'en' => 'A short meeting email',
+        'es' => 'Un correo breve de reunión',
+        'fr' => 'Un court mail de réunion',
+        'nl' => 'Een korte afspraakmail',
+        'no' => 'En kort møte-e-post',
+      ],
+    ],
+    [
+      'kind' => 'email',
+      'duration' => 240,
+      'titles' => [
+        'de' => 'Die Einladung zum Projekt',
+        'en' => 'The project invitation',
+        'es' => 'La invitación al proyecto',
+        'fr' => 'L’invitation au projet',
+        'nl' => 'De projectuitnodiging',
+        'no' => 'Invitasjonen til prosjektet',
+      ],
+    ],
+    [
+      'kind' => 'email',
+      'duration' => 410,
+      'titles' => [
+        'de' => 'Ein ausführlicher Kundenbrief',
+        'en' => 'A detailed client email',
+        'es' => 'Un correo detallado a un cliente',
+        'fr' => 'Un mail détaillé à un client',
+        'nl' => 'Een uitgebreide klantmail',
+        'no' => 'En grundig kunde-e-post',
+      ],
+    ],
+  ];
 }
 
 function dummy_stories($readAlongLang) {
   $stories = [];
 
-  foreach (dummy_story_titles($readAlongLang) as $index => $title) {
+  foreach (dummy_story_catalog() as $index => $entry) {
+    $titles = $entry['titles'];
+    $title = $titles[$readAlongLang] ?? $titles['en'];
+    $kind = $entry['kind'];
+    $seconds = (int) $entry['duration'];
     $stories[] = [
       'id' => 'dummy-' . ($index + 1),
       'slug' => null,
       'order' => 1000 + $index,
       'title' => $title,
-      'duration' => '&mdash;',
+      'duration' => format_duration($seconds),
+      'durationSeconds' => $seconds,
       'level' => null,
       'levelLabel' => null,
+      'kind' => $kind,
+      'kindLabel' => story_kind_label($kind),
       'dummy' => true,
     ];
   }

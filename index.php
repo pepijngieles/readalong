@@ -17,6 +17,20 @@ if (!$needsOnboarding) {
   $translationLang = lang_pref('translate', $translationLangs, $uiLocale);
   $levelFilter = lang_pref('level', array_merge([''], $levelTiers), '');
   $stories = story_list($storiesDir, $translationLang, $readAlongLang, $levelFilter ?: null);
+  $todayWeather = null;
+  $tussendoorStories = [];
+  $tussendoorLimit = 10 * 60;
+  foreach ($stories as $item) {
+    if ($todayWeather === null && ($item['kind'] ?? '') === 'weather') {
+      $todayWeather = $item;
+    }
+    $seconds = $item['durationSeconds'] ?? 0;
+    if ($seconds > 0 && $seconds <= $tussendoorLimit) {
+      $tussendoorStories[] = $item;
+    }
+  }
+  $durationPills = [2, 5, 7, 10];
+  $kindTiles = story_filter_kinds();
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -98,23 +112,53 @@ if (!$needsOnboarding) {
 <?php endif; ?>
 		</div>
 
-		<ul class=list>
-<?php foreach ($stories as $item): ?>
-			<li<?= !empty($item['dummy']) ? ' class=dummy-story' : '' ?>>
-<?php if (!empty($item['dummy'])): ?>
-				<span class=dummy-story-item aria-disabled=true>
-					<p><?= e($item['title']) ?></p>
-					<small><?= e(t('home.placeholder')) ?></small>
-				</span>
-<?php else: ?>
-				<a href="stories/<?= e($item['slug']) ?>/">
-					<p><?= e($item['title']) ?></p>
-					<small><?= e($item['duration']) ?><?php if (!empty($item['levelLabel'])): ?> · <?= e($item['levelLabel']) ?><?php endif; ?></small>
-				</a>
+		<section class="home-section js-only" data-continue-section hidden>
+			<div class=home-section__header>
+				<h2><?= e(t('home.continue_reading')) ?></h2>
+			</div>
+			<ul class=list data-continue-items></ul>
+		</section>
+
+<?php if ($todayWeather): ?>
+		<section class=home-section data-weather-section>
+			<div class=home-section__header>
+				<h2><?= e(t('home.weather_today')) ?></h2>
+				<button type=button class="quiet home-section__more" data-show-all-weather aria-pressed=false><?= e(t('home.show_all')) ?></button>
+			</div>
+			<ul class=list>
+<?php echo story_list_item($todayWeather); ?>
+			</ul>
+		</section>
 <?php endif; ?>
-			</li>
+
+		<section class=home-section data-tussendoor-section>
+			<div class=home-section__header>
+				<h2><?= e(t('home.in_between')) ?></h2>
+			</div>
+			<div class=pill-row role=group aria-label="<?= e(t('home.in_between')) ?>">
+<?php foreach ($durationPills as $minutes): ?>
+				<button type=button class=pill data-duration-filter="<?= e((string) $minutes) ?>"<?= $minutes === 2 ? ' aria-pressed=true' : ' aria-pressed=false' ?>><?= e(t('home.minutes', ['n' => (string) $minutes])) ?></button>
 <?php endforeach; ?>
-		</ul>
+			</div>
+<?php render_story_list($tussendoorStories, 'data-tussendoor-items'); ?>
+		</section>
+
+		<section class=home-section id=alle-items data-all-section>
+			<div class=home-section__header>
+				<h2><?= e(t('home.all_items')) ?></h2>
+			</div>
+			<div class=kind-tiles role=group aria-label="<?= e(t('home.all_items')) ?>">
+<?php foreach ($kindTiles as $kind): ?>
+				<button type=button class=kind-tile data-kind-filter="<?= e($kind) ?>" aria-pressed=false><?= e(t('home.kind.' . $kind)) ?></button>
+<?php endforeach; ?>
+			</div>
+			<label class=home-search>
+				<span class=visually-hidden><?= e(t('home.search')) ?></span>
+				<input type=search data-story-search placeholder="<?= e(t('home.search_placeholder')) ?>" autocomplete=off>
+			</label>
+<?php render_story_list($stories, 'data-all-items'); ?>
+			<p class="home-no-results" data-no-results hidden><?= e(t('home.no_results')) ?></p>
+		</section>
 
 		<p class="info velvet">
 			<?= e(t('home.feedback_prefix')) ?>
@@ -187,6 +231,7 @@ if (!$needsOnboarding) {
 
 		if (iOS()) document.body.classList.add('ios')
 	</script>
+	<script type="text/javascript" src="assets/home.js?v=1"></script>
 
 <?php endif; ?>
 

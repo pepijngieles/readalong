@@ -1,6 +1,7 @@
 {
   "id": "viktoria-av-hessen-darmstadt",
   "type": "default",
+  "kind": "book",
   "language": "no",
   "order": 4,
   "published": true,
