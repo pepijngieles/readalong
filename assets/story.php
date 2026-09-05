@@ -41,6 +41,61 @@ function story_flatten_blocks(array $text, array $translation) {
   return $sentences;
 }
 
+function story_translation_from_text(array $text) {
+  $sentences = [];
+  foreach ($text['blocks'] as $block) {
+    foreach ($block['sentences'] as $sentence) {
+      $sentences[] = $sentence;
+    }
+  }
+  return [
+    'title' => $text['heading'] ?? '',
+    'sentences' => $sentences,
+  ];
+}
+
+function story_read_translation($storyDir, $lang) {
+  if (!$lang) {
+    return null;
+  }
+  $path = $storyDir . '/translations/' . $lang . '.json';
+  return is_readable($path) ? read_json($path) : null;
+}
+
+function story_resolve_translation($storyDir, $requestedLang, $sourceLang, ?array $text = null) {
+  $direct = story_read_translation($storyDir, $requestedLang);
+  if ($direct) {
+    return $direct;
+  }
+
+  if ($text === null) {
+    $textPath = $storyDir . '/text/' . $sourceLang . '.json';
+    if (is_readable($textPath)) {
+      $text = read_json($textPath);
+    }
+  }
+
+  if ($requestedLang === $sourceLang && $text) {
+    return story_translation_from_text($text);
+  }
+
+  foreach (array_unique(array_filter(['en', $sourceLang])) as $lang) {
+    if ($lang === $requestedLang) {
+      continue;
+    }
+    $found = story_read_translation($storyDir, $lang);
+    if ($found) {
+      return $found;
+    }
+  }
+
+  foreach (glob($storyDir . '/translations/*.json') as $path) {
+    return read_json($path);
+  }
+
+  return $text ? story_translation_from_text($text) : null;
+}
+
 function story_validate(array $meta, array $sentences) {
   $count = count($sentences);
 
@@ -57,7 +112,6 @@ function story_validate(array $meta, array $sentences) {
 function story_load($storyDir, $translationLang = 'en', $voiceId = null) {
   $meta = read_json($storyDir . '/story.json');
   $language = $meta['language'];
-  $translation = read_json($storyDir . '/translations/' . $translationLang . '.json');
 
   $defaultVoice = $meta['voices'][0];
   $activeVoiceId = $voiceId ?? $defaultVoice['id'];
@@ -69,6 +123,10 @@ function story_load($storyDir, $translationLang = 'en', $voiceId = null) {
 
   $textKey = $activeVoice['text'] ?? $language;
   $text = read_json($storyDir . '/text/' . $textKey . '.json');
+  $translation = story_resolve_translation($storyDir, $translationLang, $language, $text);
+  if ($translation === null) {
+    throw new RuntimeException('No translation available for story in ' . $storyDir);
+  }
   $sentences = story_flatten_blocks($text, $translation);
   story_validate($meta, $sentences);
 
@@ -202,11 +260,10 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
       }
     }
 
-    $translationPath = $storyDir . '/translations/' . $translationLang . '.json';
-    if (!is_readable($translationPath)) {
+    $translation = story_resolve_translation($storyDir, $translationLang, $meta['language']);
+    if ($translation === null) {
       continue;
     }
-    $translation = read_json($translationPath);
     $defaultVoice = $meta['voices'][0];
 
     $kind = $meta['kind'] ?? null;

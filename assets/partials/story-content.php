@@ -17,7 +17,7 @@ foreach ($text['blocks'] as $block) {
     echo "\t\t\t\t\t<p data-name=" . e($block['speaker']) . ">\n";
     foreach ($block['sentences'] as $sentence) {
       $translationText = $translation['sentences'][$sentenceIndex];
-      echo "\t\t\t\t\t\t<span tabindex=1 data-sentence=" . $sentenceIndex . ' data-translation="' . e($translationText) . "\">\n";
+      echo "\t\t\t\t\t\t<span tabindex=0 data-sentence=" . $sentenceIndex . ' data-translation="' . e($translationText) . "\">\n";
       echo "\t\t\t\t\t\t\t" . e($sentence) . "\n";
       echo "\t\t\t\t\t\t</span>\n";
       $sentenceIndex++;
@@ -29,7 +29,7 @@ foreach ($text['blocks'] as $block) {
     $parts = [];
     foreach ($block['sentences'] as $sentence) {
       $translationText = $translation['sentences'][$sentenceIndex];
-      $parts[] = '<span tabindex=1 data-sentence=' . $sentenceIndex . ' data-translation="' . e($translationText) . '">' . e($sentence) . '</span>';
+      $parts[] = '<span tabindex=0 data-sentence=' . $sentenceIndex . ' data-translation="' . e($translationText) . '">' . e($sentence) . '</span>';
       $sentenceIndex++;
     }
     echo "\t\t\t\t" . implode(' ', $parts) . "\n";

@@ -1344,6 +1344,12 @@ body.theme-dark .settings-segment__preview{
   display: none;
 }
 
+.onboarding-demo-controls{
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
 .onboarding-demo-controls button:focus-visible{
   outline: 2px solid var(--accent-yellow);
   outline-offset: 2px;

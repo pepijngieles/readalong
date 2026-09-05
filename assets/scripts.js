@@ -151,6 +151,9 @@ function play() {
   playing = true
   document.body.classList.remove('paused')
   const playAttempt = audioFile.play()
+  if (playAttempt && typeof playAttempt.catch === 'function') {
+    playAttempt.catch(function () {})
+  }
   checkForScroll()
   // Callers can reach play() without pausing first, which would leave the
   // previous interval running alongside the new one
@@ -200,7 +203,8 @@ function autoPlay() {
   // updateProgressBar can still hold the previous position for one tick
   // and would skip or stick on the wrong sentence.
   const currentTime = audioFile.currentTime
-  if (!inSentencePause && currentTime >= timestamps[voice][currentSentence + 1]) {
+  const nextStart = timestamps[voice][currentSentence + 1]
+  if (!inSentencePause && Number.isFinite(nextStart) && currentTime >= nextStart) {
     currentSentence++
     // Change to next sentence if no pause was set
     if (sentencePause == 0) changeSentence()
@@ -252,7 +256,7 @@ function changeSentence() {
   /* 5.2 Update the translation -------------------------------------------- */
   function updateTranslation() {
     if (!translationPopover || !translationText || !currentSentenceEl) return
-    translationText.innerHTML = currentSentenceEl.dataset.translation
+    translationText.textContent = currentSentenceEl.dataset.translation || ''
     // Calculate the right Y-position for the popover
     popoverOffsetY = currentSentenceEl.offsetHeight - 8
     popoverOffsetY += currentSentenceEl.offsetTop
@@ -284,6 +288,8 @@ function changeSentence() {
   let scrollMargin = (storyType == 'dialogue') ? 48 : 12
   
   function checkForScroll() {
+    if (document.body.classList.contains('onboarding-page')) return
+    if (!currentSentenceEl) return
 
     let sentenceOffset = currentSentenceEl.getBoundingClientRect()
     if (sentenceOffset.top < scrollMargin) {
@@ -292,8 +298,8 @@ function changeSentence() {
     }
 
     let contentHeight = window.innerHeight - navHeight
-    let popoverOffsetY = translationPopover.getBoundingClientRect()
-    let offsetBottom = (showTranslation) ? popoverOffsetY.bottom + 48 : sentenceOffset.bottom + scrollMargin
+    let popoverRect = translationPopover ? translationPopover.getBoundingClientRect() : sentenceOffset
+    let offsetBottom = (showTranslation) ? popoverRect.bottom + 48 : sentenceOffset.bottom + scrollMargin
     
     if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - scrollMargin)
   }
@@ -543,11 +549,12 @@ function initSettingsControls() {
 }
 
 function closeSettings() {
-  if (settingsPopover.hidden) return
+  if (!settingsPopover || settingsPopover.hidden) return
   toggleSettings()
 }
 
 function toggleSettings() {
+  if (!settingsPopover) return
   settingsPopover.hidden = !settingsPopover.hidden
   if (settingsScrim) settingsScrim.hidden = settingsPopover.hidden
   document.body.classList.toggle('show-settings')

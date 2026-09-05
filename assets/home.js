@@ -121,8 +121,9 @@
     entries.forEach(function (entry) {
       const source = allList.querySelector('li[data-id="' + entry.id.replace(/"/g, '') + '"]')
       if (!source || source.classList.contains('dummy-story')) return
-      decorateContinueItem(source, entry.progress)
-      continueList.appendChild(source)
+      const clone = source.cloneNode(true)
+      decorateContinueItem(clone, entry.progress)
+      continueList.appendChild(clone)
     })
     continueSection.hidden = continueList.children.length === 0
   }

@@ -2,11 +2,7 @@
 <html lang="<?= e(ui_locale()) ?>" translate=yes class=no-js>
 <head>
 	<meta charset="utf-8">
-<<<<<<< HEAD
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-=======
-	<meta name="viewport" content="width=device-width">
->>>>>>> origin/main
 	<meta name="theme-color" content="#ffffff" />
 
 	<title><?= e($story['title']) ?></title>
@@ -20,5 +16,5 @@
 	<link rel=icon href=<?= e($base) ?>assets/favicons/favicon.svg type=image/svg+xml>
 	<link rel=apple-touch-icon href=<?= e($base) ?>assets/favicons/favicon-180.png>
 	<link rel=manifest href=<?= e($base) ?>manifest.json>
-	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/styles.css?v=8">
+	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/styles.css?v=9">
 </head>

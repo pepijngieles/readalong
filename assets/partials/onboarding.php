@@ -33,8 +33,8 @@ $storyConfig = [
 			<div class=onboarding-demo>
 				<article class=story lang=<?= e($defaultRead) ?> translate=no data-onboarding-demo-story>
 					<p>
-						<span tabindex=1 data-sentence=0 lang=<?= e($defaultRead) ?> data-translation="<?= e($demoTranslation[0]) ?>"><?= e($demoSource[0]) ?></span>
-						<span tabindex=1 data-sentence=1 lang=<?= e($defaultRead) ?> data-translation="<?= e($demoTranslation[1]) ?>"><?= e($demoSource[1]) ?></span>
+						<span tabindex=0 data-sentence=0 lang=<?= e($defaultRead) ?> data-translation="<?= e($demoTranslation[0]) ?>" aria-current=true><?= e($demoSource[0]) ?></span>
+						<span tabindex=0 data-sentence=1 lang=<?= e($defaultRead) ?> data-translation="<?= e($demoTranslation[1]) ?>"><?= e($demoSource[1]) ?></span>
 					</p>
 				</article>
 
@@ -52,7 +52,7 @@ $storyConfig = [
 					<progress value="0" max="100"></progress>
 				</div>
 
-				<audio src="assets/audio/onboarding-silence.wav" preload=auto playsinline muted></audio>
+				<audio src="assets/audio/onboarding-silence.wav" preload=auto playsinline muted hidden></audio>
 			</div>
 
 			<div class=onboarding-translations>
@@ -95,5 +95,5 @@ $storyConfig = [
 	window.READALONG_ENDONYMS = <?= json_encode(lang_endonyms(), JSON_UNESCAPED_UNICODE) ?>;
 	window.READALONG_DEMO = <?= json_encode($segments, JSON_UNESCAPED_UNICODE) ?>;
 </script>
-<script type="text/javascript" src="assets/scripts.js?v=15"></script>
-<script type="text/javascript" src="assets/onboarding.js?v=2"></script>
+<script type="text/javascript" src="assets/scripts.js?v=16"></script>
+<script type="text/javascript" src="assets/onboarding.js?v=3"></script>

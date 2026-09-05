@@ -23,7 +23,7 @@ if (!$needsOnboarding) {
 }
 ?>
 <?php include $partials . '/head.php'; ?>
-<body<?= $needsOnboarding ? ' class="onboarding-page show-translation"' : '' ?>>
+<body<?= $needsOnboarding ? ' class="onboarding-page show-translation started paused"' : '' ?>>
 
 <?php if ($needsOnboarding): ?>
 
@@ -139,7 +139,7 @@ if (!$needsOnboarding) {
 				</button>
 <?php endforeach; ?>
 			</div>
-			<div class=pill-row role=group aria-label="<?= e(t('home.up_to_minutes', ['n' => ''])) ?>">
+			<div class=pill-row role=group aria-label="<?= e(t('home.duration_filters')) ?>">
 <?php foreach ($durationPills as $minutes): ?>
 				<button type=button class=pill data-duration-filter="<?= e((string) $minutes) ?>" aria-pressed=false>
 					<?php icon('check', ['size' => 16, 'class' => 'pill__check']); ?>
@@ -162,7 +162,7 @@ if (!$needsOnboarding) {
 			<?= e(t('home.feedback_prefix')) ?>
 			<a href="mailto:support@readalong.io?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A"><?= e(t('home.feedback_email')) ?></a>
 			<?= e(t('home.feedback_middle')) ?>
-			<a href="https://github.com/pepijngieles/read-along" target="_blank" rel="noopener"><?= e(t('home.feedback_github')) ?></a>.
+			<a href="https://github.com/pepijngieles/readalong" target="_blank" rel="noopener"><?= e(t('home.feedback_github')) ?></a>.
 		</p>
 
 	</main>
@@ -229,7 +229,7 @@ if (!$needsOnboarding) {
 
 		if (iOS()) document.body.classList.add('ios')
 	</script>
-	<script type="text/javascript" src="assets/home.js?v=2"></script>
+	<script type="text/javascript" src="assets/home.js?v=3"></script>
 
 <?php endif; ?>
 
