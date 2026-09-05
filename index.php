@@ -23,7 +23,7 @@ if (!$needsOnboarding) {
 }
 ?>
 <?php include $partials . '/head.php'; ?>
-<body<?= $needsOnboarding ? ' class=onboarding-page' : '' ?>>
+<body<?= $needsOnboarding ? ' class="onboarding-page show-translation"' : '' ?>>
 
 <?php if ($needsOnboarding): ?>
 

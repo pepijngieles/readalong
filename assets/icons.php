@@ -9,6 +9,10 @@ function icon_definitions() {
       'viewBox' => '0 0 24 24',
       'body' => '<path d="M2.5 11.5L9.5 4.5" class="round"/><path d="M2.5 11.5H22.5" class="round"/><path d="M9.5 18.5L2.5 11.5" class="round"/>',
     ],
+    'check' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M4.5 12.5L9.5 17.5L19.5 6.5" class="round"/>',
+    ],
     'chevron-down' => [
       'viewBox' => '0 0 16 16',
       'body' => '<path d="M7.5 10.5L4.5 7.5" class="round"/><path d="M7.5 10.5L10.5 7.5" class="round"/>',

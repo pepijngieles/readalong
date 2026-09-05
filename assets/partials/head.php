@@ -2,7 +2,11 @@
 <html lang="<?= e(ui_locale()) ?>" translate=yes class=no-js>
 <head>
 	<meta charset="utf-8">
+<<<<<<< HEAD
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+=======
 	<meta name="viewport" content="width=device-width">
+>>>>>>> origin/main
 	<meta name="theme-color" content="#ffffff" />
 
 	<title><?= e($story['title']) ?></title>

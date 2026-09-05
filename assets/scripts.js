@@ -33,7 +33,8 @@ const audioFile = document.querySelector('audio'),
       timeInput =  document.querySelector('input[name=currentSentenceTime]'), // For developer purposes
       translationPopover = document.querySelector('[data-translation-popover]'),
       translationText = document.querySelector('[data-translation-text]'),
-      navHeight = document.querySelector('nav').offsetHeight,
+      navEl = document.querySelector('nav'),
+      navHeight = navEl ? navEl.offsetHeight : 0,
       settingsPopover = document.querySelector('.settings-popover'),
       settingsScrim = document.querySelector('.settings-scrim'),
       themeColorEl = document.querySelector("meta[name=theme-color]"),
@@ -138,6 +139,7 @@ function start() {
 }
 
 function play() {
+  if (!audioFile) return
   if (!started) start()
   if (pendingRestoreSeek) {
     pendingRestoreSeek = false
@@ -148,7 +150,7 @@ function play() {
   }
   playing = true
   document.body.classList.remove('paused')
-  audioFile.play()
+  const playAttempt = audioFile.play()
   checkForScroll()
   // Callers can reach play() without pausing first, which would leave the
   // previous interval running alongside the new one
@@ -157,9 +159,11 @@ function play() {
   interval = setInterval(function() {
     if(playing) autoPlay()
   }, 100)
+  return playAttempt
 }
 
 function pause() {
+  if (!audioFile) return
   clearTimeout(sentencePauseTimeout)
   // currentSentence was already advanced, but changeSentence() was still
   // waiting on the timeout. Catch the UI up, or the sentence gets skipped
@@ -228,7 +232,7 @@ function changeSentence() {
   updateProgressBar()
   disableButtons()
   // Dev thinghies
-  timeInput.value = timestamps[voice][currentSentence]
+  if (timeInput) timeInput.value = timestamps[voice][currentSentence]
   // A little timeOut is needed so the function uses the updated values
   setTimeout(function(){
     checkForScroll()
@@ -239,14 +243,15 @@ function changeSentence() {
   /* 5.1 Highlight a sentence ---------------------------------------------- */
   function highlightSentence(number) {
     if (!started) start()
-    document.querySelector('[data-sentence][aria-current]').removeAttribute('aria-current')
-    currentSentenceEl.setAttribute('aria-current', 'true')
+    const current = document.querySelector('[data-sentence][aria-current]')
+    if (current) current.removeAttribute('aria-current')
+    if (currentSentenceEl) currentSentenceEl.setAttribute('aria-current', 'true')
     // TODO: find out how to cope with focus()
   }
 
   /* 5.2 Update the translation -------------------------------------------- */
   function updateTranslation() {
-    // Replace the text
+    if (!translationPopover || !translationText || !currentSentenceEl) return
     translationText.innerHTML = currentSentenceEl.dataset.translation
     // Calculate the right Y-position for the popover
     popoverOffsetY = currentSentenceEl.offsetHeight - 8
@@ -295,6 +300,7 @@ function changeSentence() {
 
   /* 5.4 Update the progress bar ------------------------------------------- */
   function updateProgressBar() {
+    if (!progressBar || !audioFile) return
     // Keep time numeric so sentence-boundary compares stay reliable
     time = audioFile.currentTime
     if (Number.isFinite(audioFile.duration) && audioFile.duration > 0) {
@@ -304,10 +310,8 @@ function changeSentence() {
 
   /* 5.5 Disable rewind/forward button if needed --------------------------- */
   function disableButtons(button){
-    if (currentSentence == 0) rewindButton.disabled = true
-    else if (rewindButton.disabled) rewindButton.disabled = false
-    if (currentSentence == sentences.length - 1) fastForwardButton.disabled = true
-    else if (fastForwardButton.disabled) fastForwardButton.disabled = false
+    if (rewindButton) rewindButton.disabled = currentSentence == 0
+    if (fastForwardButton) fastForwardButton.disabled = currentSentence == sentences.length - 1
   }
 
 
@@ -352,7 +356,7 @@ function toggleTranslation() {
 let wasPlaying = playing
 const voiceSelect = document.querySelector('[data-voice]')
 const durationEl = document.querySelector('[data-duration]')
-voiceSelect.addEventListener('change', switchVoice, false)
+if (voiceSelect) voiceSelect.addEventListener('change', switchVoice, false)
 
 function switchVoice() {
   const newVoice = this.value
@@ -410,8 +414,9 @@ const FONT_FAMILIES = {
 let currentTheme = 'light'
 
 function updateThemeColor() {
+  if (!themeColorEl) return
   const colors = THEME_META_COLORS[currentTheme] || THEME_META_COLORS.light
-  if (!settingsPopover.hidden && started) themeColorValue = colors.secondary
+  if (settingsPopover && !settingsPopover.hidden && started) themeColorValue = colors.secondary
   else if (started && showTranslation) themeColorValue = colors.secondary
   else themeColorValue = colors.primary
   themeColorEl.setAttribute('content', themeColorValue)
