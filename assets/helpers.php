@@ -35,6 +35,59 @@ function configured_languages() {
   return ['de', 'en', 'es', 'fr', 'nl', 'no'];
 }
 
+function lang_endonyms() {
+  return [
+    'de' => 'Deutsch',
+    'en' => 'English',
+    'es' => 'Español',
+    'fr' => 'Français',
+    'nl' => 'Nederlands',
+    'no' => 'Norsk',
+  ];
+}
+
+function lang_endonym($code) {
+  $endonyms = lang_endonyms();
+  return $endonyms[$code] ?? strtoupper($code);
+}
+
+function languages_by_endonym() {
+  $codes = configured_languages();
+  usort($codes, function ($a, $b) {
+    return strcasecmp(lang_endonym($a), lang_endonym($b));
+  });
+  return $codes;
+}
+
+function onboarding_demo_segments() {
+  return [
+    'de' => [
+      'Als der Zug endlich in den Bahnhof einfuhr,',
+      'hatte ich schon die Hälfte des Buches gelesen.',
+    ],
+    'en' => [
+      'When the train finally pulled into the station,',
+      'I had already read half the book.',
+    ],
+    'es' => [
+      'Cuando el tren por fin llegó a la estación,',
+      'ya había leído la mitad del libro.',
+    ],
+    'fr' => [
+      'Quand le train est enfin entré en gare,',
+      'j\'avais déjà lu la moitié du livre.',
+    ],
+    'nl' => [
+      'Toen de trein eindelijk het station binnenreed,',
+      'had ik al de helft van het boek gelezen.',
+    ],
+    'no' => [
+      'Da toget endelig kjørte inn på stasjonen,',
+      'hadde jeg allerede lest halve boka.',
+    ],
+  ];
+}
+
 function detect_browser_locale(array $allowed, $default = 'en') {
   $header = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
   if (preg_match_all('/\b([a-z]{2})(?:-[a-z]{2})?\b/i', $header, $matches)) {

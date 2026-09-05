@@ -1233,30 +1233,113 @@ body.theme-dark .settings-segment__preview{
 /* 17b. Onboarding
 ---------------------------------------------------------------------------- */
 .onboarding-page{
-  overflow: hidden;
+  overflow: auto;
 }
 
 .onboarding-screen{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100dvh;
   padding: 2rem 1.5rem;
-  background-color: var(--background);
+  background-color: var(--background-primary);
 }
 
 .onboarding-screen__inner{
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  width: min(100%, 24rem);
+  gap: 1rem;
+  width: min(100%, 28rem);
+  margin-block: auto;
 }
 
 .onboarding-brand{
   margin: 0;
   font-size: 1.5rem;
   text-align: center;
+}
+
+.onboarding-card{
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border-default);
+  border-radius: 1.25rem;
+  background-color: var(--background-primary);
+}
+
+.onboarding-demo{
+  position: relative;
+}
+
+.onboarding-demo .story{
+  min-height: 5.5rem;
+  margin: 0;
+  padding-block-end: 4.5rem;
+}
+
+.onboarding-demo .story p{
+  margin: 0;
+}
+
+.onboarding-demo .translation-popover{
+  pointer-events: none;
+}
+
+.onboarding-demo .translation-popover button{
+  display: none;
+}
+
+.onboarding-demo-controls button:focus-visible{
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: 2px;
+}
+
+.onboarding-demo-controls progress{
+  position: static;
+  flex: 1 1 auto;
+  height: .25rem;
+  z-index: auto;
+}
+
+.onboarding-translations{
+  display: flex;
+  flex-direction: column;
+  gap: .375rem;
+}
+
+.onboarding-translations__row{
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .375rem .5rem;
+}
+
+.onboarding-translations__row label{
+  display: inline;
+  padding: 0;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.onboarding-translations__row select{
+  width: auto;
+  max-width: 100%;
+}
+
+.onboarding-translations__row select:focus-visible{
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: 2px;
+}
+
+.onboarding-translations__note{
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: .875rem;
+  line-height: 1.45;
 }
 
 .onboarding-languages{
@@ -1269,70 +1352,59 @@ body.theme-dark .settings-segment__preview{
 .onboarding-languages__legend{
   display: block;
   margin-block-end: .75rem;
+  padding: 0;
   font-weight: 600;
 }
 
-.onboarding-languages__grid{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .75rem;
+.onboarding-languages__list{
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
 }
 
 .onboarding-language{
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-height: 2.75rem;
+  padding: .5rem .75rem;
+  border-radius: .75rem;
   cursor: pointer;
 }
 
-.onboarding-language__button{
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 3.5rem;
-  padding: .75rem 1rem;
-  border-radius: .75rem;
-  background-color: var(--background-popover);
-  box-shadow: inset 0 0 0 1px var(--border-warm);
-  transition: box-shadow ease-out .15s;
+.onboarding-language:hover{
+  background-color: var(--shade-default);
 }
 
-.onboarding-language__radio{
-  position: absolute;
-  top: .625rem;
-  left: .625rem;
-  margin: 0;
-  accent-color: var(--text-velvet);
+.onboarding-language:has(:checked){
+  background-color: var(--background-yellow);
 }
 
-.onboarding-language__label{
-  text-align: center;
-}
-
-.onboarding-language:has(.onboarding-language__radio:checked) .onboarding-language__button{
-  box-shadow: inset 0 0 0 2px var(--accent-yellow);
-}
-
-.onboarding-language__radio:focus-visible{
+.onboarding-language:has(:focus-visible){
   outline: 2px solid var(--accent-yellow);
   outline-offset: 2px;
 }
 
-.onboarding-translations{
+.onboarding-language__radio{
+  position: absolute;
+}
+
+.onboarding-language__label{
+  flex: 1 1 auto;
+}
+
+.onboarding-language:has(:checked) .onboarding-language__label{
+  font-weight: 600;
+}
+
+.onboarding-language__check{
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: .375rem .5rem;
-  color: var(--text-secondary);
-  font-size: .875rem;
+  color: var(--text-velvet);
+  visibility: hidden;
 }
 
-.onboarding-translations label{
-  margin: 0;
-}
-
-.onboarding-translations select{
-  width: auto;
-  max-width: 100%;
-  font-size: inherit;
+.onboarding-language:has(:checked) .onboarding-language__check{
+  visibility: visible;
 }
 
 .onboarding-continue{
@@ -1341,6 +1413,11 @@ body.theme-dark .settings-segment__preview{
   border-color: transparent;
   color: var(--background-yellow);
   background-color: var(--text-velvet);
+}
+
+.onboarding-continue:focus-visible{
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: 2px;
 }
 
 @media (hover: hover) {
@@ -1356,6 +1433,21 @@ body.theme-dark .settings-segment__preview{
 .onboarding-continue:disabled{
   opacity: .5;
   cursor: not-allowed;
+}
+
+.onboarding-change-later{
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: .875rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-page [data-sentence],
+  .onboarding-page .translation-popover{
+    transition: none;
+  }
 }
 
 .dummy-content-notice{
