@@ -44,7 +44,7 @@ let   started = false,
       playing = false,
       time = 0,
       sentencePause = 0,
-      currentSentence = 0, // TODO: get current sentence from localStorage
+      currentSentence = 0,
       currentSentenceEl = sentences[0],
       interval,
       sentencePauseTimeout,
@@ -61,6 +61,43 @@ const timestamps = Object.fromEntries(
   Object.entries(storyConfig.voices).map(([id, v]) => [id, v.timestamps]))
 const storyType = storyConfig.type
 let voice = storyConfig.voice
+let pendingRestoreSeek = false
+
+const PROGRESS_KEY = 'readalong-progress'
+
+function loadProgressMap() {
+  try {
+    return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}') || {}
+  } catch (error) {
+    return {}
+  }
+}
+
+function saveStoryProgress(completed) {
+  if (!storyConfig.id || !storyConfig.slug) return
+  try {
+    const map = loadProgressMap()
+    map[storyConfig.id] = {
+      slug: storyConfig.slug,
+      sentence: currentSentence,
+      updatedAt: Date.now(),
+      completed: completed === true
+    }
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(map))
+  } catch (error) {}
+}
+
+function restoreStoryProgress() {
+  const saved = loadProgressMap()[storyConfig.id]
+  if (!saved || saved.completed || !(saved.sentence > 0) || !sentences.length) return
+  const index = Math.min(saved.sentence, sentences.length - 1)
+  if (index <= 0) return
+  currentSentence = index
+  currentSentenceEl = sentences[currentSentence]
+  pendingRestoreSeek = true
+}
+
+restoreStoryProgress()
 
 // Make all sentences clickable
 for (sentence of sentences) {
@@ -104,6 +141,13 @@ function start() {
 function play() {
   if (!audioFile) return
   if (!started) start()
+  if (pendingRestoreSeek) {
+    pendingRestoreSeek = false
+    const startTime = Number(timestamps[voice][currentSentence])
+    if (Number.isFinite(startTime)) {
+      try { audioFile.currentTime = startTime } catch (error) {}
+    }
+  }
   playing = true
   document.body.classList.remove('paused')
   const playAttempt = audioFile.play()
@@ -131,9 +175,11 @@ function pause() {
   document.body.classList.add('paused')
   audioFile.pause()
   clearInterval(interval)
+  saveStoryProgress(false)
 }
 
 function end() {
+  saveStoryProgress(true)
   audioFile.currentTime = 0
   currentSentence = 0
   updateThemeColor()
@@ -191,6 +237,7 @@ function changeSentence() {
   setTimeout(function(){
     checkForScroll()
   }, 240)
+  if (started) saveStoryProgress(false)
 }
 
   /* 5.1 Highlight a sentence ---------------------------------------------- */
@@ -512,6 +559,15 @@ function updateSettings() {
 }
 
 initSettingsControls()
+
+if (currentSentence > 0 && currentSentenceEl) {
+  start()
+  changeSentence()
+}
+
+window.addEventListener('pagehide', function () {
+  if (started) saveStoryProgress(false)
+})
 
 
 

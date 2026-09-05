@@ -631,7 +631,7 @@ def next_order(stories_dir):
 
 def write_story(slug, heading, language, story_type, blocks, translation_sets, titles,
                 voice, order=None, published=False, speakers=None, level=None,
-                attribution=None, rights=None):
+                attribution=None, rights=None, kind=None):
     story_dir = REPO / "stories" / slug
     sentences = flatten(blocks)
 
@@ -655,6 +655,8 @@ def write_story(slug, heading, language, story_type, blocks, translation_sets, t
         meta["attribution"] = attribution
     if rights:
         meta["rights"] = rights
+    if kind:
+        meta["kind"] = kind
     write_json(story_json, meta)
 
     text = {"heading": heading}
@@ -834,6 +836,8 @@ def add_common(parser):
     parser.add_argument("--voice-name", help="weergavenaam (default: voice-id met hoofdletter)")
     parser.add_argument("--dialect", help="optioneel, komt tussen haakjes achter de naam")
     parser.add_argument("--type", default="default", choices=["default", "dialogue"])
+    parser.add_argument("--kind", choices=["podcast", "news", "book", "email", "weather", "story"],
+                        help="inhoudstype op de startpagina")
     parser.add_argument("--order", type=int, help="sorteerpositie op de startpagina")
     parser.add_argument("--publish", action="store_true", help="zet published op true")
     parser.add_argument("--lead-in", type=float, default=LEAD_IN,
@@ -945,7 +949,8 @@ def cmd_from_audio(args):
     write_story(args.slug, args.heading, args.language,
                 resolve_type(args.type, speakers), blocks, translation_sets,
                 build_titles(args), voice_entry(args, timestamps, duration),
-                args.order, args.publish, speakers, level, attribution, rights)
+                args.order, args.publish, speakers, level, attribution, rights,
+                getattr(args, "kind", None))
     report(args.slug, blocks, timestamps, translation_sets, duration)
 
 
@@ -977,7 +982,8 @@ def cmd_from_text(args):
     write_story(args.slug, args.heading, args.language,
                 resolve_type(args.type, speakers), blocks, translation_sets,
                 build_titles(args), voice_entry(args, timestamps, duration),
-                args.order, args.publish, speakers, level, attribution, rights)
+                args.order, args.publish, speakers, level, attribution, rights,
+                getattr(args, "kind", None))
     report(args.slug, blocks, timestamps, translation_sets, duration)
 
 
