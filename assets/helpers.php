@@ -104,7 +104,7 @@ function lang_pref($key, array $allowed, $default) {
 }
 
 function story_filter_kinds() {
-  return ['podcast', 'news', 'book', 'email'];
+  return ['podcast', 'news', 'book', 'email', 'weather'];
 }
 
 function story_kind_label($kind) {
@@ -308,6 +308,8 @@ function dummy_stories($readAlongLang) {
       'levelLabel' => null,
       'kind' => $kind,
       'kindLabel' => story_kind_label($kind),
+      'language' => $readAlongLang,
+      'sentenceCount' => 0,
       'dummy' => true,
     ];
   }

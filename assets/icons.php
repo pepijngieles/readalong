@@ -21,6 +21,10 @@ function icon_definitions() {
       'viewBox' => '0 0 24 24',
       'body' => '<path d="M7.5 16.5L16.5 7.5" class="round"/><path d="M16.5 16.5L7.5 7.5" class="round"/>',
     ],
+    'check' => [
+      'viewBox' => '0 0 16 16',
+      'body' => '<path d="M3.5 8.5L6.5 11.5L12.5 4.5" class="round no-fill"/>',
+    ],
     'curve' => [
       'viewBox' => '0 0 80 24',
       'body' => '<path d="M21.1 14.8a24 24 0 0 0 37.8 0C64.3 8 71.2 0 80 0H0c8.8 0 15.7 7.9 21.1 14.8Z" class="fill no-stroke"/>',
