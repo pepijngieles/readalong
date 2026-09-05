@@ -7,7 +7,8 @@ if (!empty($story['storyType']) && $story['storyType'] !== 'default') {
 }
 ?>
 <?php include $partials . '/head.php'; ?>
-<body class=show-translation>
+<?php $showTranslation = ($translationLang ?? '') !== ($story['languageCode'] ?? ''); ?>
+<body<?= $showTranslation ? ' class=show-translation' : '' ?>>
 
 	<main>
 

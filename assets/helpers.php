@@ -342,12 +342,13 @@ function dummy_story_catalog() {
   ];
 }
 
-function dummy_stories($readAlongLang) {
+function dummy_stories($readAlongLang, $titleLang = null) {
   $stories = [];
+  $titleLang = $titleLang ?: $readAlongLang;
 
   foreach (dummy_story_catalog() as $index => $entry) {
     $titles = $entry['titles'];
-    $title = $titles[$readAlongLang] ?? $titles['en'];
+    $title = $titles[$titleLang] ?? $titles[$readAlongLang] ?? $titles['en'];
     $kind = $entry['kind'];
     $seconds = (int) $entry['duration'];
     $stories[] = [
@@ -355,6 +356,7 @@ function dummy_stories($readAlongLang) {
       'slug' => null,
       'order' => 1000 + $index,
       'title' => $title,
+      'sourceTitle' => $titles[$readAlongLang] ?? $title,
       'duration' => format_duration($seconds),
       'durationSeconds' => $seconds,
       'level' => null,

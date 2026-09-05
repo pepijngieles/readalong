@@ -1,7 +1,7 @@
 {
   "name": "Readalong",
   "short_name": "Readalong",
-  "start_url": "https://readalong.io",
+  "start_url": "/",
   "icons": [
     {
       "src": "assets/favicons/favicon-192.png",
