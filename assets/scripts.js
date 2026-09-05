@@ -61,7 +61,6 @@ const timestamps = Object.fromEntries(
   Object.entries(storyConfig.voices).map(([id, v]) => [id, v.timestamps]))
 const storyType = storyConfig.type
 let voice = storyConfig.voice
-let pendingRestoreSeek = false
 
 const PROGRESS_KEY = 'readalong-progress'
 
@@ -95,7 +94,6 @@ function restoreStoryProgress() {
   if (index <= 0) return
   currentSentence = index
   currentSentenceEl = sentences[currentSentence]
-  pendingRestoreSeek = true
 }
 
 restoreStoryProgress()
@@ -127,6 +125,19 @@ function findAncestor(element, selector){
   return element;
 }
 
+function sentenceStart(index) {
+  return Number(timestamps[voice][index])
+}
+
+function seekAudio(seconds) {
+  const start = Number(seconds)
+  if (!audioFile || !Number.isFinite(start)) return
+  try {
+    audioFile.currentTime = start
+  } catch (error) {}
+  time = start
+}
+
 
 
 /* 3. Start, Play, Pause & End
@@ -142,18 +153,31 @@ function start() {
 function play() {
   if (!audioFile) return
   if (!started) start()
-  if (pendingRestoreSeek) {
-    pendingRestoreSeek = false
-    const startTime = Number(timestamps[voice][currentSentence])
-    if (Number.isFinite(startTime)) {
-      try { audioFile.currentTime = startTime } catch (error) {}
-    }
+  const startTime = sentenceStart(currentSentence)
+  // Skip title/intro audio that sits before the current sentence. On the
+  // first Play click, browsers often ignore currentTime until playback has
+  // actually started, so re-apply once play() resolves.
+  const needsStartSeek = Number.isFinite(startTime) &&
+    audioFile.currentTime + 0.1 < startTime
+  if (needsStartSeek) {
+    if (!audioFile.paused) audioFile.pause()
+    seekAudio(startTime)
   }
   playing = true
   document.body.classList.remove('paused')
   const playAttempt = audioFile.play()
   if (playAttempt && typeof playAttempt.catch === 'function') {
     playAttempt.catch(function () {})
+  }
+  if (needsStartSeek) {
+    const reapplySeek = function () {
+      if (!playing) return
+      if (audioFile.currentTime + 0.1 < startTime) seekAudio(startTime)
+    }
+    if (playAttempt && typeof playAttempt.then === 'function') {
+      playAttempt.then(reapplySeek).catch(function () {})
+    }
+    audioFile.addEventListener('playing', reapplySeek, { once: true })
   }
   checkForScroll()
   // Callers can reach play() without pausing first, which would leave the
@@ -184,12 +208,12 @@ function pause() {
 
 function end() {
   saveStoryProgress(true)
-  audioFile.currentTime = 0
   currentSentence = 0
+  const startTime = sentenceStart(0)
+  seekAudio(Number.isFinite(startTime) ? startTime : 0)
   updateThemeColor()
   document.body.classList.remove('started')
   changeSentence()
-  time = 0
   playing = false
   started = false
   clearInterval(interval)
@@ -331,15 +355,13 @@ function playSentence(number) {
   else currentSentence = parseInt(this.dataset.sentence, 10)
   // 2. Seek the audio. Pause first: WebKit often ignores currentTime while
   // playing, especially when the element is visually hidden.
-  const start = Number(timestamps[voice][currentSentence])
+  const start = sentenceStart(currentSentence)
   time = start
   const wasPlaying = playing
   clearTimeout(sentencePauseTimeout)
   inSentencePause = false
   if (!audioFile.paused) audioFile.pause()
-  try {
-    audioFile.currentTime = start
-  } catch (error) {}
+  seekAudio(start)
   // 3. After the audio file time-change, the UI can be updated accordingly
   changeSentence()
   time = start
