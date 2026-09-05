@@ -95,5 +95,5 @@ $storyConfig = [
 	window.READALONG_ENDONYMS = <?= json_encode(lang_endonyms(), JSON_UNESCAPED_UNICODE) ?>;
 	window.READALONG_DEMO = <?= json_encode($segments, JSON_UNESCAPED_UNICODE) ?>;
 </script>
-<script type="text/javascript" src="assets/scripts.js?v=16"></script>
+<script type="text/javascript" src="assets/scripts.js?v=17"></script>
 <script type="text/javascript" src="assets/onboarding.js?v=3"></script>

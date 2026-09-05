@@ -113,7 +113,7 @@
     const entries = Object.keys(map).map(function (id) {
       return { id: id, progress: map[id] }
     }).filter(function (entry) {
-      return entry.progress && !entry.progress.completed && entry.progress.sentence > 0
+      return entry.progress && !entry.progress.completed && (entry.progress.sentence > 0 || entry.progress.started)
     }).sort(function (a, b) {
       return (b.progress.updatedAt || 0) - (a.progress.updatedAt || 0)
     })
@@ -133,12 +133,17 @@
     const sentence = progress.sentence || 0
     const duration = parseInt(item.getAttribute('data-duration-seconds'), 10) || 0
     const ratio = 1 - (sentence / Math.max(total - 1, 1))
-    const remainingMinutes = Math.max(1, Math.round(duration * ratio / 60))
+    const remainingSeconds = Math.max(0, duration * ratio)
+    const remainingMinutes = Math.round(remainingSeconds / 60)
     const remainingEl = item.querySelector('[data-remaining]')
     const progressEl = item.querySelector('[data-item-progress]')
     if (remainingEl) {
-      remainingEl.textContent = remainingTemplate.replace('{n}', String(remainingMinutes))
-      remainingEl.hidden = false
+      if (remainingMinutes >= 1) {
+        remainingEl.textContent = remainingTemplate.replace('{n}', String(remainingMinutes))
+        remainingEl.hidden = false
+      } else {
+        remainingEl.hidden = true
+      }
     }
     if (progressEl) {
       progressEl.value = Math.max(0, Math.min(100, Math.round((sentence / Math.max(total - 1, 1)) * 100)))

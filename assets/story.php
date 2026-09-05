@@ -292,7 +292,7 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
   });
 
   if ($readAlongLang !== null) {
-    $stories = array_merge($stories, dummy_stories($readAlongLang));
+    $stories = array_merge($stories, dummy_stories($readAlongLang, $translationLang));
   }
 
   return $stories;

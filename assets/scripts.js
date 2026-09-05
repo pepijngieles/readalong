@@ -49,7 +49,7 @@ let   started = false,
       interval,
       sentencePauseTimeout,
       inSentencePause = false,
-      showTranslation = true,
+      showTranslation = document.body.classList.contains('show-translation'),
       popoverOffsetY = 0,
       popoverOffsetX = 0,
       playbackRate = 1,
@@ -81,7 +81,8 @@ function saveStoryProgress(completed) {
       slug: storyConfig.slug,
       sentence: currentSentence,
       updatedAt: Date.now(),
-      completed: completed === true
+      completed: completed === true,
+      started: true
     }
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(map))
   } catch (error) {}
