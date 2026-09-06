@@ -5,7 +5,7 @@ function ui_strings() {
     'de' => [
       'onboarding.read_along' => 'Mitlesen in',
       'onboarding.translations_label' => 'Übersetzung in',
-      'onboarding.translations_note' => 'Die App selbst ist auch in dieser Sprache.',
+      'onboarding.next' => 'Weiter',
       'onboarding.continue' => 'Mit dem Lesen beginnen',
       'onboarding.change_later' => 'Du kannst das jederzeit in den Einstellungen ändern.',
       'home.tagline' => 'Lies Fremdsprachen gemeinsam mit Muttersprachlern. Keine Tests, kein Ranking, kein Gamification. Lies einfach in deinem Tempo mit.',
@@ -79,7 +79,7 @@ function ui_strings() {
     'en' => [
       'onboarding.read_along' => 'Read along in',
       'onboarding.translations_label' => 'Translation in',
-      'onboarding.translations_note' => 'The app itself is also in this language.',
+      'onboarding.next' => 'Continue',
       'onboarding.continue' => 'Start reading',
       'onboarding.change_later' => 'You can always change this in settings.',
       'home.tagline' => 'Read foreign languages along with native speakers. No tests, no rankings, no gamification. Just read along at your pace.',
@@ -153,7 +153,7 @@ function ui_strings() {
     'es' => [
       'onboarding.read_along' => 'Leer en',
       'onboarding.translations_label' => 'Traducción en',
-      'onboarding.translations_note' => 'La app también está en este idioma.',
+      'onboarding.next' => 'Continuar',
       'onboarding.continue' => 'Empezar a leer',
       'onboarding.change_later' => 'Puedes cambiar esto en cualquier momento en ajustes.',
       'home.tagline' => 'Lee idiomas extranjeros junto a hablantes nativos. Sin pruebas, sin rankings, sin gamificación. Simplemente lee a tu ritmo.',
@@ -227,7 +227,7 @@ function ui_strings() {
     'fr' => [
       'onboarding.read_along' => 'Lire en',
       'onboarding.translations_label' => 'Traduction en',
-      'onboarding.translations_note' => 'L\'application elle-même est aussi dans cette langue.',
+      'onboarding.next' => 'Continuer',
       'onboarding.continue' => 'Commencer à lire',
       'onboarding.change_later' => 'Tu peux toujours modifier cela dans les réglages.',
       'home.tagline' => 'Lisez des langues étrangères avec des locuteurs natifs. Pas de tests, pas de classement, pas de gamification. Lisez simplement à votre rythme.',
@@ -301,7 +301,7 @@ function ui_strings() {
     'nl' => [
       'onboarding.read_along' => 'Meelezen in',
       'onboarding.translations_label' => 'Vertaling in',
-      'onboarding.translations_note' => 'De app zelf staat ook in deze taal.',
+      'onboarding.next' => 'Volgende',
       'onboarding.continue' => 'Begin met lezen',
       'onboarding.change_later' => 'Je kunt dit altijd wijzigen bij je instellingen.',
       'home.tagline' => 'Lees vreemde talen mee met native speakers. Geen tests, geen rankings, geen gamification. Lees gewoon mee in je eigen tempo.',
@@ -375,7 +375,7 @@ function ui_strings() {
     'no' => [
       'onboarding.read_along' => 'Lese med på',
       'onboarding.translations_label' => 'Oversettelse på',
-      'onboarding.translations_note' => 'Appen selv er også på dette språket.',
+      'onboarding.next' => 'Fortsett',
       'onboarding.continue' => 'Begynn å lese',
       'onboarding.change_later' => 'Du kan alltid endre dette i innstillingene.',
       'home.tagline' => 'Les fremmedspråk sammen med morsmålstalere. Ingen tester, ingen rangering, ingen gamification. Bare les i ditt eget tempo.',

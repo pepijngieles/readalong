@@ -1,6 +1,5 @@
 (function () {
   const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
-  const strings = window.READALONG_I18N || {};
   const supportedLangs = window.READALONG_LANGS || [];
   const endonyms = window.READALONG_ENDONYMS || {};
   const demoSegments = window.READALONG_DEMO || {};
@@ -22,22 +21,6 @@
   function detectSystemLanguage() {
     const lang = (navigator.language || 'en').split('-')[0].toLowerCase();
     return supportedLangs.includes(lang) ? lang : 'en';
-  }
-
-  function translate(key, locale) {
-    return (strings[locale] && strings[locale][key]) || (strings.en && strings.en[key]) || key;
-  }
-
-  function applyLocale(locale) {
-    document.documentElement.lang = locale;
-    document.querySelectorAll('[data-i18n]').forEach(function (element) {
-      const key = element.getAttribute('data-i18n');
-      if (key) element.textContent = translate(key, locale);
-    });
-    document.querySelectorAll('.onboarding-language__label').forEach(function (element) {
-      const input = element.closest('label')?.querySelector('[data-onboarding-read]');
-      if (input) element.textContent = translate('lang.' + input.value, locale);
-    });
   }
 
   function selectedRead() {
@@ -100,20 +83,51 @@
     if (typeof play === 'function') play();
   }
 
+  function afterLayout(callback) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(callback);
+    });
+  }
+
+  const screen = document.querySelector('[data-onboarding-screen]');
+  const stepEls = document.querySelectorAll('[data-onboarding-step]');
   const systemLang = detectSystemLanguage();
   const readInputs = document.querySelectorAll('[data-onboarding-read]');
   const translateSelect = document.querySelector('[data-onboarding-translate]');
+  const nextButton = document.querySelector('[data-onboarding-next]');
   const continueButton = document.querySelector('[data-onboarding-continue]');
   let readLang = selectedRead();
   let translateLang = resolveTranslate(readLang, systemLang, systemLang);
+  let demoStarted = false;
+  let currentStep = 1;
+
+  function setStep(step) {
+    currentStep = step;
+    screen.dataset.step = String(step);
+    stepEls.forEach(function (el) {
+      const isActive = el.getAttribute('data-onboarding-step') === String(step);
+      el.inert = !isActive;
+    });
+    if (step === 2) {
+      afterLayout(function () {
+        if (!demoStarted) {
+          demoStarted = true;
+          if (typeof start === 'function') start();
+        }
+        restartDemo();
+      });
+    } else if (typeof pause === 'function') {
+      pause();
+    }
+  }
 
   if (translateSelect.querySelector('option[value="' + translateLang + '"]') == null) {
     translateLang = resolveTranslate(readLang, translateSelect.value, systemLang);
   }
 
   fillTranslateSelect(readLang, translateLang);
-  applyLocale(translateLang);
   renderDemo();
+  setStep(1);
 
   if (audioFile) {
     audioFile.addEventListener('ended', function () {
@@ -121,28 +135,28 @@
     });
   }
 
-  if (typeof start === 'function') start();
-  if (typeof play === 'function') {
-    const playAttempt = play();
-    if (playAttempt && typeof playAttempt.catch === 'function') {
-      playAttempt.catch(function () {});
-    }
-  }
-
   readInputs.forEach(function (input) {
     input.addEventListener('change', function () {
       readLang = input.value;
       translateLang = resolveTranslate(readLang, translateSelect.value, systemLang);
       fillTranslateSelect(readLang, translateLang);
-      applyLocale(translateLang);
-      restartDemo();
+      renderDemo();
+      if (currentStep === 2) restartDemo();
     });
   });
 
   translateSelect.addEventListener('change', function () {
     translateLang = this.value;
-    applyLocale(translateLang);
     renderDemo();
+    if (currentStep === 2) restartDemo();
+  });
+
+  nextButton.addEventListener('click', function () {
+    if (!selectedRead()) {
+      nextButton.disabled = true;
+      return;
+    }
+    setStep(2);
   });
 
   continueButton.addEventListener('click', function () {
