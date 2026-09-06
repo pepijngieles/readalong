@@ -19,7 +19,12 @@ if ($meta['id'] !== $slug) {
   exit('Story not found');
 }
 
-$translationLangs = story_translation_languages(__DIR__);
-$translationLang = lang_pref('translate', $translationLangs, ui_locale());
+$translationLangOptions = story_translation_languages(__DIR__);
+$translationLangsSelected = lang_prefs_list('translate', $translationLangOptions, [ui_locale()]);
+[, $translationLang] = story_pick_translation($storyDir, $translationLangsSelected, $meta['language']);
+if ($translationLang === null) {
+  http_response_code(404);
+  exit('Story not found');
+}
 
 story_render($storyDir, '../../', $translationLang);

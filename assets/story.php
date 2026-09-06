@@ -62,6 +62,29 @@ function story_read_translation($storyDir, $lang) {
   return is_readable($path) ? read_json($path) : null;
 }
 
+function story_translation_available($storyDir, $lang, $sourceLang) {
+  if (story_read_translation($storyDir, $lang)) {
+    return true;
+  }
+
+  return $lang === $sourceLang;
+}
+
+function story_pick_translation($storyDir, array $preferredLangs, $sourceLang, ?array $text = null) {
+  foreach ($preferredLangs as $lang) {
+    if (!story_translation_available($storyDir, $lang, $sourceLang)) {
+      continue;
+    }
+
+    $translation = story_resolve_translation($storyDir, $lang, $sourceLang, $text);
+    if ($translation !== null) {
+      return [$translation, $lang];
+    }
+  }
+
+  return [null, null];
+}
+
 function story_resolve_translation($storyDir, $requestedLang, $sourceLang, ?array $text = null) {
   $direct = story_read_translation($storyDir, $requestedLang);
   if ($direct) {
@@ -239,7 +262,11 @@ function story_level_tiers($storiesDir) {
   return $codes;
 }
 
-function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null, $levelTier = null) {
+function story_list($storiesDir, $translationLangs = 'en', $readAlongLang = null, $levelTier = null) {
+  if (!is_array($translationLangs)) {
+    $translationLangs = [$translationLangs];
+  }
+
   $stories = [];
 
   foreach (glob($storiesDir . '/*/story.json') as $storyJsonPath) {
@@ -260,7 +287,7 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
       }
     }
 
-    $translation = story_resolve_translation($storyDir, $translationLang, $meta['language']);
+    [$translation, $usedTranslationLang] = story_pick_translation($storyDir, $translationLangs, $meta['language']);
     if ($translation === null) {
       continue;
     }
@@ -289,6 +316,7 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
       'kind' => $kind,
       'kindLabel' => story_kind_label($kind),
       'language' => $meta['language'],
+      'translationLang' => $usedTranslationLang,
       'sentenceCount' => count($defaultVoice['timestamps'] ?? []),
     ];
   }
@@ -302,7 +330,8 @@ function story_list($storiesDir, $translationLang = 'en', $readAlongLang = null,
   });
 
   if ($readAlongLang !== null) {
-    $stories = array_merge($stories, dummy_stories($readAlongLang, $translationLang));
+    $titleLang = $translationLangs[0] ?? $readAlongLang;
+    $stories = array_merge($stories, dummy_stories($readAlongLang, $titleLang));
   }
 
   return $stories;
@@ -325,10 +354,13 @@ function story_search_text($text) {
   return strtolower((string) $text);
 }
 
-function story_item_meta(array $item) {
+function story_item_meta(array $item, $showTranslationLang = false) {
   $parts = [];
   if (!empty($item['duration']) && $item['duration'] !== '&mdash;') {
     $parts[] = $item['duration'];
+  }
+  if ($showTranslationLang && !empty($item['translationLang'])) {
+    $parts[] = lang_endonym($item['translationLang']);
   }
   if (!empty($item['kindLabel'])) {
     $parts[] = $item['kindLabel'];
@@ -336,7 +368,7 @@ function story_item_meta(array $item) {
   return implode(' · ', $parts);
 }
 
-function story_list_item(array $item) {
+function story_list_item(array $item, $showTranslationLang = false) {
   $isDummy = !empty($item['dummy']);
   $classes = [];
   if ($isDummy) {
@@ -348,6 +380,13 @@ function story_list_item(array $item) {
   $attrs .= ' data-kind="' . e($item['kind'] ?? '') . '"';
   $attrs .= ' data-kind-label="' . e($item['kindLabel'] ?? '') . '"';
   $attrs .= ' data-duration-seconds="' . e((string) ($item['durationSeconds'] ?? '')) . '"';
+  if (!empty($item['duration']) && $item['duration'] !== '&mdash;') {
+    $attrs .= ' data-duration-display="' . e($item['duration']) . '"';
+  }
+  if (!empty($item['translationLang'])) {
+    $attrs .= ' data-translation-lang="' . e($item['translationLang']) . '"';
+    $attrs .= ' data-translation-endonym="' . e(lang_endonym($item['translationLang'])) . '"';
+  }
   $attrs .= ' data-title="' . e(story_search_text($search)) . '"';
   $attrs .= ' data-level="' . e($item['level'] ?? '') . '"';
   $attrs .= ' data-sentence-count="' . e((string) ($item['sentenceCount'] ?? '')) . '"';
@@ -360,7 +399,7 @@ function story_list_item(array $item) {
   }
 
   $classAttr = $classes ? ' class="' . e(implode(' ', $classes)) . '"' : '';
-  $meta = story_item_meta($item);
+  $meta = story_item_meta($item, $showTranslationLang);
   $lang = $item['language'] ?? '';
   $langAttr = $lang !== '' ? ' lang="' . e($lang) . '"' : '';
   $title = '<p' . $langAttr . '>' . e($item['title']) . '</p>';
@@ -399,10 +438,10 @@ function story_list_item(array $item) {
   return $html;
 }
 
-function render_story_list(array $items, $extraAttrs = '') {
+function render_story_list(array $items, $extraAttrs = '', $showTranslationLang = false) {
   echo "\t\t<ul class=list" . ($extraAttrs !== '' ? ' ' . $extraAttrs : '') . ">\n";
   foreach ($items as $item) {
-    echo story_list_item($item);
+    echo story_list_item($item, $showTranslationLang);
   }
   echo "\t\t</ul>\n";
 }

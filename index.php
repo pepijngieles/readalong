@@ -14,13 +14,14 @@ if (!$needsOnboarding) {
   $translationLangs = story_translation_languages($storiesDir);
   $levelTiers = story_level_tiers($storiesDir);
   $readAlongLang = lang_pref('read', $sourceLangs, 'nl');
-  $translationLang = lang_pref('translate', $translationLangs, $uiLocale);
+  $translationLangsSelected = lang_prefs_list('translate', $translationLangs, [$uiLocale]);
   $levelFilter = lang_pref('level', array_merge([''], $levelTiers), '');
-  $stories = story_list($storiesDir, $translationLang, $readAlongLang, $levelFilter ?: null);
+  $showTranslationLang = count($translationLangsSelected) > 1;
+  $stories = story_list($storiesDir, $translationLangsSelected, $readAlongLang, $levelFilter ?: null);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = [2, 5, 10];
   $kindTiles = story_filter_kinds();
-  $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_endonym($translationLang) . ' · ' . lang_endonym($uiLocale);
+  $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_prefs_summary($translationLangsSelected);
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -47,32 +48,28 @@ if (!$needsOnboarding) {
 				<?php icon('close-small'); ?>
 			</button>
 			<div class=selection-row>
-				<div class=read-along>
+				<div class="read-along read-along--primary">
 					<label for=read-along><?= e(t('home.read_along')) ?></label>
-					<select id=read-along name=read-along class=quiet data-read-along>
+					<div class=read-along__field>
+						<select id=read-along name=read-along class="quiet read-along-select" data-read-along>
 <?php foreach ($sourceLangs as $code): ?>
-						<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
+							<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
 <?php endforeach; ?>
-					</select>
-					<?php icon('chevron-down', ['size' => 16]); ?>
+						</select>
+						<?php icon('chevron-down', ['size' => 16]); ?>
+					</div>
 				</div>
-				<div class=app-language>
-					<label for=app-language><?= e(t('home.translate_into')) ?></label>
-					<select id=app-language name=app-language class=quiet data-app-language translate=no>
+				<div class=translation-langs>
+					<span class=translation-langs__label><?= e(t('home.translate_into')) ?></span>
+					<div class="pill-row translation-langs__pills" role=group aria-label="<?= e(t('home.translate_into')) ?>">
 <?php foreach ($translationLangs as $code): ?>
-						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $translationLang ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
+<?php if ($code === $readAlongLang) continue; ?>
+						<button type=button class=pill data-translate-pill="<?= e($code) ?>" aria-pressed=<?= in_array($code, $translationLangsSelected, true) ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
+							<?php icon('check', ['size' => 16, 'class' => 'pill__check']); ?>
+							<?= e(lang_endonym($code)) ?>
+						</button>
 <?php endforeach; ?>
-					</select>
-					<?php icon('chevron-down', ['size' => 16]); ?>
-				</div>
-				<div class=ui-language>
-					<label for=ui-language><?= e(t('home.ui_language')) ?></label>
-					<select id=ui-language name=ui-language class=quiet data-ui-language translate=no>
-<?php foreach (configured_languages() as $code): ?>
-						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $uiLocale ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
-<?php endforeach; ?>
-					</select>
-					<?php icon('chevron-down', ['size' => 16]); ?>
+					</div>
 				</div>
 <?php if ($levelTiers): ?>
 				<div class=story-level>
@@ -98,7 +95,7 @@ if (!$needsOnboarding) {
 			<p class="dummy-content-notice"><?= e(t('home.dummy_notice')) ?></p>
 		</div>
 
-		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>">
+		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
 			<div class=home-section__header>
 				<h2><?= e(t('home.continue_reading')) ?></h2>
 				<button type=button class="quiet home-section__link" data-continue-history-toggle hidden aria-expanded=false><?= e(t('home.continue_history')) ?></button>
@@ -112,11 +109,11 @@ if (!$needsOnboarding) {
 			<div class=home-section__header>
 				<h2><?= e(t('home.weather')) ?></h2>
 			</div>
-<?php render_story_list($weatherStories, 'data-weather-items'); ?>
+<?php render_story_list($weatherStories, 'data-weather-items', $showTranslationLang); ?>
 		</section>
 <?php endif; ?>
 
-		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>">
+		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
 			<div class=home-section__header>
 				<h2><?= e(t('home.all_items')) ?></h2>
 			</div>
@@ -144,7 +141,7 @@ if (!$needsOnboarding) {
 				<p class=home-results-count data-results-count></p>
 				<button type=button class="quiet home-clear-filters" data-clear-filters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
-<?php render_story_list($stories, 'data-all-items'); ?>
+<?php render_story_list($stories, 'data-all-items', $showTranslationLang); ?>
 			<div class=home-empty data-no-results hidden>
 				<p><?= e(t('home.no_results_filters')) ?></p>
 				<button type=button class="quiet home-clear-filters" data-clear-filters><?= e(t('home.clear_filters')) ?></button>
@@ -175,6 +172,39 @@ if (!$needsOnboarding) {
 			};
 		}
 
+		function selectedTranslatePills() {
+			return Array.from(document.querySelectorAll('[data-translate-pill][aria-pressed=true]'))
+				.map(function (pill) { return pill.getAttribute('data-translate-pill'); })
+				.filter(Boolean);
+		}
+
+		function saveTranslatePrefs() {
+			const selected = selectedTranslatePills();
+			if (selected.length === 0) return;
+			setLangPref('translate', selected.join(','));
+			location.reload();
+		}
+
+		function syncTranslatePillsForReadAlong() {
+			const readLang = document.querySelector('[data-read-along]')?.value;
+			document.querySelectorAll('[data-translate-pill]').forEach(function (pill) {
+				const code = pill.getAttribute('data-translate-pill');
+				if (code === readLang) {
+					pill.hidden = true;
+					pill.setAttribute('aria-pressed', 'false');
+					return;
+				}
+				pill.hidden = false;
+			});
+			if (selectedTranslatePills().length === 0) {
+				const firstVisible = document.querySelector('[data-translate-pill]:not([hidden])');
+				if (firstVisible) {
+					firstVisible.setAttribute('aria-pressed', 'true');
+					saveTranslatePrefs();
+				}
+			}
+		}
+
 		(function syncLangPrefsFromStorage() {
 			const params = new URLSearchParams(location.search);
 			let shouldReload = false;
@@ -192,12 +222,23 @@ if (!$needsOnboarding) {
 			if (shouldReload) location.reload();
 		})();
 
-		document.querySelector('[data-read-along]')?.addEventListener('change', onLangChange('read'));
-		document.querySelector('[data-app-language]')?.addEventListener('change', onLangChange('translate'));
-		document.querySelector('[data-ui-language]')?.addEventListener('change', onLangChange('ui'));
+		document.querySelector('[data-read-along]')?.addEventListener('change', function () {
+			setLangPref('read', this.value);
+			syncTranslatePillsForReadAlong();
+			location.reload();
+		});
+		document.querySelectorAll('[data-translate-pill]').forEach(function (pill) {
+			pill.addEventListener('click', function () {
+				const pressed = this.getAttribute('aria-pressed') === 'true';
+				const selectedCount = selectedTranslatePills().length;
+				if (pressed && selectedCount <= 1) return;
+				this.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+				saveTranslatePrefs();
+			});
+		});
 		document.querySelector('[data-story-level]')?.addEventListener('change', onLangChange('level'));
 	</script>
-	<script type="text/javascript" src="assets/home.js?v=6"></script>
+	<script type="text/javascript" src="assets/home.js?v=7"></script>
 
 <?php endif; ?>
 
