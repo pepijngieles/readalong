@@ -199,21 +199,15 @@ class ResegmentBlocksTest(unittest.TestCase):
                 "Ja.",
             ],
         }]
-        translations = [[
-            "Mama bepaalde het menu en we hadden bijvoorbeeld vaak "
-            "zelfgemaakte lasagne, soms ook moussaka omdat ze in Griekenland "
-            "op vakantie ging en daar ideeën opdeed, en tzatziki.",
-            "Ja.",
-        ]]
-        new_blocks, new_tr, new_ts = ra.resegment_blocks(
-            blocks, translations, [[0.0, 15.3]], 36.2, 16, 4)
+        new_blocks, new_ts, split_map = ra.resegment_blocks(
+            blocks, [[0.0, 15.3]], 36.2, 16, 4)
         sents = new_blocks[0]["sentences"]
         self.assertEqual(new_blocks[0]["speaker"], "Ane")
         self.assertEqual(len(sents), 3)
-        self.assertEqual(len(new_tr[0]), 3)
         self.assertEqual(len(new_ts[0]), 3)
+        self.assertEqual(len(split_map), 2)
         self.assertEqual(sents[-1], "Ja.")
-        self.assertEqual(new_tr[0][-1], "Ja.")
+        self.assertEqual(split_map[-1][1], ["Ja."])
 
     def test_splits_internal_periods_only_when_long(self):
         short = {
@@ -226,15 +220,14 @@ class ResegmentBlocksTest(unittest.TestCase):
                 "Og hun var også helt fri for overlegenhet mot andre mennesker."
             ]
         }
-        b1, t1, ts1 = ra.resegment_blocks(
-            [short], [["Oh pizza, that's cool! Why do you like it so much?"]],
-            [[0.0]], 4.0, 16, 4)
+        b1, ts1, _ = ra.resegment_blocks(
+            [short], [[0.0]], 4.0, 16, 4)
         self.assertEqual(len(b1[0]["sentences"]), 1)
-        b2, t2, ts2 = ra.resegment_blocks(
-            [long], [["She taught me to enjoy working hard. She said what she thought. And she was also completely free of superiority."]],
-            [[0.0]], 10.0, 16, 4)
+        b2, ts2, split_map = ra.resegment_blocks(
+            [long], [[0.0]], 10.0, 16, 4)
         self.assertGreaterEqual(len(b2[0]["sentences"]), 3)
-        self.assertEqual(len(t2[0]), len(b2[0]["sentences"]))
+        self.assertEqual(len(ts2[0]), len(b2[0]["sentences"]))
+        self.assertEqual(sum(len(parts) for _, parts in split_map), len(b2[0]["sentences"]))
 
 
 if __name__ == "__main__":
