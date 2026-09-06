@@ -21,7 +21,8 @@ if (!$needsOnboarding) {
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = [2, 5, 10];
   $kindTiles = story_filter_kinds();
-  $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_prefs_summary($translationLangsSelected);
+  $levelSummary = $levelFilter === '' ? t('home.all_levels') : level_tier_label($levelFilter);
+  $prefsSummary = lang_label($readAlongLang) . ' · ' . $levelSummary;
 }
 ?>
 <?php include $partials . '/head.php'; ?>
