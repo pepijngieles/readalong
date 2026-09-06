@@ -239,6 +239,66 @@ function dummy_story_catalog() {
       ],
     ],
     [
+      'kind' => 'podcast',
+      'duration' => 102,
+      'titles' => [
+        'de' => 'Willkommen in der Bibliothek',
+        'en' => 'Welcome to the library',
+        'es' => 'Bienvenidos a la biblioteca',
+        'fr' => 'Bienvenue à la bibliothèque',
+        'nl' => 'Welkom in de bibliotheek',
+        'no' => 'Velkommen til biblioteket',
+      ],
+    ],
+    [
+      'kind' => 'podcast',
+      'duration' => 188,
+      'titles' => [
+        'de' => 'Alltag in der Stadt',
+        'en' => 'Everyday life in the city',
+        'es' => 'El día a día en la ciudad',
+        'fr' => 'Le quotidien en ville',
+        'nl' => 'Het dagelijks leven in de stad',
+        'no' => 'Hverdagsliv i byen',
+      ],
+    ],
+    [
+      'kind' => 'podcast',
+      'duration' => 255,
+      'titles' => [
+        'de' => 'Forscher im Gespräch',
+        'en' => 'Researchers in conversation',
+        'es' => 'Investigadores conversando',
+        'fr' => 'Des chercheurs en conversation',
+        'nl' => 'Onderzoekers in gesprek',
+        'no' => 'Forskere i samtale',
+      ],
+    ],
+    [
+      'kind' => 'podcast',
+      'duration' => 410,
+      'titles' => [
+        'de' => 'Ein Gespräch auf Nynorsk',
+        'en' => 'A conversation in Nynorsk',
+        'es' => 'Una conversación en nynorsk',
+        'fr' => 'Une conversation en nynorsk',
+        'nl' => 'Een gesprek in het nynorsk',
+        'no' => 'Ein samtale på nynorsk',
+      ],
+    ],
+    [
+      'kind' => 'podcast',
+      'duration' => 615,
+      'titles' => [
+        'de' => 'Live aus dem Saal',
+        'en' => 'Live from the hall',
+        'es' => 'En directo desde la sala',
+        'fr' => 'En direct depuis la salle',
+        'nl' => 'Live vanuit de zaal',
+        'no' => 'Direkte fra salen',
+      ],
+    ],
+    [
       'kind' => 'news',
       'duration' => 100,
       'titles' => [
