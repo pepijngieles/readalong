@@ -17,6 +17,7 @@ if (!$needsOnboarding) {
   $translationLang = lang_pref('translate', $translationLangs, $uiLocale);
   $levelFilter = lang_pref('level', array_merge([''], $levelTiers), '');
   $stories = story_list($storiesDir, $translationLang, $readAlongLang, $levelFilter ?: null);
+  [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = [2, 5, 10];
   $kindTiles = story_filter_kinds();
   $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_endonym($translationLang);
@@ -88,12 +89,23 @@ if (!$needsOnboarding) {
 			<p class="dummy-content-notice"><?= e(t('home.dummy_notice')) ?></p>
 		</div>
 
-		<section class="home-section js-only" data-continue-section hidden>
+		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>">
 			<div class=home-section__header>
 				<h2><?= e(t('home.continue_reading')) ?></h2>
+				<button type=button class="quiet home-section__link" data-continue-history-toggle hidden aria-expanded=false><?= e(t('home.continue_history')) ?></button>
 			</div>
-			<ul class=list data-continue-items></ul>
+			<ul class="list continue-list" data-continue-featured></ul>
+			<ul class="list continue-list continue-list--history" data-continue-history hidden></ul>
 		</section>
+
+<?php if ($weatherStories): ?>
+		<section class=home-section data-weather-section>
+			<div class=home-section__header>
+				<h2><?= e(t('home.weather')) ?></h2>
+			</div>
+<?php render_story_list($weatherStories, 'data-weather-items'); ?>
+		</section>
+<?php endif; ?>
 
 		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>">
 			<div class=home-section__header>
@@ -175,7 +187,7 @@ if (!$needsOnboarding) {
 		document.querySelector('[data-app-language]')?.addEventListener('change', onLangChange('translate'));
 		document.querySelector('[data-story-level]')?.addEventListener('change', onLangChange('level'));
 	</script>
-	<script type="text/javascript" src="assets/home.js?v=5"></script>
+	<script type="text/javascript" src="assets/home.js?v=6"></script>
 
 <?php endif; ?>
 

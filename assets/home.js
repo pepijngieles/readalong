@@ -8,7 +8,9 @@
   const searchInput = document.querySelector('[data-story-search]')
   const allList = document.querySelector('[data-all-items]')
   const continueSection = document.querySelector('[data-continue-section]')
-  const continueList = document.querySelector('[data-continue-items]')
+  const continueFeatured = document.querySelector('[data-continue-featured]')
+  const continueHistory = document.querySelector('[data-continue-history]')
+  const historyToggle = document.querySelector('[data-continue-history-toggle]')
   const noResults = document.querySelector('[data-no-results]')
   const resultsCount = document.querySelector('[data-results-count]')
   const clearButtons = document.querySelectorAll('[data-clear-filters]')
@@ -23,6 +25,8 @@
 
   const remainingTemplate = (allSection && allSection.getAttribute('data-i18n-remaining')) || '{n} min'
   const resultsTemplate = (allSection && allSection.getAttribute('data-i18n-results')) || '{n}'
+  const historyLabel = (continueSection && continueSection.getAttribute('data-i18n-history')) || 'All history'
+  const hideHistoryLabel = (continueSection && continueSection.getAttribute('data-i18n-hide-history')) || 'Hide history'
 
   let kindFilter = ''
   let durationLimit = 0
@@ -100,9 +104,7 @@
     writeFiltersToUrl()
   }
 
-  function fillContinueReading() {
-    if (!continueSection || !continueList) return
-
+  function loadProgressEntries() {
     let map = {}
     try {
       map = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}') || {}
@@ -110,22 +112,60 @@
       map = {}
     }
 
-    const entries = Object.keys(map).map(function (id) {
+    return Object.keys(map).map(function (id) {
       return { id: id, progress: map[id] }
     }).filter(function (entry) {
       return entry.progress && !entry.progress.completed && (entry.progress.sentence > 0 || entry.progress.started)
     }).sort(function (a, b) {
       return (b.progress.updatedAt || 0) - (a.progress.updatedAt || 0)
     })
+  }
 
-    entries.forEach(function (entry) {
-      const source = allList.querySelector('li[data-id="' + entry.id.replace(/"/g, '') + '"]')
-      if (!source || source.classList.contains('dummy-story')) return
-      const clone = source.cloneNode(true)
-      decorateContinueItem(clone, entry.progress)
-      continueList.appendChild(clone)
-    })
-    continueSection.hidden = continueList.children.length === 0
+  function cloneContinueItem(entry, featured) {
+    const source = allList.querySelector('li[data-id="' + entry.id.replace(/"/g, '') + '"]')
+    if (!source || source.classList.contains('dummy-story')) return null
+    const clone = source.cloneNode(true)
+    if (featured) clone.classList.add('continue-item--featured')
+    decorateContinueItem(clone, entry.progress)
+    return clone
+  }
+
+  function fillContinueReading() {
+    if (!continueSection || !continueFeatured) return
+
+    const entries = loadProgressEntries()
+    continueFeatured.innerHTML = ''
+    if (continueHistory) continueHistory.innerHTML = ''
+
+    if (entries.length === 0) {
+      continueSection.hidden = true
+      return
+    }
+
+    const featuredItem = cloneContinueItem(entries[0], true)
+    if (!featuredItem) {
+      continueSection.hidden = true
+      return
+    }
+
+    continueFeatured.appendChild(featuredItem)
+
+    if (continueHistory) {
+      entries.slice(1).forEach(function (entry) {
+        const item = cloneContinueItem(entry, false)
+        if (item) continueHistory.appendChild(item)
+      })
+    }
+
+    if (historyToggle) {
+      const hasHistory = continueHistory && continueHistory.children.length > 0
+      historyToggle.hidden = !hasHistory
+      historyToggle.textContent = historyLabel
+      historyToggle.setAttribute('aria-expanded', 'false')
+      if (continueHistory) continueHistory.hidden = true
+    }
+
+    continueSection.hidden = false
   }
 
   function decorateContinueItem(item, progress) {
@@ -195,6 +235,15 @@
   clearButtons.forEach(function (button) {
     button.addEventListener('click', clearFilters)
   })
+
+  if (historyToggle && continueHistory) {
+    historyToggle.addEventListener('click', function () {
+      const expanded = this.getAttribute('aria-expanded') === 'true'
+      continueHistory.hidden = expanded
+      this.setAttribute('aria-expanded', expanded ? 'false' : 'true')
+      this.textContent = expanded ? historyLabel : hideHistoryLabel
+    })
+  }
 
   if (prefsToggle && prefsPanel) {
     prefsToggle.addEventListener('click', function () {
