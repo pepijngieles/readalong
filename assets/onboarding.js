@@ -11,7 +11,7 @@
   }
 
   if (localStorage.getItem('readalong-onboarding-complete') === '1' || localStorage.getItem('readalong-read')) {
-    ['read', 'translate', 'level', 'onboarding-complete'].forEach(function (key) {
+    ['read', 'translate', 'ui', 'level', 'onboarding-complete'].forEach(function (key) {
       const value = localStorage.getItem('readalong-' + key);
       if (value) setLangPref(key, value);
     });
@@ -39,6 +39,11 @@
   function selectedRead() {
     const select = document.querySelector('[data-onboarding-read]');
     return select ? select.value : supportedLangs[0];
+  }
+
+  function selectedUi() {
+    const select = document.querySelector('[data-onboarding-ui]');
+    return select ? select.value : detectSystemLanguage();
   }
 
   function resolveTranslate(readLang, translateLang, systemLang) {
@@ -104,6 +109,7 @@
 
   const readSelect = document.querySelector('[data-onboarding-read]');
   const translateSelect = document.querySelector('[data-onboarding-translate]');
+  const uiSelect = document.querySelector('[data-onboarding-ui]');
   const continueButton = document.querySelector('[data-onboarding-continue]');
   const systemLang = detectSystemLanguage();
   let readLang = selectedRead();
@@ -114,7 +120,7 @@
   }
 
   fillTranslateSelect(readLang, translateLang);
-  applyLocale(translateLang);
+  applyLocale(selectedUi());
   renderDemo();
 
   afterLayout(function () {
@@ -132,14 +138,16 @@
     readLang = readSelect.value;
     translateLang = resolveTranslate(readLang, translateSelect.value, systemLang);
     fillTranslateSelect(readLang, translateLang);
-    applyLocale(translateLang);
     restartDemo();
   });
 
   translateSelect.addEventListener('change', function () {
     translateLang = translateSelect.value;
-    applyLocale(translateLang);
     restartDemo();
+  });
+
+  uiSelect.addEventListener('change', function () {
+    applyLocale(uiSelect.value);
   });
 
   continueButton.addEventListener('click', function () {
@@ -150,6 +158,7 @@
     }
     setLangPref('read', read);
     setLangPref('translate', translateSelect.value);
+    setLangPref('ui', uiSelect.value);
     setLangPref('onboarding-complete', '1');
     location.href = location.pathname;
   });

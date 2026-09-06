@@ -2,9 +2,6 @@
 require_once __DIR__ . '/helpers.php';
 $partials = __DIR__ . '/partials';
 $storyClass = 'story';
-if (!empty($story['storyType']) && $story['storyType'] !== 'default') {
-  $storyClass .= ' ' . $story['storyType'];
-}
 ?>
 <?php include $partials . '/head.php'; ?>
 <?php $showTranslation = ($translationLang ?? '') !== ($story['languageCode'] ?? ''); ?>
