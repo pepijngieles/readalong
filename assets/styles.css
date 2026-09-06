@@ -288,6 +288,10 @@ body.theme-dark [data-sentence][aria-current]{
   color: var(--text-primary);
 }
 
+body.started.show-translation [data-sentence][aria-current]{
+  color: transparent;
+}
+
 
 
 /* 5. Lists
@@ -738,6 +742,10 @@ progress::-moz-progress-bar{
   margin-block-end: 0.125rem;
 }
 
+.story:has([data-name]) p:not([data-name]){
+  margin-block-start: 0.35em;
+}
+
 
 
 /* 15. Translation popover
@@ -745,14 +753,14 @@ progress::-moz-progress-bar{
 .translation-popover{
   z-index: 2;
   position: absolute;
-  top: 1rem;
-  right: 0;
-  left: 0;
-  width: fit-content;
-  max-width: calc(var(--page-width) - 1rem);
-  min-width: 6rem;
-  padding: 1rem 1rem 1.25rem;
-  margin: 0 auto;
+  top: 0;
+  right: 1rem;
+  left: 1rem;
+  width: auto;
+  max-width: none;
+  min-width: 0;
+  padding: 0 0 1.25rem;
+  margin: 0;
   overflow: visible; /* for the close button to be visible */
   font-size: var(--font-size);
   line-height: var(--line-height);
@@ -775,8 +783,14 @@ body:not(.show-translation) [data-hide-translation]{
 body:not(.started.show-translation) .translation-popover{
   position: fixed;
   top: auto;
+  right: 0;
   bottom: 8rem;
+  left: 0;
+  width: fit-content;
+  max-width: calc(var(--page-width) - 1rem);
+  min-height: 0;
   padding: 0;
+  margin: 0 auto;
   transform: none!important;
 }
 

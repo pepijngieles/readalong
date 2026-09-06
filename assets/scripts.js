@@ -51,7 +51,6 @@ let   started = false,
       inSentencePause = false,
       showTranslation = document.body.classList.contains('show-translation'),
       popoverOffsetY = 0,
-      popoverOffsetX = 0,
       playbackRate = 1,
       volume = 1,
       themeColorValue = '#ffffff'
@@ -281,16 +280,16 @@ function changeSentence() {
   function updateTranslation() {
     if (!translationPopover || !translationText || !currentSentenceEl) return
     translationText.textContent = currentSentenceEl.dataset.translation || ''
-    // Calculate the right Y-position for the popover
-    popoverOffsetY = currentSentenceEl.offsetHeight - 8
-    popoverOffsetY += currentSentenceEl.offsetTop
-    // Convert pixel-value to rem
-    popoverOffsetY /= 16
-    popoverTransform = 'translateY(' + popoverOffsetY + 'rem) translateZ(0)';
 
-    // Update the position
+    const parent = translationPopover.offsetParent
+    if (!parent) return
+
+    const sentenceRect = currentSentenceEl.getBoundingClientRect()
+    const parentRect = parent.getBoundingClientRect()
+    popoverOffsetY = (sentenceRect.top - parentRect.top) / 16
+    translationPopover.style.minHeight = (sentenceRect.height / 16) + 'rem'
     // Added translateZ(0) to prevent laggy animation of drop-shadow filter
-    translationPopover.style.transform = 'translateX(' + popoverOffsetX + 'rem) translateY(' + popoverOffsetY + 'rem) translateZ(0)'    
+    translationPopover.style.transform = 'translateY(' + popoverOffsetY + 'rem) translateZ(0)'
   }
 
   /* 5.3 Check if auto-scrolling is needed --------------------------------- */
