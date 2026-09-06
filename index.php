@@ -19,7 +19,7 @@ if (!$needsOnboarding) {
   $stories = story_list($storiesDir, $translationLang, $readAlongLang, $levelFilter ?: null);
   $durationPills = [2, 5, 10];
   $kindTiles = story_filter_kinds();
-  $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_label($translationLang);
+  $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_endonym($translationLang);
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -32,34 +32,6 @@ if (!$needsOnboarding) {
 <?php else: ?>
 
 	<main>
-
-		<div class="add-app-popover velvet hide-on-standalone js-only ios-only">
-			<button class="close-button quiet icon-only" onclick="hideAppBanner()">
-				<span class=visually-hidden><?= e(t('common.close')) ?></span>
-				<?php icon('close-small'); ?>
-			</button>
-			<img src="assets/favicons/favicon.svg" class=app-icon width=40>
-			<div class=text>
-				<h3>Readalong</h3>
-				<small><?= e(t('app.use_app')) ?></small>
-			</div>
-			<button class="primary small" onclick="toggleExplanationPopover()"><?= e(t('app.view')) ?></button>
-		</div>
-
-		<script type="text/javascript">
-			const appBanner = document.querySelector('.add-app-popover');
-
-			function hideAppBanner() {
-				document.body.classList.add('hide-app-banner')
-				let bannerTimeOut = setTimeout(function(){
-					appBanner.remove()
-				}, 200)
-			}
-
-			function toggleExplanationPopover() {
-				document.body.classList.toggle('show-install-explanation')
-			}
-		</script>
 
 		<header class=home-header>
 			<h1>Readalong <sup style="color:var(--text-tertiary)">b&egrave;ta</sup></h1>
@@ -87,7 +59,7 @@ if (!$needsOnboarding) {
 					<label for=app-language><?= e(t('home.translate_into')) ?></label>
 					<select id=app-language name=app-language class=quiet data-app-language translate=no>
 <?php foreach ($translationLangs as $code): ?>
-						<option value=<?= e($code) ?><?= $code === $translationLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
+						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $translationLang ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
 <?php endforeach; ?>
 					</select>
 					<?php icon('chevron-down', ['size' => 16]); ?>
@@ -167,18 +139,6 @@ if (!$needsOnboarding) {
 
 	</main>
 
-	<div class="explanation-popover pointer bottom-center hide-on-standalone js-only ios-only" onclick="toggleExplanationPopover()">
-		<h3><?= e(t('app.add_home_screen')) ?></h3>
-		<small class=description><?= e(t('app.add_home_description')) ?></small>
-		<ol>
-			<li><?= e(t('app.open_safari')) ?></li>
-			<li>
-				<?= e(t('app.tap_share')) ?><?php icon('share-ios', ['style' => 'color:#036EFC']); ?>
-			</li>
-			<li><?= e(t('app.add_to_home')) ?><?php icon('add-ios'); ?></li>
-		</ol>
-	</div>
-
 	<script type="text/javascript">
 		const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
@@ -214,20 +174,6 @@ if (!$needsOnboarding) {
 		document.querySelector('[data-read-along]')?.addEventListener('change', onLangChange('read'));
 		document.querySelector('[data-app-language]')?.addEventListener('change', onLangChange('translate'));
 		document.querySelector('[data-story-level]')?.addEventListener('change', onLangChange('level'));
-
-		function iOS() {
-		  return [
-		    'iPad Simulator',
-		    'iPhone Simulator',
-		    'iPod Simulator',
-		    'iPad',
-		    'iPhone',
-		    'iPod'
-		  ].includes(navigator.platform)
-		  || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-		}
-
-		if (iOS()) document.body.classList.add('ios')
 	</script>
 	<script type="text/javascript" src="assets/home.js?v=5"></script>
 
