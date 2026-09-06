@@ -152,7 +152,7 @@ function lang_pref($key, array $allowed, $default) {
 }
 
 function story_filter_kinds() {
-  return ['podcast', 'news', 'book', 'email', 'weather'];
+  return ['podcast', 'news', 'book', 'email'];
 }
 
 function story_kind_label($kind) {

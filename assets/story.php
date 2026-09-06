@@ -406,3 +406,18 @@ function render_story_list(array $items, $extraAttrs = '') {
   }
   echo "\t\t</ul>\n";
 }
+
+function story_partition_by_kind(array $items, $kind) {
+  $matched = [];
+  $rest = [];
+
+  foreach ($items as $item) {
+    if (($item['kind'] ?? '') === $kind) {
+      $matched[] = $item;
+    } else {
+      $rest[] = $item;
+    }
+  }
+
+  return [$matched, $rest];
+}

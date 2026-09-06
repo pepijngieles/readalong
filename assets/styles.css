@@ -1529,6 +1529,46 @@ body.theme-dark .settings-segment__preview{
   margin-block-end: 0;
 }
 
+.home-section__link{
+  flex-shrink: 0;
+  font-size: .875rem;
+  line-height: 1.25rem;
+  text-decoration: underline;
+}
+
+.continue-list{
+  margin-block: 0;
+}
+
+.continue-list--history{
+  margin-block-start: .75rem;
+}
+
+.continue-item--featured{
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: .75rem;
+  padding: .875rem 1rem;
+}
+
+.continue-item--featured .story-item{
+  padding-block: 0;
+}
+
+.continue-item--featured .story-item p{
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
+  text-decoration: none;
+}
+
+.continue-item--featured .story-item:hover p{
+  text-decoration: underline;
+}
+
+.continue-item--featured .story-item__progress{
+  margin-block-start: .5rem;
+}
+
 .pill-row{
   display: flex;
   flex-wrap: nowrap;
