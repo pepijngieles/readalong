@@ -144,6 +144,28 @@ class SplitTranslationTest(unittest.TestCase):
         self.assertEqual(" ".join(got).split(), translated.split())
         self.assertTrue(all(g.strip() for g in got))
 
+    def test_friday_bath_translation_keeps_phrases(self):
+        source = (
+            "På fredager så bada vi i badekaret og så blei reine og så fikk jeg "
+            "og søstera mi lov å gå og ta på oss noe fint og så komme ned og "
+            "være pynta til dette måltidet som var taima til halvsju "
+            "selvfølgelig sånn at vi kunne liksom se og sitte å se spise foran "
+            "tv-en, se på halv sju og spise, det var bare helt nydelig."
+        )
+        src_parts = parts(source)
+        translated = (
+            "Op vrijdag namen we een bad en werden we schoon en toen mochten "
+            "ik en mijn zus iets moois aantrekken en naar beneden komen en "
+            "aangekleed zijn voor deze maaltijd die getimed was op half zeven "
+            "natuurlijk, zodat we voor de tv konden zitten eten, naar het "
+            "halfzevenjournaal kijken en eten, het was gewoon heerlijk."
+        )
+        got = ra.split_translation(source, src_parts, translated)
+        self.assertEqual(len(got), len(src_parts))
+        self.assertEqual(" ".join(got).split(), translated.split())
+        self.assertFalse(any(p.endswith((" we", " naar")) for p in got[:-1]))
+        self.assertTrue(any("werden we schoon" in p for p in got))
+
     def test_empty_translation(self):
         self.assertEqual(
             ra.split_translation("een twee drie vier vijf zes zeven acht",

@@ -467,14 +467,28 @@ def segment_text(text, max_words, min_words, literal=False):
     return parts
 
 
+FUNCTION_ENDS = {
+    "en", "og", "and", "de", "het", "een", "the", "a", "an", "van", "of", "to",
+    "naar", "til", "på", "i", "in", "we", "ik", "jeg", "vi", "den", "det",
+    "dat", "die", "this", "that", "te", "å", "om", "for", "at", "a",
+}
+
+
 def _snap_cut(words, ideal, lo, hi):
     """Schuif een proportionele knip naar de dichtstbijzijnde natuurlijke breuk."""
+    lo = max(1, lo)
+    hi = min(len(words) - 1, hi)
+    if lo > hi:
+        return max(1, min(len(words) - 1, ideal))
     ideal = max(lo, min(hi, ideal))
-    window = range(max(lo, ideal - 5), min(hi, ideal + 6))
+
+    in_range = [(idx, prio) for idx, prio in _cut_candidates(words, min_words=1)
+                if lo <= idx <= hi]
+    if in_range:
+        return min(in_range, key=lambda c: abs(c[0] - ideal) + c[1] * 4)[0]
+
     best, best_cost = ideal, 10**9
-    for i in window:
-        if i < 1 or i >= len(words):
-            continue
+    for i in range(lo, hi + 1):
         prev = words[i - 1]
         cur = words[i]
         cost = abs(i - ideal) * 2
@@ -488,6 +502,8 @@ def _snap_cut(words, ideal, lo, hi):
             cost -= 3
         elif normalise_word(cur) in WEAK_CONJUNCTIONS:
             cost -= 1
+        if normalise_word(prev) in FUNCTION_ENDS:
+            cost += 8
         if cost < best_cost:
             best, best_cost = i, cost
     return best
