@@ -1,5 +1,6 @@
 (function () {
   const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+  const strings = window.READALONG_I18N || {};
   const supportedLangs = window.READALONG_LANGS || [];
   const endonyms = window.READALONG_ENDONYMS || {};
   const demoSegments = window.READALONG_DEMO || {};
@@ -21,6 +22,18 @@
   function detectSystemLanguage() {
     const lang = (navigator.language || 'en').split('-')[0].toLowerCase();
     return supportedLangs.includes(lang) ? lang : 'en';
+  }
+
+  function translate(key, locale) {
+    return (strings[locale] && strings[locale][key]) || (strings.en && strings.en[key]) || key;
+  }
+
+  function applyLocale(locale) {
+    document.documentElement.lang = locale;
+    document.querySelectorAll('[data-i18n]').forEach(function (element) {
+      const key = element.getAttribute('data-i18n');
+      if (key) element.textContent = translate(key, locale);
+    });
   }
 
   function selectedRead() {
@@ -101,6 +114,7 @@
   }
 
   fillTranslateSelect(readLang, translateLang);
+  applyLocale(translateLang);
   renderDemo();
 
   afterLayout(function () {
@@ -118,11 +132,13 @@
     readLang = readSelect.value;
     translateLang = resolveTranslate(readLang, translateSelect.value, systemLang);
     fillTranslateSelect(readLang, translateLang);
+    applyLocale(translateLang);
     restartDemo();
   });
 
   translateSelect.addEventListener('change', function () {
     translateLang = translateSelect.value;
+    applyLocale(translateLang);
     restartDemo();
   });
 
