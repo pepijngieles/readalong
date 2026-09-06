@@ -24,8 +24,8 @@
   }
 
   function selectedRead() {
-    const selected = document.querySelector('[data-onboarding-read]:checked');
-    return selected ? selected.value : supportedLangs[0];
+    const select = document.querySelector('[data-onboarding-read]');
+    return select ? select.value : supportedLangs[0];
   }
 
   function resolveTranslate(readLang, translateLang, systemLang) {
@@ -89,37 +89,12 @@
     });
   }
 
-  const screen = document.querySelector('[data-onboarding-screen]');
-  const stepEls = document.querySelectorAll('[data-onboarding-step]');
-  const systemLang = detectSystemLanguage();
-  const readInputs = document.querySelectorAll('[data-onboarding-read]');
+  const readSelect = document.querySelector('[data-onboarding-read]');
   const translateSelect = document.querySelector('[data-onboarding-translate]');
-  const nextButton = document.querySelector('[data-onboarding-next]');
   const continueButton = document.querySelector('[data-onboarding-continue]');
+  const systemLang = detectSystemLanguage();
   let readLang = selectedRead();
   let translateLang = resolveTranslate(readLang, systemLang, systemLang);
-  let demoStarted = false;
-  let currentStep = 1;
-
-  function setStep(step) {
-    currentStep = step;
-    screen.dataset.step = String(step);
-    stepEls.forEach(function (el) {
-      const isActive = el.getAttribute('data-onboarding-step') === String(step);
-      el.inert = !isActive;
-    });
-    if (step === 2) {
-      afterLayout(function () {
-        if (!demoStarted) {
-          demoStarted = true;
-          if (typeof start === 'function') start();
-        }
-        restartDemo();
-      });
-    } else if (typeof pause === 'function') {
-      pause();
-    }
-  }
 
   if (translateSelect.querySelector('option[value="' + translateLang + '"]') == null) {
     translateLang = resolveTranslate(readLang, translateSelect.value, systemLang);
@@ -127,7 +102,11 @@
 
   fillTranslateSelect(readLang, translateLang);
   renderDemo();
-  setStep(1);
+
+  afterLayout(function () {
+    if (typeof start === 'function') start();
+    restartDemo();
+  });
 
   if (audioFile) {
     audioFile.addEventListener('ended', function () {
@@ -135,28 +114,16 @@
     });
   }
 
-  readInputs.forEach(function (input) {
-    input.addEventListener('change', function () {
-      readLang = input.value;
-      translateLang = resolveTranslate(readLang, translateSelect.value, systemLang);
-      fillTranslateSelect(readLang, translateLang);
-      renderDemo();
-      if (currentStep === 2) restartDemo();
-    });
+  readSelect.addEventListener('change', function () {
+    readLang = readSelect.value;
+    translateLang = resolveTranslate(readLang, translateSelect.value, systemLang);
+    fillTranslateSelect(readLang, translateLang);
+    restartDemo();
   });
 
   translateSelect.addEventListener('change', function () {
-    translateLang = this.value;
-    renderDemo();
-    if (currentStep === 2) restartDemo();
-  });
-
-  nextButton.addEventListener('click', function () {
-    if (!selectedRead()) {
-      nextButton.disabled = true;
-      return;
-    }
-    setStep(2);
+    translateLang = translateSelect.value;
+    restartDemo();
   });
 
   continueButton.addEventListener('click', function () {

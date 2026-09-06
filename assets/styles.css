@@ -1199,7 +1199,7 @@ body.theme-dark .settings-segment__preview{
   align-items: center;
   justify-content: flex-start;
   min-height: 100dvh;
-  padding: 2rem 1.5rem calc(8.5rem + env(safe-area-inset-bottom, 0px));
+  padding: 2rem 1.5rem calc(7.5rem + env(safe-area-inset-bottom, 0px));
   background-color: var(--background-primary);
 }
 
@@ -1220,27 +1220,11 @@ body.theme-dark .settings-segment__preview{
 .onboarding-card{
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 1.25rem;
   border: 1px solid var(--border-default);
   border-radius: 1.25rem;
   background-color: var(--background-primary);
-}
-
-.onboarding-step{
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.onboarding-screen[data-step="1"] [data-onboarding-step="2"],
-.onboarding-screen[data-step="2"] [data-onboarding-step="1"]{
-  display: none;
-}
-
-.onboarding-screen[data-step="1"] [data-onboarding-continue],
-.onboarding-screen[data-step="2"] [data-onboarding-next]{
-  display: none;
 }
 
 .onboarding-demo{
@@ -1248,9 +1232,9 @@ body.theme-dark .settings-segment__preview{
 }
 
 .onboarding-demo .story{
-  min-height: 5.5rem;
+  min-height: 4.5rem;
   margin: 0;
-  padding-block-end: 4.5rem;
+  padding-block-end: 3.5rem;
 }
 
 .onboarding-demo .story p{
@@ -1283,12 +1267,14 @@ body.theme-dark .settings-segment__preview{
   z-index: auto;
 }
 
+.onboarding-languages,
 .onboarding-translations{
   display: flex;
   flex-direction: column;
   gap: .375rem;
 }
 
+.onboarding-languages__row,
 .onboarding-translations__row{
   position: relative;
   display: flex;
@@ -1297,11 +1283,58 @@ body.theme-dark .settings-segment__preview{
   gap: .375rem .5rem;
 }
 
+.onboarding-languages__row label,
 .onboarding-translations__row label{
   display: inline;
   padding: 0;
   margin: 0;
   color: var(--text-secondary);
+}
+
+.onboarding-languages__row select.onboarding-select{
+  flex: 1 1 100%;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: calc(1.25rem - 1px);
+  padding-inline-end: 2.5rem;
+  border: 1px solid var(--border-default);
+  border-radius: .75rem;
+  background-color: var(--background-popover);
+  box-shadow: inset .125rem -.25rem .5rem rgba(0, 0, 0, 0.01);
+}
+
+@media screen and (max-width: 370px){
+  .onboarding-languages__row select.onboarding-select{
+    padding: calc(.75rem - 1px);
+    padding-inline-end: 2.25rem;
+  }
+}
+
+@media (hover: hover) {
+  .onboarding-languages__row select.onboarding-select:hover{
+    filter: brightness(.98);
+  }
+}
+
+.onboarding-languages__row select.onboarding-select:focus-visible{
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: 2px;
+}
+
+.onboarding-languages__row .icon{
+  position: absolute;
+  right: 1rem;
+  bottom: calc(1.25rem - 1px + .125rem);
+  width: 1rem;
+  height: 1rem;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 370px){
+  .onboarding-languages__row .icon{
+    bottom: calc(.75rem - 1px + .125rem);
+    right: .75rem;
+  }
 }
 
 .onboarding-translations__row select{
@@ -1312,71 +1345,6 @@ body.theme-dark .settings-segment__preview{
 .onboarding-translations__row select:focus-visible{
   outline: 2px solid var(--accent-yellow);
   outline-offset: 2px;
-}
-
-.onboarding-languages{
-  min-width: 0;
-  padding: 0;
-  margin: 0;
-  border: none;
-}
-
-.onboarding-languages__legend{
-  display: block;
-  margin-block-end: .75rem;
-  padding: 0;
-  font-weight: 600;
-}
-
-.onboarding-languages__list{
-  display: flex;
-  flex-direction: column;
-  gap: .25rem;
-}
-
-.onboarding-language{
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  min-height: 2.75rem;
-  padding: .5rem .75rem;
-  border-radius: .75rem;
-  cursor: pointer;
-}
-
-.onboarding-language:hover{
-  background-color: var(--shade-default);
-}
-
-.onboarding-language:has(:checked){
-  background-color: var(--background-yellow);
-}
-
-.onboarding-language:has(:focus-visible){
-  outline: 2px solid var(--accent-yellow);
-  outline-offset: 2px;
-}
-
-.onboarding-language__radio{
-  position: absolute;
-}
-
-.onboarding-language__label{
-  flex: 1 1 auto;
-}
-
-.onboarding-language:has(:checked) .onboarding-language__label{
-  font-weight: 600;
-}
-
-.onboarding-language__check{
-  display: flex;
-  color: var(--text-velvet);
-  visibility: hidden;
-}
-
-.onboarding-language:has(:checked) .onboarding-language__check{
-  visibility: visible;
 }
 
 .onboarding-footer{
