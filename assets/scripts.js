@@ -287,6 +287,9 @@ function changeSentence() {
     const sentenceRect = currentSentenceEl.getBoundingClientRect()
     const parentRect = parent.getBoundingClientRect()
     popoverOffsetY = (sentenceRect.top - parentRect.top) / 16
+    translationPopover.style.left = ((sentenceRect.left - parentRect.left) / 16) + 'rem'
+    translationPopover.style.right = 'auto'
+    translationPopover.style.width = (sentenceRect.width / 16) + 'rem'
     translationPopover.style.minHeight = (sentenceRect.height / 16) + 'rem'
     // Added translateZ(0) to prevent laggy animation of drop-shadow filter
     translationPopover.style.transform = 'translateY(' + popoverOffsetY + 'rem) translateZ(0)'
