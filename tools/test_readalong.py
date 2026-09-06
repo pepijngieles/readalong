@@ -78,14 +78,12 @@ class SplitLongTest(unittest.TestCase):
         )
         self.assertEqual(parts(text), [text])
 
-    def test_splits_at_maar(self):
+    def test_written_sentence_with_maar_stays_when_short(self):
         text = (
             "De derde kikker daarentegen bleef klimmen en vallen, maar na een "
             "paar uur slaagde hij erin om naar de oppervlakte te komen."
         )
-        got = parts(text)
-        self.assertEqual(len(got), 2)
-        self.assertTrue(got[1].startswith("maar "))
+        self.assertEqual(parts(text), [text])
 
     def test_does_not_split_noun_phrase_at_midpoint(self):
         text = (

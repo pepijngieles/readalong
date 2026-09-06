@@ -340,9 +340,6 @@ def _target_parts(n, candidates, max_words):
     keep = max(KEEP_MAX, max_words)
     target = max(TARGET_PART, max_words)
     if n <= keep:
-        lo, hi = n // 4, (3 * n) // 4
-        if any(lo <= idx <= hi and prio <= 1 for idx, prio in candidates):
-            return 2
         return 1
     parts = max(2, -(-n // target))
     return min(parts, MAX_PARTS)
