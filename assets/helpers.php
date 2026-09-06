@@ -154,6 +154,36 @@ function lang_pref($key, array $allowed, $default) {
   return in_array($value, $allowed, true) ? $value : $default;
 }
 
+function lang_prefs_list($key, array $allowed, $default) {
+  $raw = $_GET[$key] ?? $_COOKIE['readalong-' . $key] ?? $default;
+  if (is_array($raw)) {
+    $values = $raw;
+  } else {
+    $values = array_map('trim', explode(',', (string) $raw));
+  }
+
+  $values = array_values(array_unique(array_filter($values, function ($code) use ($allowed) {
+    return in_array($code, $allowed, true);
+  })));
+
+  if ($values === []) {
+    $fallback = is_array($default) ? $default : [$default];
+    $values = array_values(array_filter($fallback, function ($code) use ($allowed) {
+      return in_array($code, $allowed, true);
+    }));
+  }
+
+  return $values;
+}
+
+function lang_prefs_summary(array $translationLangs) {
+  if (count($translationLangs) === 1) {
+    return lang_endonym($translationLangs[0]);
+  }
+
+  return implode(' · ', array_map('lang_endonym', $translationLangs));
+}
+
 function story_filter_kinds() {
   return ['podcast', 'news', 'book', 'email'];
 }

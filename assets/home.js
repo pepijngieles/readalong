@@ -177,13 +177,25 @@
     const remainingMinutes = Math.round(remainingSeconds / 60)
     const remainingEl = item.querySelector('[data-remaining]')
     const progressEl = item.querySelector('[data-item-progress]')
+    const metaEl = item.querySelector('.story-item__meta')
+    const showTranslationLang = continueSection?.hasAttribute('data-show-translation-lang')
+    const durationDisplay = item.getAttribute('data-duration-display') || ''
+    const kindLabel = item.getAttribute('data-kind-label') || ''
+    const translationEndonym = item.getAttribute('data-translation-endonym') || ''
+    const parts = []
+
+    if (durationDisplay) parts.push(durationDisplay)
+    if (remainingMinutes >= 1) {
+      parts.push(remainingTemplate.replace('{n}', String(remainingMinutes)))
+    }
+    if (showTranslationLang && translationEndonym) parts.push(translationEndonym)
+    if (kindLabel) parts.push(kindLabel)
+
+    if (metaEl && parts.length) {
+      metaEl.textContent = parts.join(' · ')
+    }
     if (remainingEl) {
-      if (remainingMinutes >= 1) {
-        remainingEl.textContent = remainingTemplate.replace('{n}', String(remainingMinutes))
-        remainingEl.hidden = false
-      } else {
-        remainingEl.hidden = true
-      }
+      remainingEl.hidden = true
     }
     if (progressEl) {
       progressEl.value = Math.max(0, Math.min(100, Math.round((sentence / Math.max(total - 1, 1)) * 100)))

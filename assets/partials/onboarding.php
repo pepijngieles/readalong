@@ -1,19 +1,20 @@
 <?php
 $languages = languages_by_endonym();
-$uiLang = ui_locale();
+$uiLang = detect_browser_locale(configured_languages());
 $segments = onboarding_demo_segments();
-$translateLang = lang_pref('translate', $languages, $uiLang);
+$translateLangsSelected = lang_prefs_list('translate', $languages, [$uiLang]);
 $defaultRead = 'no';
-if ($defaultRead === $translateLang) {
+if (in_array($defaultRead, $translateLangsSelected, true)) {
   foreach ($languages as $code) {
-    if ($code !== $translateLang) {
-      $defaultRead = $code;
+    if ($code !== $defaultRead) {
+      $translateLangsSelected = [$code];
       break;
     }
   }
 }
+$demoTranslateLang = $translateLangsSelected[0] ?? 'en';
 $demoSource = $segments[$defaultRead] ?? $segments['no'];
-$demoTranslation = $segments[$translateLang] ?? $segments['en'];
+$demoTranslation = $segments[$demoTranslateLang] ?? $segments['en'];
 $storyConfig = [
   'type' => 'default',
   'audioBase' => 'assets/audio/',
@@ -69,27 +70,15 @@ $storyConfig = [
 			</div>
 
 			<div class=onboarding-translations>
-				<div class=onboarding-translations__row>
-					<label for=onboarding-translate data-i18n=onboarding.translations_label><?= e(t('onboarding.translations_label')) ?></label>
-					<select id=onboarding-translate class=quiet data-onboarding-translate translate=no>
+				<span class=onboarding-translations__label data-i18n=onboarding.translations_label><?= e(t('onboarding.translations_label')) ?></span>
+				<div class="pill-row onboarding-translations__pills" role=group aria-label="<?= e(t('onboarding.translations_label')) ?>">
 <?php foreach ($languages as $code): ?>
 <?php if ($code === $defaultRead) continue; ?>
-						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $translateLang ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
+					<button type=button class=pill data-onboarding-translate-pill="<?= e($code) ?>" aria-pressed=<?= in_array($code, $translateLangsSelected, true) ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
+						<?php icon('check', ['size' => 16, 'class' => 'pill__check']); ?>
+						<?= e(lang_endonym($code)) ?>
+					</button>
 <?php endforeach; ?>
-					</select>
-					<?php icon('chevron-down', ['size' => 16]); ?>
-				</div>
-			</div>
-
-			<div class=onboarding-ui-language>
-				<div class=onboarding-ui-language__row>
-					<label for=onboarding-ui data-i18n=onboarding.ui_language><?= e(t('onboarding.ui_language')) ?></label>
-					<select id=onboarding-ui class=quiet data-onboarding-ui translate=no>
-<?php foreach ($languages as $code): ?>
-						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $uiLang ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
-<?php endforeach; ?>
-					</select>
-					<?php icon('chevron-down', ['size' => 16]); ?>
 				</div>
 			</div>
 		</div>
@@ -111,4 +100,4 @@ $storyConfig = [
 	window.READALONG_DEMO = <?= json_encode($segments, JSON_UNESCAPED_UNICODE) ?>;
 </script>
 <script type="text/javascript" src="assets/scripts.js?v=19"></script>
-<script type="text/javascript" src="assets/onboarding.js?v=7"></script>
+<script type="text/javascript" src="assets/onboarding.js?v=8"></script>
