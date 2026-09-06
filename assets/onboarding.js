@@ -34,6 +34,10 @@
       const key = element.getAttribute('data-i18n');
       if (key) element.textContent = translate(key, locale);
     });
+    document.querySelectorAll('.onboarding-language__label').forEach(function (element) {
+      const input = element.closest('label')?.querySelector('[data-onboarding-read]');
+      if (input) element.textContent = translate('lang.' + input.value, locale);
+    });
   }
 
   function selectedRead() {

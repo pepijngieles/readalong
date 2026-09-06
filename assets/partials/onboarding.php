@@ -75,7 +75,7 @@ $storyConfig = [
 <?php foreach ($languages as $code): ?>
 					<label class=onboarding-language>
 						<input type=radio name=read value=<?= e($code) ?> class="visually-hidden onboarding-language__radio" data-onboarding-read<?= $code === $defaultRead ? ' checked' : '' ?>>
-						<span class=onboarding-language__label lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></span>
+						<span class=onboarding-language__label><?= e(lang_label($code)) ?></span>
 						<span class=onboarding-language__check aria-hidden=true><?php icon('check', ['size' => 16]); ?></span>
 					</label>
 <?php endforeach; ?>
@@ -96,4 +96,4 @@ $storyConfig = [
 	window.READALONG_DEMO = <?= json_encode($segments, JSON_UNESCAPED_UNICODE) ?>;
 </script>
 <script type="text/javascript" src="assets/scripts.js?v=18"></script>
-<script type="text/javascript" src="assets/onboarding.js?v=3"></script>
+<script type="text/javascript" src="assets/onboarding.js?v=4"></script>

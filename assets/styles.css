@@ -14,14 +14,13 @@
   10. Progress bar
   11. Popovers
   12. Info blocks
-  13. App banners
-  14. Stories
-  15. Translation popover
-  16. Settings
-  17. Voice & language selection
-  18. Homepage sections
-  19. Loading state
-  20. Developer controls
+  13. Stories
+  14. Translation popover
+  15. Settings
+  16. Voice & language selection
+  17. Homepage sections
+  18. Loading state
+  19. Developer controls
 
 */
 
@@ -144,8 +143,6 @@ body{
 }
 
 [hidden],
-.ios .hide-on-ios,
-body:not(.ios) .ios-only,
 .no-js .js-only,
 .js .no-js-only{
   display: none !important;
@@ -162,11 +159,7 @@ body:not(.ios) .ios-only,
   pointer-events: none;
 }
 
-@media screen and (display-mode: standalone){
-  .hide-on-standalone{
-    display: none !important;
-  }
-}
+
 
 .visually-hidden{
   position: absolute !important;
@@ -734,95 +727,7 @@ progress::-moz-progress-bar{
 
 
 
-/* 13. App banners
----------------------------------------------------------------------------- */
-@media screen and (display-mode: browser){
-  body.ios{
-    transition: padding-top ease-out .2s .1s;
-  }
-
-  body.ios:not(.hide-app-banner){
-    padding-top: 6rem;
-  }
-
-  body.show-install-explanation{
-    --background-primary: var(--background-secondary);
-  }
-
-  .add-app-popover{
-    position: fixed;
-    right: 0;
-    top: 1rem;
-    left: 0;
-    display: grid;
-    grid-template-columns: auto 2.5rem 1fr auto;
-    align-items: center;
-    width: fit-content;
-    min-width: 18rem;
-    padding-inline: 0 .5rem;
-    margin-block: 0 2.5rem;
-    margin-inline: auto;
-    border-radius: 1rem;
-    transition: transform ease-out .2s;
-    user-select: none;
-  }
-
-  .hide-app-banner .add-app-popover{
-    transform: translateY(-8rem);
-  }
-
-  .show-install-explanation .add-app-popover{
-    opacity: .5;
-  }
-
-  .add-app-popover .close-button{
-    padding-inline: .5rem .25rem;
-    border-radius: 1rem 0 0 1rem;
-  }
-
-  .add-app-popover .app-icon{
-    border-radius: .5rem;
-  }
-
-  .add-app-popover .text{
-    flex-grow: 1;
-    padding-block: .5rem;
-    margin-inline: .75rem;
-    line-height: 1.2;
-  }
-
-  .explanation-popover{
-    position: fixed;
-    right: .75rem;
-    bottom: 1rem;
-    left: .75rem;
-    transform: translateY(-1.5rem);
-    opacity: 0;
-    transition:
-      opacity ease-out .1s,
-      transform ease-out .1s;
-    max-width: fit-content;
-    margin: 0 auto;
-    padding: 1rem;
-    user-select: none;
-  }
-
-  .show-install-explanation .explanation-popover{
-    transform: none;
-    opacity: 1;
-  }
-
-  .explanation-popover .description{
-    display: block;
-    margin-block: 0.25rem .5rem;
-  }
-}
-
-/* Eventually support beyond iOS @media (hover:none) and (pointer:coarse) {} */
-
-
-
-/* 14. Stories
+/* 13. Stories
 ---------------------------------------------------------------------------- */
 .story{
   font-family: var(--font-family-story);
