@@ -59,7 +59,6 @@ let   started = false,
 const storyConfig = JSON.parse(document.getElementById('story-config').textContent)
 const timestamps = Object.fromEntries(
   Object.entries(storyConfig.voices).map(([id, v]) => [id, v.timestamps]))
-const storyType = storyConfig.type
 let voice = storyConfig.voice
 
 const PROGRESS_KEY = 'readalong-progress'
@@ -289,28 +288,13 @@ function changeSentence() {
     popoverOffsetY /= 16
     popoverTransform = 'translateY(' + popoverOffsetY + 'rem) translateZ(0)';
 
-    // For dialogue stories, the popover is positioned differently
-    if (storyType == 'dialogue'){
-      // Get the list item element to relatively position popover to
-      let listItem = findAncestor(currentSentenceEl, 'li')
-      // Calculate transform and text align values
-      popoverOffsetY++
-      popoverOffsetX = (listItem.classList.contains('right')) ? 2.75 : -2.75
-      popoverTransform += ' translateX(' + popoverOffsetX + 'rem)';
-      popoverTextAlign = (listItem.classList.contains('right')) ? 'right' : 'left'
-      // Set the text align and max width values
-      // A max-width is set to prevent popover from transforming out of the viewport
-      translationPopover.style.textAlign = popoverTextAlign
-      translationPopover.style.maxWidth = currentSentenceEl.offsetWidth / 16 + 2 + 'rem'
-    }
-
     // Update the position
     // Added translateZ(0) to prevent laggy animation of drop-shadow filter
     translationPopover.style.transform = 'translateX(' + popoverOffsetX + 'rem) translateY(' + popoverOffsetY + 'rem) translateZ(0)'    
   }
 
   /* 5.3 Check if auto-scrolling is needed --------------------------------- */
-  let scrollMargin = (storyType == 'dialogue') ? 48 : 12
+  let scrollMargin = 12
   
   function checkForScroll() {
     if (document.body.classList.contains('onboarding-page')) return

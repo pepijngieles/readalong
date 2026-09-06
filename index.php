@@ -20,7 +20,7 @@ if (!$needsOnboarding) {
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = [2, 5, 10];
   $kindTiles = story_filter_kinds();
-  $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_endonym($translationLang);
+  $prefsSummary = lang_label($readAlongLang) . ' → ' . lang_endonym($translationLang) . ' · ' . lang_endonym($uiLocale);
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -61,6 +61,15 @@ if (!$needsOnboarding) {
 					<select id=app-language name=app-language class=quiet data-app-language translate=no>
 <?php foreach ($translationLangs as $code): ?>
 						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $translationLang ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
+<?php endforeach; ?>
+					</select>
+					<?php icon('chevron-down', ['size' => 16]); ?>
+				</div>
+				<div class=ui-language>
+					<label for=ui-language><?= e(t('home.ui_language')) ?></label>
+					<select id=ui-language name=ui-language class=quiet data-ui-language translate=no>
+<?php foreach (configured_languages() as $code): ?>
+						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $uiLocale ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
 <?php endforeach; ?>
 					</select>
 					<?php icon('chevron-down', ['size' => 16]); ?>
@@ -170,7 +179,7 @@ if (!$needsOnboarding) {
 			const params = new URLSearchParams(location.search);
 			let shouldReload = false;
 
-			['read', 'translate', 'level'].forEach(function (key) {
+			['read', 'translate', 'ui', 'level'].forEach(function (key) {
 				if (params.has(key)) return;
 				const value = localStorage.getItem('readalong-' + key);
 				if (!value) return;
@@ -185,6 +194,7 @@ if (!$needsOnboarding) {
 
 		document.querySelector('[data-read-along]')?.addEventListener('change', onLangChange('read'));
 		document.querySelector('[data-app-language]')?.addEventListener('change', onLangChange('translate'));
+		document.querySelector('[data-ui-language]')?.addEventListener('change', onLangChange('ui'));
 		document.querySelector('[data-story-level]')?.addEventListener('change', onLangChange('level'));
 	</script>
 	<script type="text/javascript" src="assets/home.js?v=6"></script>

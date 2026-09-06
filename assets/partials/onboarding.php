@@ -1,7 +1,8 @@
 <?php
 $languages = languages_by_endonym();
+$uiLang = ui_locale();
 $segments = onboarding_demo_segments();
-$translateLang = ui_locale();
+$translateLang = lang_pref('translate', $languages, $uiLang);
 $defaultRead = 'no';
 if ($defaultRead === $translateLang) {
   foreach ($languages as $code) {
@@ -79,6 +80,18 @@ $storyConfig = [
 					<?php icon('chevron-down', ['size' => 16]); ?>
 				</div>
 			</div>
+
+			<div class=onboarding-ui-language>
+				<div class=onboarding-ui-language__row>
+					<label for=onboarding-ui data-i18n=onboarding.ui_language><?= e(t('onboarding.ui_language')) ?></label>
+					<select id=onboarding-ui class=quiet data-onboarding-ui translate=no>
+<?php foreach ($languages as $code): ?>
+						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $uiLang ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
+<?php endforeach; ?>
+					</select>
+					<?php icon('chevron-down', ['size' => 16]); ?>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -97,5 +110,5 @@ $storyConfig = [
 	window.READALONG_ENDONYMS = <?= json_encode(lang_endonyms(), JSON_UNESCAPED_UNICODE) ?>;
 	window.READALONG_DEMO = <?= json_encode($segments, JSON_UNESCAPED_UNICODE) ?>;
 </script>
-<script type="text/javascript" src="assets/scripts.js?v=18"></script>
-<script type="text/javascript" src="assets/onboarding.js?v=6"></script>
+<script type="text/javascript" src="assets/scripts.js?v=19"></script>
+<script type="text/javascript" src="assets/onboarding.js?v=7"></script>

@@ -107,7 +107,10 @@ function ui_locale() {
     return $locale;
   }
 
-  return $locale = detect_browser_locale(configured_languages());
+  $allowed = configured_languages();
+  $default = detect_browser_locale($allowed);
+
+  return $locale = lang_pref('ui', $allowed, $default);
 }
 
 function t($key, array $replacements = [], $locale = null) {
