@@ -8,6 +8,7 @@ index.php-stub en de mp3 op de juiste plek. Twee bronnen, dezelfde uitvoer:
   from-text    bestaande tekst   -> ElevenLabs TTS -> audio + timestamps
   add-voice    extra stem bij een bestaand verhaal (tekst blijft ongewijzigd)
   check        valideer bestaande verhalen tegen de invarianten uit story.php
+  resegment    splits te lange zinnen; vertalingen volgen de brongrenzen
 
 Vereist de omgevingsvariabele XI_API_KEY. Voor from-audio is de permissie
 speech_to_text nodig, voor from-text text_to_speech. Optioneel DEEPL_API_KEY
@@ -79,6 +80,36 @@ CONJUNCTIONS = {
     "og", "men", "som", "fordi", "at", "når", "hvis", "så", "eller", "mens",
     "der", "for", "siden", "selv", "enn", "da", "maar", "omdat", "terwijl",
     "want", "dus", "toen", "als", "hoewel", "zodat",
+}
+
+WEAK_CONJUNCTIONS = {
+    "og", "en", "and", "så", "da", "at", "som", "der", "for",
+}
+STRONG_CONJUNCTIONS = CONJUNCTIONS - WEAK_CONJUNCTIONS
+# knippen — niet op een komma die in die taal toevallig ergens anders valt.
+CONJUNCTION_ALIGN = {
+    "fordi": ("omdat", "want", "because", "since", "weil", "parce"),
+    "omdat": ("fordi", "want", "because", "since", "weil", "parce"),
+    "want": ("fordi", "omdat", "because", "denn", "car"),
+    "men": ("maar", "but", "aber", "mais", "pero"),
+    "maar": ("men", "but", "aber", "mais", "pero"),
+    "eller": ("of", "or", "oder", "ou", "o"),
+    "og": ("en", "and", "und", "et", "y"),
+    "en": ("og", "and", "und", "et", "y"),
+    "så": ("dus", "so", "dann", "alors", "entonces"),
+    "dus": ("så", "so", "dann", "alors"),
+    "når": ("wanneer", "when", "wenn", "quand", "cuando"),
+    "hvis": ("als", "if", "wenn", "si"),
+    "als": ("hvis", "når", "if", "when", "wenn", "si", "quand"),
+    "som": ("die", "dat", "that", "who", "which", "der", "que"),
+    "at": ("dat", "that", "dass", "que"),
+    "mens": ("terwijl", "while", "während", "pendant"),
+    "terwijl": ("mens", "while", "während", "pendant"),
+    "da": ("toen", "when", "als", "alsdann"),
+    "toen": ("da", "when", "quand"),
+    "for": ("want", "because", "denn", "car"),
+    "hoewel": ("selv", "although", "obwohl", "aunque"),
+    "zodat": ("så", "so", "damit", "pour"),
 }
 
 # De handmatig afgestemde timestamps in de bestaande verhalen liggen niet op
@@ -217,8 +248,9 @@ def split_sentences(paragraph):
     return sentences
 
 
-def split_long(words, max_words, min_words):
+def split_long(words, max_words, min_words, conjunctions=None):
     """Hak een te lange zin op bij komma's of voegwoorden, anders bij het midden."""
+    conjunctions = CONJUNCTIONS if conjunctions is None else conjunctions
     if len(words) <= max_words:
         return [words]
 
@@ -228,7 +260,7 @@ def split_long(words, max_words, min_words):
             continue
         if CLAUSE_END.search(w):
             candidates.append((i + 1, 0))          # breek ná de komma
-        elif normalise_word(w) in CONJUNCTIONS:
+        elif normalise_word(w) in conjunctions:
             candidates.append((i, 1))              # breek vóór het voegwoord
 
     if not candidates:
@@ -246,13 +278,158 @@ def split_long(words, max_words, min_words):
         # Zoek het eerste goede split-punt na min_words dat tot twee behapbare delen leidt
         for idx, priority in sorted(candidates, key=lambda c: (c[1], c[0])):
             if idx >= min_words and len(words) - idx >= min_words:
-                return (split_long(words[:idx], max_words, min_words)
-                        + split_long(words[idx:], max_words, min_words))
+                return (split_long(words[:idx], max_words, min_words, conjunctions)
+                        + split_long(words[idx:], max_words, min_words, conjunctions))
     
     # Anders, splits dicht bij het midden
     idx, _ = min(candidates, key=lambda c: (c[1], abs(c[0] - target)))
-    return (split_long(words[:idx], max_words, min_words)
-            + split_long(words[idx:], max_words, min_words))
+    return (split_long(words[:idx], max_words, min_words, conjunctions)
+            + split_long(words[idx:], max_words, min_words, conjunctions))
+
+
+def _nearest_token(words, candidates, guessed, window):
+    """Index of the candidate token closest to guessed, or None."""
+    wanted = {normalise_word(c) for c in candidates}
+    lo = max(0, guessed - window)
+    hi = min(len(words), guessed + window + 1)
+    best, best_dist = None, window + 1
+    for i in range(lo, hi):
+        if normalise_word(words[i]) not in wanted:
+            continue
+        dist = abs(i - guessed)
+        if dist < best_dist:
+            best, best_dist = i, dist
+    return best
+
+
+def _nearest_clause_end(words, guessed, window):
+    lo = max(0, guessed - window)
+    hi = min(len(words), guessed + window + 1)
+    best, best_dist = None, window + 1
+    for i in range(lo, hi):
+        if not CLAUSE_END.search(words[i]):
+            continue
+        dist = abs(i - guessed)
+        if dist < best_dist:
+            best, best_dist = i, dist
+    return best
+
+
+def split_translation_following_source(source_chunks, translation, min_words=4):
+    """Knip een bestaande vertaling op dezelfde plekken als de bronchunks.
+
+    De bron is leidend (komma's/voegwoorden in dát script). De vertaling
+    volgt: eerst de relatieve woordooffset, daarna bijstellen naar het
+    equivalent van het voegwoord waar de volgende bronchunk mee begint.
+    Zelfstandig split_long op de vertaling toepassen is fout, omdat die
+    markeringen per taal ergens anders vallen.
+    """
+    if len(source_chunks) <= 1:
+        return [translation]
+
+    src_words = []
+    starts = []
+    for chunk in source_chunks:
+        starts.append(len(src_words))
+        src_words.extend(chunk.split())
+    tr_words = translation.split()
+    if not src_words or not tr_words:
+        return [translation] * len(source_chunks)
+
+    window = max(8, len(tr_words) // 6)
+    bounds = [0]
+    for i, src_start in enumerate(starts[1:], start=1):
+        guessed = round(src_start / len(src_words) * len(tr_words))
+        next_word = normalise_word(src_words[src_start])
+        prev_word = src_words[src_start - 1]
+        idx = guessed
+
+        content = []
+        for w in src_words[src_start:src_start + 5]:
+            nw = normalise_word(w)
+            if nw in CONJUNCTIONS or len(nw) < 5:
+                continue
+            content.append(nw)
+            if len(content) == 2:
+                break
+        content_at = None
+        for nw in content:
+            content_at = _nearest_token(tr_words, [nw], guessed, window)
+            if content_at is not None:
+                break
+        if content_at is not None:
+            idx = content_at
+            if idx > bounds[-1] + 1 and normalise_word(tr_words[idx - 1]) in CONJUNCTIONS:
+                idx -= 1
+        else:
+            equivalents = CONJUNCTION_ALIGN.get(next_word, ())
+            if next_word in CONJUNCTIONS and next_word not in equivalents:
+                equivalents = (*equivalents, next_word)
+            found = _nearest_token(tr_words, equivalents, guessed, window) if equivalents else None
+            if found is not None:
+                idx = found
+            elif CLAUSE_END.search(prev_word):
+                comma = _nearest_clause_end(tr_words, guessed, window)
+                if comma is not None:
+                    idx = comma + 1
+
+        remaining = len(source_chunks) - i
+        idx = max(bounds[-1] + 1, min(len(tr_words) - remaining, idx))
+        bounds.append(idx)
+    bounds.append(len(tr_words))
+
+    return [" ".join(tr_words[a:b]) for a, b in zip(bounds, bounds[1:])]
+
+
+def interpolate_chunk_times(start, end, source_chunks):
+    weights = [max(len(chunk.split()), 1) for chunk in source_chunks]
+    total = sum(weights)
+    times, acc = [], 0
+    for weight in weights:
+        times.append(round(start + (acc / total) * (end - start), 1))
+        acc += weight
+    return times
+
+
+def resegment_blocks(blocks, translation_lists, timestamp_lists, duration,
+                     max_words, min_words, conjunctions=None):
+    """Splits te lange bronzinnen; knipt elke vertaling en timestamp mee."""
+    if conjunctions is None:
+        conjunctions = STRONG_CONJUNCTIONS
+    new_blocks = []
+    new_translations = [[] for _ in translation_lists]
+    new_timestamps = [[] for _ in timestamp_lists]
+    index = 0
+
+    for block in blocks:
+        new_sentences = []
+        for sentence in block["sentences"]:
+            chunks = [" ".join(part) for part in split_long(
+                sentence.split(), max_words, min_words, conjunctions) if part]
+            if not chunks:
+                index += 1
+                continue
+            aligned = [
+                split_translation_following_source(chunks, translations[index], min_words)
+                for translations in translation_lists
+            ]
+            starts = []
+            for stamps in timestamp_lists:
+                start = stamps[index]
+                end = stamps[index + 1] if index + 1 < len(stamps) else duration
+                starts.append(interpolate_chunk_times(start, end, chunks))
+            new_sentences.extend(chunks)
+            for dest, parts in zip(new_translations, aligned):
+                dest.extend(parts)
+            for dest, parts in zip(new_timestamps, starts):
+                dest.extend(parts)
+            index += 1
+        rebuilt = {"sentences": new_sentences}
+        if "speaker" in block:
+            rebuilt["speaker"] = block["speaker"]
+        new_blocks.append(rebuilt)
+
+    return new_blocks, new_translations, new_timestamps
 
 
 SPEAKER_LINE = re.compile(r"^([^\s:][^:]{0,30}):\s*(.+)$")
@@ -1022,6 +1199,61 @@ def cmd_add_voice(args):
     report(args.slug, blocks, timestamps, translations, duration)
 
 
+def resegment_story(slug, max_words, min_words, dry_run=False):
+    story_dir = REPO / "stories" / slug
+    meta_path = story_dir / "story.json"
+    if not meta_path.exists():
+        sys.exit(f"{story_dir} bestaat niet.")
+    meta = json.loads(meta_path.read_text())
+    language = meta["language"]
+    text_path = story_dir / "text" / f"{language}.json"
+    text = json.loads(text_path.read_text())
+    trans_paths = sorted((story_dir / "translations").glob("*.json"))
+    trans_docs = [json.loads(p.read_text()) for p in trans_paths]
+    trans_lists = [doc["sentences"] for doc in trans_docs]
+    stamp_lists = [list(voice["timestamps"]) for voice in meta["voices"]]
+    duration = max(voice.get("duration") or (stamps[-1] + 1 if stamps else 0)
+                   for voice, stamps in zip(meta["voices"], stamp_lists))
+
+    before = len(flatten(text["blocks"]))
+    blocks, new_trans, new_stamps = resegment_blocks(
+        text["blocks"], trans_lists, stamp_lists, duration, max_words, min_words)
+    after = len(flatten(blocks))
+    print(f"  {slug}: {before} → {after} zinnen")
+
+    if dry_run:
+        src = flatten(blocks)
+        shown = new_trans[0] if new_trans else [""] * after
+        for i, (sentence, translation) in enumerate(zip(src, shown)):
+            if i and src[i-1] and sentence.startswith(("fordi ", "og ", "men ", "omdat ", "maar ")):
+                print(f"    {i-1} {src[i-1][-60:]}")
+                print(f"         {shown[i-1][-60:]}")
+                print(f"    {i} {sentence[:70]}")
+                print(f"         {translation[:70]}")
+                print()
+        return before, after
+
+    text["blocks"] = blocks
+    write_json(text_path, text)
+    for path, doc, sentences in zip(trans_paths, trans_docs, new_trans):
+        doc["sentences"] = sentences
+        write_json(path, doc)
+    for voice, stamps in zip(meta["voices"], new_stamps):
+        voice["timestamps"] = stamps
+    write_json(meta_path, meta)
+    return before, after
+
+
+def cmd_resegment(args):
+    max_words = args.max_words if args.max_words > 0 else 10 ** 6
+    if args.slug:
+        slugs = [args.slug]
+    else:
+        slugs = [p.parent.name for p in sorted((REPO / "stories").glob("*/story.json"))]
+    for slug in slugs:
+        resegment_story(slug, max_words, args.min_words, args.dry_run)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -1065,6 +1297,15 @@ def main():
     p.add_argument("--lead-in", type=float, default=LEAD_IN)
     p.add_argument("--cache")
     p.set_defaults(func=cmd_add_voice)
+
+    p = sub.add_parser("resegment",
+                       help="splits te lange zinnen in bestaande verhalen; "
+                            "vertalingen volgen de bron, niet hun eigen komma's")
+    p.add_argument("--slug", help="één verhaal (default: alle)")
+    p.add_argument("--max-words", type=int, default=20)
+    p.add_argument("--min-words", type=int, default=6)
+    p.add_argument("--dry-run", action="store_true", help="alleen tonen, niet schrijven")
+    p.set_defaults(func=cmd_resegment)
 
     p = sub.add_parser("check", help="valideer alle verhalen")
     p.set_defaults(func=lambda a: sys.exit(check_stories()))
