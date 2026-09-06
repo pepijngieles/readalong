@@ -503,7 +503,14 @@ def sentence_times_from_chars(sentences, full_text, alignment, lead_in):
 # --------------------------------------------------------------------------
 
 def translate(sentences, source_language, target="EN-GB"):
-    """Vertaal zin voor zin, zodat de indices exact overeenkomen."""
+    """Vertaal zin voor zin, zodat de indices exact overeenkomen.
+
+    Splits de brontekst eerst, vertaal daarna elk segment. Achteraf de
+    vertaling zelfstandig knippen (op komma's of voegwoorden) loopt scheef:
+    die markeringen vallen per taal ergens anders, waardoor bijv.
+    "moussakka også" en "soms ook moussaka" in verschillende actieve zinnen
+    terechtkomen.
+    """
     key = os.environ.get("DEEPL_API_KEY")
     if not key:
         print("  DEEPL_API_KEY niet gezet: translations krijgen lege strings. "
