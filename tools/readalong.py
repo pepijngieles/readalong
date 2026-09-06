@@ -8,6 +8,7 @@ index.php-stub en de mp3 op de juiste plek. Twee bronnen, dezelfde uitvoer:
   from-text    bestaande tekst   -> ElevenLabs TTS -> audio + timestamps
   add-voice    extra stem bij een bestaand verhaal (tekst blijft ongewijzigd)
   resegment    bestaande verhalen in 2–3 halfzinnen knippen (tekst, vertalingen, timestamps)
+  retranslate  vertaal alle segmenten opnieuw per halfzin (DeepL)
   check        valideer bestaande verhalen tegen de invarianten uit story.php
 
 Vereist de omgevingsvariabele XI_API_KEY. Voor from-audio is de permissie
@@ -35,6 +36,8 @@ Voorbeelden:
     python3 tools/readalong.py check
     python3 tools/readalong.py resegment
     python3 tools/readalong.py resegment --slug taco-pa-fredag
+    python3 tools/readalong.py retranslate
+    python3 tools/readalong.py retranslate --slug taco-pa-fredag
 
 Bij verwerking schat de agent het CEFR-niveau per bron (--level B1-B2) en vult
 attribution (publiek) en rights (intern) in. Voorbeeld:
@@ -571,13 +574,11 @@ def interpolate_timestamps(old_ts, groups, duration):
     return new
 
 
-def resegment_blocks(blocks, translation_lists, timestamps_lists, duration,
-                     max_words, min_words):
-    """Splits bestaande zinnen; houd vertalingen en timestamps in de pas."""
+def resegment_blocks(blocks, timestamps_lists, duration, max_words, min_words):
+    """Splits bestaande zinnen; timestamps worden evenredig geïnterpoleerd."""
     new_blocks = []
-    new_translations = [[] for _ in translation_lists]
     groups = []
-    old_index = 0
+    split_map = []
     for block in blocks:
         new_block = {k: v for k, v in block.items() if k != "sentences"}
         new_sents = []
@@ -592,17 +593,31 @@ def resegment_blocks(blocks, translation_lists, timestamps_lists, duration,
                 parts = [sentence]
             new_sents.extend(parts)
             groups.append([max(1, len(p.split())) for p in parts])
-            for dest, original_list in zip(new_translations, translation_lists):
-                original = original_list[old_index] if old_index < len(original_list) else ""
-                dest.extend(split_translation(sentence, parts, original, min_words))
-            old_index += 1
+            split_map.append((sentence, parts))
         new_block["sentences"] = new_sents
         new_blocks.append(new_block)
 
     new_ts_lists = [
         interpolate_timestamps(ts, groups, duration) for ts in timestamps_lists
     ]
-    return new_blocks, new_translations, new_ts_lists
+    return new_blocks, new_ts_lists, split_map
+
+
+def refresh_translations(sentences, split_map, translation_lists, language, langs,
+                         min_words):
+    """Vertaal elk segment opnieuw; fallback naar mechanisch knippen zonder DeepL."""
+    if os.environ.get("DEEPL_API_KEY"):
+        return translate_all(sentences, language, langs)
+
+    print("  DEEPL_API_KEY niet gezet: vertalingen mechanisch geknipt (fallback).")
+    out = {}
+    for lang, trans_list in zip(langs, translation_lists):
+        refreshed = []
+        for i, (original, parts) in enumerate(split_map):
+            original_tr = trans_list[i] if i < len(trans_list) else ""
+            refreshed.extend(split_translation(original, parts, original_tr, min_words))
+        out[lang] = refreshed
+    return out
 
 
 SPEAKER_LINE = re.compile(r"^([^\s:][^:]{0,30}):\s*(.+)$")
@@ -1357,23 +1372,80 @@ def resegment_story(slug, max_words, min_words):
     for voice, ts in zip(voices, timestamps_lists):
         duration = max(duration, float(voice.get("duration") or (ts[-1] + 5 if ts else 0)))
 
-    new_blocks, new_trans, new_ts = resegment_blocks(
-        blocks, translation_lists, timestamps_lists, duration, max_words, min_words)
+    new_blocks, new_ts, split_map = resegment_blocks(
+        blocks, timestamps_lists, duration, max_words, min_words)
     new_count = len(flatten(new_blocks))
     if new_count == old_count:
         print(f"{slug}: {old_count} zinnen, geen extra splitsing")
         return False
 
+    langs = [p.stem for p in translation_paths]
+    sentences = flatten(new_blocks)
+    print("Vertalen")
+    translation_sets = refresh_translations(
+        sentences, split_map, translation_lists, language, langs, min_words)
+
     text["blocks"] = new_blocks
     write_json(text_path, text)
-    for path, doc, sentences in zip(translation_paths, translation_docs, new_trans):
-        doc["sentences"] = sentences
+    for path, doc in zip(translation_paths, translation_docs):
+        doc["sentences"] = translation_sets[path.stem]
         write_json(path, doc)
     for voice, ts in zip(voices, new_ts):
         voice["timestamps"] = ts
     write_json(story_json, meta)
     print(f"{slug}: {old_count} → {new_count} zinnen")
     return True
+
+
+def retranslate_story(slug, langs=None):
+    """Vertaal alle segmenten opnieuw per halfzin via DeepL."""
+    story_dir = REPO / "stories" / slug
+    story_json = story_dir / "story.json"
+    if not story_json.exists():
+        sys.exit(f"Geen verhaal '{slug}' in stories/")
+
+    meta = json.loads(story_json.read_text(encoding="utf-8"))
+    language = meta["language"]
+    text_path = story_dir / "text" / f"{language}.json"
+    text = json.loads(text_path.read_text(encoding="utf-8"))
+    sentences = flatten(text["blocks"])
+    count = len(sentences)
+
+    translation_paths = sorted((story_dir / "translations").glob("*.json"))
+    if langs:
+        wanted = set(langs)
+        translation_paths = [p for p in translation_paths if p.stem in wanted]
+    if not translation_paths:
+        sys.exit(f"Geen vertaalbestanden voor '{slug}'")
+
+    split_map = [(s, [s]) for s in sentences]
+    translation_docs = [json.loads(p.read_text(encoding="utf-8")) for p in translation_paths]
+    translation_lists = [doc.get("sentences", []) for doc in translation_docs]
+    target_langs = [p.stem for p in translation_paths]
+
+    print(f"{slug}: {count} segmenten → {', '.join(target_langs)}")
+    print("Vertalen")
+    translation_sets = refresh_translations(
+        sentences, split_map, translation_lists, language, target_langs, min_words=4)
+
+    for path, doc in zip(translation_paths, translation_docs):
+        doc["sentences"] = translation_sets[path.stem]
+        if len(doc["sentences"]) != count:
+            sys.exit(f"{path.name}: {len(doc['sentences'])} vertalingen voor {count} zinnen")
+        write_json(path, doc)
+    print(f"{slug}: klaar")
+    return True
+
+
+def cmd_retranslate(args):
+    langs = parse_csv(args.translations) if args.translations else None
+    slugs = ([args.slug] if args.slug
+             else [p.parent.name for p in sorted((REPO / "stories").glob("*/story.json"))])
+    done = 0
+    for slug in slugs:
+        if retranslate_story(slug, langs):
+            done += 1
+    print(f"\n{done}/{len(slugs)} verhaal(en) opnieuw vertaald")
 
 
 def cmd_resegment(args):
@@ -1469,6 +1541,12 @@ def main():
                    help="langer wordt in 2–3 halfzinnen gesplitst (0 = nooit)")
     p.add_argument("--min-words", type=int, default=4)
     p.set_defaults(func=cmd_resegment)
+
+    p = sub.add_parser("retranslate",
+                       help="vertaal alle segmenten opnieuw per halfzin (DeepL)")
+    p.add_argument("--slug", help="één verhaal; zonder dit argument alle verhalen")
+    p.add_argument("--translations", help="kommagescheiden doeltalen (bijv. nl,en); standaard alle")
+    p.set_defaults(func=cmd_retranslate)
 
     args = parser.parse_args()
     args.func(args)
