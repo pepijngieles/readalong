@@ -1,0 +1,46 @@
+{
+  "id": "steilneset-minnested",
+  "type": "dialogue",
+  "kind": "podcast",
+  "language": "no",
+  "order": 8,
+  "published": true,
+  "level": "B1-B2",
+  "voices": [
+    {
+      "id": "samtale",
+      "name": "Liv og Silje",
+      "duration": 138,
+      "timestamps": [
+        0.0,
+        12.6,
+        22.3,
+        26.2,
+        34.4,
+        43.2,
+        55.9,
+        72.5,
+        87.8,
+        107.3,
+        109.8,
+        128.6
+      ]
+    }
+  ],
+  "attribution": {
+    "title": "NB Samtale",
+    "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+  },
+  "rights": {
+    "text": {
+      "source": "NB Samtale, Språkbanken ved Nasjonalbiblioteket",
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "audio": {
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "note": "Publiek domein. Sprekers zijn geanonimiseerd in het corpus; voornamen in de UI zijn aliassen."
+  }
+}

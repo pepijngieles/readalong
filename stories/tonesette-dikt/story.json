@@ -1,0 +1,61 @@
+{
+  "id": "tonesette-dikt",
+  "type": "dialogue",
+  "kind": "podcast",
+  "language": "no",
+  "order": 9,
+  "published": true,
+  "level": "B1",
+  "voices": [
+    {
+      "id": "samtale",
+      "name": "Eva, Susanna og Tuva",
+      "duration": 269,
+      "timestamps": [
+        0.0,
+        18.0,
+        36.8,
+        51.5,
+        52.9,
+        66.3,
+        71.4,
+        91.4,
+        107.3,
+        111.0,
+        122.5,
+        136.9,
+        154.0,
+        157.8,
+        173.1,
+        175.5,
+        194.3,
+        208.6,
+        211.9,
+        220.3,
+        221.9,
+        231.2,
+        244.5,
+        246.0,
+        249.8,
+        253.3,
+        256.1
+      ]
+    }
+  ],
+  "attribution": {
+    "title": "NB Samtale",
+    "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+  },
+  "rights": {
+    "text": {
+      "source": "NB Samtale, Språkbanken ved Nasjonalbiblioteket",
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "audio": {
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "note": "Publiek domein. Sprekers zijn geanonimiseerd in het corpus; voornamen in de UI zijn aliassen."
+  }
+}

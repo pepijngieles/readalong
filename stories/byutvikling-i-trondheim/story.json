@@ -1,0 +1,65 @@
+{
+  "id": "byutvikling-i-trondheim",
+  "type": "dialogue",
+  "kind": "podcast",
+  "language": "no",
+  "order": 6,
+  "published": true,
+  "level": "B1-B2",
+  "voices": [
+    {
+      "id": "samtale",
+      "name": "Marte, Per og Kari",
+      "duration": 345,
+      "timestamps": [
+        0.0,
+        5.5,
+        21.1,
+        22.5,
+        29.9,
+        41.9,
+        45.9,
+        65.4,
+        81.0,
+        100.5,
+        121.2,
+        124.1,
+        127.5,
+        129.4,
+        133.2,
+        151.6,
+        168.5,
+        183.2,
+        193.9,
+        202.0,
+        219.3,
+        231.9,
+        247.4,
+        262.9,
+        270.8,
+        280.3,
+        299.7,
+        306.7,
+        311.7,
+        331.6,
+        335.0
+      ]
+    }
+  ],
+  "attribution": {
+    "title": "NB Samtale",
+    "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+  },
+  "rights": {
+    "text": {
+      "source": "NB Samtale, Språkbanken ved Nasjonalbiblioteket",
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "audio": {
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "note": "Publiek domein. Sprekers zijn geanonimiseerd in het corpus; voornamen in de UI zijn aliassen."
+  }
+}

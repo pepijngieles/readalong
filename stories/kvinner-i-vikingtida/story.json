@@ -1,0 +1,53 @@
+{
+  "id": "kvinner-i-vikingtida",
+  "type": "dialogue",
+  "kind": "podcast",
+  "language": "no",
+  "order": 7,
+  "published": true,
+  "level": "B1-B2",
+  "voices": [
+    {
+      "id": "samtale",
+      "name": "Henrik og Inger",
+      "duration": 181,
+      "timestamps": [
+        0.0,
+        13.3,
+        29.0,
+        38.4,
+        47.1,
+        61.4,
+        81.1,
+        89.9,
+        93.8,
+        94.8,
+        95.2,
+        102.2,
+        114.8,
+        116.2,
+        136.0,
+        144.5,
+        152.6,
+        166.4,
+        174.6
+      ]
+    }
+  ],
+  "attribution": {
+    "title": "NB Samtale",
+    "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+  },
+  "rights": {
+    "text": {
+      "source": "NB Samtale, Språkbanken ved Nasjonalbiblioteket",
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "audio": {
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "note": "Publiek domein. Sprekers zijn geanonimiseerd in het corpus; voornamen in de UI zijn aliassen."
+  }
+}
