@@ -107,12 +107,7 @@ function ui_locale() {
     return $locale;
   }
 
-  $allowed = configured_languages();
-  if (!empty($_COOKIE['readalong-translate']) && in_array($_COOKIE['readalong-translate'], $allowed, true)) {
-    return $locale = $_COOKIE['readalong-translate'];
-  }
-
-  return $locale = detect_browser_locale($allowed);
+  return $locale = detect_browser_locale(configured_languages());
 }
 
 function t($key, array $replacements = [], $locale = null) {
