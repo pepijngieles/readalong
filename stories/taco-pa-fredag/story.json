@@ -1,0 +1,57 @@
+{
+  "id": "taco-pa-fredag",
+  "type": "dialogue",
+  "kind": "podcast",
+  "language": "no",
+  "order": 5,
+  "published": true,
+  "level": "A2-B1",
+  "voices": [
+    {
+      "id": "samtale",
+      "name": "Ane og Siri",
+      "duration": 193,
+      "timestamps": [
+        0.0,
+        9.5,
+        15.3,
+        36.2,
+        47.0,
+        50.7,
+        62.3,
+        73.5,
+        88.8,
+        105.6,
+        108.4,
+        120.4,
+        133.5,
+        141.4,
+        149.3,
+        150.5,
+        155.5,
+        158.6,
+        170.2,
+        179.0,
+        185.3,
+        185.8,
+        191.3
+      ]
+    }
+  ],
+  "attribution": {
+    "title": "NB Samtale",
+    "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+  },
+  "rights": {
+    "text": {
+      "source": "NB Samtale, Språkbanken ved Nasjonalbiblioteket",
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "audio": {
+      "license": "CC0",
+      "url": "https://www.nb.no/sprakbanken/ressurskatalog/oai-nb-no-sbr-85/"
+    },
+    "note": "Publiek domein. Sprekers zijn geanonimiseerd in het corpus; voornamen in de UI zijn aliassen."
+  }
+}
