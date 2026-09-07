@@ -19,14 +19,12 @@ if (!$needsOnboarding) {
   $translateLangOptions = $translationLangsBySource[$readAlongLang] ?? [];
   $translateLang = lang_prefs_list('translate', $translateLangOptions, [ui_locale()])[0] ?? ($translateLangOptions[0] ?? ui_locale());
   $levelCodes = level_codes();
-  $levelFilter = lang_prefs_list('level', $levelCodes, []);
   $showTranslationLang = false;
-  $stories = story_list($storiesDir, [$translateLang], $readAlongLang, $levelFilter);
+  $stories = story_list($storiesDir, [$translateLang], $readAlongLang, []);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = story_duration_filter_minutes();
   $kindTiles = story_filter_kinds();
-  $levelSummary = $levelFilter === [] ? t('home.all_levels') : implode(' · ', $levelFilter);
-  $prefsSummary = lang_label($readAlongLang) . ' · ' . $levelSummary;
+  $prefsSummary = lang_label($readAlongLang) . ' · ' . lang_endonym($translateLang);
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -77,21 +75,6 @@ if (!$needsOnboarding) {
 							<?php icon('chevron-down', ['size' => 16]); ?>
 						</div>
 					</div>
-					<div>
-						<label id=home-level-label><?= e(t('home.level')) ?></label>
-						<div class="pill-row flex gap-2xs" role=group aria-labelledby=home-level-label>
-							<button type=button class=pill data-level-all data-click=selectAllLevels aria-pressed=<?= $levelFilter === [] ? 'true' : 'false' ?>>
-								<?php icon('check', ['size' => 16, 'class' => 'icon check']); ?>
-								<?= e(t('home.all_levels')) ?>
-							</button>
-<?php foreach ($levelCodes as $code): ?>
-							<button type=button class=pill data-level-pill="<?= e($code) ?>" data-click=toggleLevelPill aria-pressed=<?= in_array($code, $levelFilter, true) ? 'true' : 'false' ?>>
-								<?php icon('check', ['size' => 16, 'class' => 'icon check']); ?>
-								<?= e($code) ?>
-							</button>
-<?php endforeach; ?>
-						</div>
-					</div>
 				</div>
 				<footer>
 					<button type=button class="primary full-width" data-click=saveHomePrefs><?= e(t('common.save')) ?></button>
@@ -117,28 +100,50 @@ if (!$needsOnboarding) {
 		</section>
 <?php endif; ?>
 
-		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
+		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>" data-i18n-all-levels="<?= e(t('home.all_levels')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
 			<div class=section-header>
 				<h2><?= e(t('home.browse_content')) ?></h2>
 			</div>
-			<div class="home-browse-filters flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>">
+			<div class=home-browse-filters>
+				<div class="home-browse-filters__types pill-row flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>">
 <?php foreach ($kindTiles as $kind): ?>
-				<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === 'podcast' ? 'true' : 'false' ?>>
-					<?= e(t('home.kind.' . $kind)) ?>
-				</button>
+					<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === 'podcast' ? 'true' : 'false' ?>>
+						<?= e(t('home.kind.' . $kind)) ?>
+					</button>
 <?php endforeach; ?>
-				<label>
-					<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
-					<div class=select-wrap>
-						<select class=select-medium data-duration-filter data-change=filterDuration>
-							<option value=""><?= e(t('home.all_lengths')) ?></option>
+				</div>
+				<div class="home-browse-filters__selects flex gap-2xs">
+					<label>
+						<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
+						<div class=select-wrap>
+							<select class=select-medium data-duration-filter data-change=filterDuration>
+								<option value=""><?= e(t('home.all_lengths')) ?></option>
 <?php foreach ($durationPills as $minutes): ?>
-							<option value="<?= e((string) $minutes) ?>"><?= e(t('home.up_to_minutes', ['n' => (string) $minutes])) ?></option>
+								<option value="<?= e((string) $minutes) ?>"><?= e(t('home.up_to_minutes', ['n' => (string) $minutes])) ?></option>
 <?php endforeach; ?>
-						</select>
-						<?php icon('chevron-down', ['size' => 16]); ?>
+							</select>
+							<?php icon('chevron-down', ['size' => 16]); ?>
+						</div>
+					</label>
+					<div class=custom-select data-level-filter>
+						<button type=button class="custom-select__trigger select-medium" data-click=toggleLevelMenu aria-haspopup=listbox aria-expanded=false aria-controls=level-filter-menu>
+							<span class=custom-select__label><?= e(t('home.all_levels')) ?></span>
+							<?php icon('chevron-down', ['size' => 16, 'class' => 'custom-select__chevron']); ?>
+						</button>
+						<div id=level-filter-menu class=custom-select__menu hidden role=listbox aria-multiselectable=true aria-label="<?= e(t('home.level')) ?>">
+							<button type=button class=custom-select__option role=option data-level-all data-click=selectAllLevels aria-selected=true>
+								<?php icon('check', ['size' => 16, 'class' => 'custom-select__check']); ?>
+								<?= e(t('home.all_levels')) ?>
+							</button>
+<?php foreach ($levelCodes as $code): ?>
+							<button type=button class=custom-select__option role=option data-level-option="<?= e($code) ?>" data-click=toggleLevelOption aria-selected=false>
+								<?php icon('check', ['size' => 16, 'class' => 'custom-select__check']); ?>
+								<?= e($code) ?>
+							</button>
+<?php endforeach; ?>
+						</div>
 					</div>
-				</label>
+				</div>
 			</div>
 			<div class="home-results-bar flex gap-small">
 				<p class="home-results-count text-color-tertiary" data-results-count></p>
@@ -167,7 +172,14 @@ if (!$needsOnboarding) {
 			const params = new URLSearchParams(location.search);
 			let shouldReload = false;
 
-			['read', 'translate', 'ui', 'level'].forEach(function (key) {
+			if (!localStorage.getItem('readalong-translate') && localStorage.getItem('readalong-ui')) {
+				window.setLangPref('translate', localStorage.getItem('readalong-ui'));
+				localStorage.removeItem('readalong-ui');
+				document.cookie = 'readalong-ui=; path=/; max-age=0; SameSite=Lax';
+				shouldReload = true;
+			}
+
+			['read', 'translate', 'level'].forEach(function (key) {
 				if (params.has(key)) return;
 				const value = localStorage.getItem('readalong-' + key);
 				if (!value) return;
@@ -181,7 +193,7 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=13" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=14" defer></script>
 
 <?php endif; ?>
 

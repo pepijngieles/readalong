@@ -7,7 +7,7 @@ $translationLangsBySource = [];
 foreach ($sourceLangs as $code) {
   $translationLangsBySource[$code] = story_translation_languages_for_source($storiesDir, $code);
 }
-$uiLang = detect_browser_locale(configured_languages());
+$uiLang = ui_locale();
 $defaultRead = 'no';
 $translateLangOptions = $translationLangsBySource[$defaultRead] ?? [];
 $defaultTranslate = lang_prefs_list('translate', $translateLangOptions, [$uiLang])[0] ?? ($translateLangOptions[0] ?? 'en');
