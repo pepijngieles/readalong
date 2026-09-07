@@ -4,6 +4,7 @@
   const supportedLangs = window.READALONG_LANGS || [];
   const endonyms = window.READALONG_ENDONYMS || {};
   const demoSegments = window.READALONG_DEMO || {};
+  const translationLangsBySource = window.TRANSLATION_LANGS_BY_SOURCE || {};
 
   function setLangPref(key, value) {
     localStorage.setItem('readalong-' + key, value);
@@ -41,37 +42,45 @@
     return select ? select.value : supportedLangs[0];
   }
 
-  function selectedTranslatePills() {
-    return Array.from(document.querySelectorAll('[data-onboarding-translate-pill][aria-pressed=true]:not([hidden])'))
-      .map(function (pill) { return pill.getAttribute('data-onboarding-translate-pill'); })
-      .filter(Boolean);
+  function selectedTranslate() {
+    const select = document.querySelector('[data-onboarding-translate]');
+    return select ? select.value : '';
   }
 
-  function resolveTranslate(readLang, selected, systemLang) {
-    const available = selected.filter(function (code) { return code !== readLang; });
-    if (available.length) return available;
-    if (systemLang && systemLang !== readLang) return [systemLang];
-    const fallback = supportedLangs.find(function (code) { return code !== readLang; });
-    return fallback ? [fallback] : selected;
-  }
+  function syncTranslateSelectForReadAlong() {
+    const readLang = selectedRead();
+    const select = document.querySelector('[data-onboarding-translate]');
+    if (!select) return;
 
-  function syncTranslatePills(readLang, selected) {
-    document.querySelectorAll('[data-onboarding-translate-pill]').forEach(function (pill) {
-      const code = pill.getAttribute('data-onboarding-translate-pill');
-      const hidden = code === readLang;
-      pill.hidden = hidden;
-      pill.setAttribute('aria-pressed', !hidden && selected.includes(code) ? 'true' : 'false');
+    const options = translationLangsBySource[readLang] || [];
+    const previous = select.value;
+    select.innerHTML = '';
+    options.forEach(function (code) {
+      const option = document.createElement('option');
+      option.value = code;
+      option.textContent = endonyms[code] || code.toUpperCase();
+      option.setAttribute('translate', 'no');
+      option.lang = code;
+      select.appendChild(option);
     });
+
+    if (options.indexOf(previous) !== -1) {
+      select.value = previous;
+    } else if (options.length) {
+      select.value = options[0];
+    }
+
+    updateContinueButton();
   }
 
-  function activeTranslateLang() {
-    const selected = selectedTranslatePills();
-    return selected[0] || 'en';
+  function updateContinueButton() {
+    if (!continueButton) return;
+    continueButton.disabled = !selectedRead() || !selectedTranslate();
   }
 
   function renderDemo() {
     const readLang = selectedRead();
-    const translateLang = activeTranslateLang();
+    const translateLang = selectedTranslate() || 'en';
     const source = demoSegments[readLang] || demoSegments.en;
     const translation = demoSegments[translateLang] || demoSegments.en;
     const story = document.querySelector('[data-onboarding-demo-story]');
@@ -110,14 +119,12 @@
   }
 
   const readSelect = document.querySelector('[data-onboarding-read]');
-  const translatePills = document.querySelectorAll('[data-onboarding-translate-pill]');
+  const translateSelect = document.querySelector('[data-onboarding-translate]');
   const continueButton = document.querySelector('[data-onboarding-continue]');
   const systemLang = detectSystemLanguage();
-  let readLang = selectedRead();
-  let translateLangs = resolveTranslate(readLang, selectedTranslatePills(), systemLang);
 
-  syncTranslatePills(readLang, translateLangs);
   applyLocale(systemLang);
+  updateContinueButton();
   renderDemo();
 
   afterLayout(function () {
@@ -132,31 +139,24 @@
   }
 
   readSelect.addEventListener('change', function () {
-    readLang = readSelect.value;
-    translateLangs = resolveTranslate(readLang, selectedTranslatePills(), systemLang);
-    syncTranslatePills(readLang, translateLangs);
+    syncTranslateSelectForReadAlong();
     restartDemo();
   });
 
-  translatePills.forEach(function (pill) {
-    pill.addEventListener('click', function () {
-      const pressed = this.getAttribute('aria-pressed') === 'true';
-      const selectedCount = selectedTranslatePills().length;
-      if (pressed && selectedCount <= 1) return;
-      this.setAttribute('aria-pressed', pressed ? 'false' : 'true');
-      restartDemo();
-    });
+  translateSelect.addEventListener('change', function () {
+    updateContinueButton();
+    restartDemo();
   });
 
   continueButton.addEventListener('click', function () {
     const read = selectedRead();
-    const translate = selectedTranslatePills();
-    if (!read || translate.length === 0) {
-      continueButton.disabled = true;
+    const translate = selectedTranslate();
+    if (!read || !translate) {
+      updateContinueButton();
       return;
     }
     setLangPref('read', read);
-    setLangPref('translate', translate.join(','));
+    setLangPref('translate', translate);
     setLangPref('onboarding-complete', '1');
     location.href = location.pathname;
   });
