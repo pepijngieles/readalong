@@ -329,11 +329,6 @@ function story_list($storiesDir, $translationLangs = 'en', $readAlongLang = null
     return strcmp($a['slug'] ?? $a['id'], $b['slug'] ?? $b['id']);
   });
 
-  if ($readAlongLang !== null) {
-    $titleLang = $translationLangs[0] ?? $readAlongLang;
-    $stories = array_merge($stories, dummy_stories($readAlongLang, $titleLang));
-  }
-
   return $stories;
 }
 
@@ -369,12 +364,6 @@ function story_item_meta(array $item, $showTranslationLang = false) {
 }
 
 function story_list_item(array $item, $showTranslationLang = false) {
-  $isDummy = !empty($item['dummy']);
-  $classes = [];
-  if ($isDummy) {
-    $classes[] = 'dummy-story';
-  }
-
   $search = trim($item['title'] . ' ' . ($item['sourceTitle'] ?? '') . ' ' . ($item['kindLabel'] ?? ''));
   $attrs = ' data-id="' . e($item['id']) . '"';
   $attrs .= ' data-kind="' . e($item['kind'] ?? '') . '"';
@@ -398,42 +387,27 @@ function story_list_item(array $item, $showTranslationLang = false) {
     $attrs .= ' hidden';
   }
 
-  $classAttr = $classes ? ' class="' . e(implode(' ', $classes)) . '"' : '';
   $meta = story_item_meta($item, $showTranslationLang);
   $lang = $item['language'] ?? '';
   $langAttr = $lang !== '' ? ' lang="' . e($lang) . '"' : '';
   $title = '<p' . $langAttr . '>' . e($item['title']) . '</p>';
   $metaHtml = $meta !== '' ? '<small class=story-item__meta>' . e($meta) . '</small>' : '';
-  $badge = $isDummy
-    ? '<span class=story-item__badge>' . e(t('home.no_audio')) . '</span>'
-    : (!empty($item['level']) ? '<span class=story-item__badge>' . e($item['level']) . '</span>' : '');
+  $badge = !empty($item['level']) ? '<span class=story-item__badge>' . e($item['level']) . '</span>' : '';
 
-  $html = "\t\t\t<li" . $classAttr . $attrs . ">\n";
-  if ($isDummy) {
-    $html .= "\t\t\t\t<div class=\"story-item dummy-story-item\" aria-disabled=true>\n";
-    $html .= "\t\t\t\t\t<div class=story-item__body>\n";
-    $html .= "\t\t\t\t\t\t" . $title . "\n";
-    if ($metaHtml) {
-      $html .= "\t\t\t\t\t\t" . $metaHtml . "\n";
-    }
-    $html .= "\t\t\t\t\t</div>\n";
-    $html .= "\t\t\t\t\t" . $badge . "\n";
-    $html .= "\t\t\t\t</div>\n";
-  } else {
-    $html .= "\t\t\t\t<a class=story-item href=\"stories/" . e($item['slug']) . "/\">\n";
-    $html .= "\t\t\t\t\t<div class=story-item__body>\n";
-    $html .= "\t\t\t\t\t\t" . $title . "\n";
-    if ($metaHtml) {
-      $html .= "\t\t\t\t\t\t" . $metaHtml . "\n";
-    }
-    $html .= "\t\t\t\t\t\t<small class=story-item__remaining data-remaining hidden></small>\n";
-    $html .= "\t\t\t\t\t\t<progress class=story-item__progress data-item-progress hidden value=0 max=100></progress>\n";
-    $html .= "\t\t\t\t\t</div>\n";
-    if ($badge) {
-      $html .= "\t\t\t\t\t" . $badge . "\n";
-    }
-    $html .= "\t\t\t\t</a>\n";
+  $html = "\t\t\t<li" . $attrs . ">\n";
+  $html .= "\t\t\t\t<a class=story-item href=\"stories/" . e($item['slug']) . "/\">\n";
+  $html .= "\t\t\t\t\t<div class=story-item__body>\n";
+  $html .= "\t\t\t\t\t\t" . $title . "\n";
+  if ($metaHtml) {
+    $html .= "\t\t\t\t\t\t" . $metaHtml . "\n";
   }
+  $html .= "\t\t\t\t\t\t<small class=story-item__remaining data-remaining hidden></small>\n";
+  $html .= "\t\t\t\t\t\t<progress class=story-item__progress data-item-progress hidden value=0 max=100></progress>\n";
+  $html .= "\t\t\t\t\t</div>\n";
+  if ($badge) {
+    $html .= "\t\t\t\t\t" . $badge . "\n";
+  }
+  $html .= "\t\t\t\t</a>\n";
   $html .= "\t\t\t</li>\n";
   return $html;
 }

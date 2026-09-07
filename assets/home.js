@@ -123,7 +123,7 @@
 
   function cloneContinueItem(entry, featured) {
     const source = allList.querySelector('li[data-id="' + entry.id.replace(/"/g, '') + '"]')
-    if (!source || source.classList.contains('dummy-story')) return null
+    if (!source) return null
     const clone = source.cloneNode(true)
     if (featured) clone.classList.add('continue-item--featured')
     decorateContinueItem(clone, entry.progress)
