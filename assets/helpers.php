@@ -188,6 +188,10 @@ function story_filter_kinds() {
   return ['podcast', 'news', 'book'];
 }
 
+function story_duration_filter_minutes() {
+  return [2, 5, 10, 20];
+}
+
 function story_kind_label($kind) {
   if (!$kind) {
     return null;

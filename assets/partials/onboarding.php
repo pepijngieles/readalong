@@ -1,20 +1,19 @@
 <?php
-$languages = languages_by_endonym();
-$uiLang = detect_browser_locale(configured_languages());
-$segments = onboarding_demo_segments();
-$translateLangsSelected = lang_prefs_list('translate', $languages, [$uiLang]);
-$defaultRead = 'no';
-if (in_array($defaultRead, $translateLangsSelected, true)) {
-  foreach ($languages as $code) {
-    if ($code !== $defaultRead) {
-      $translateLangsSelected = [$code];
-      break;
-    }
-  }
+require_once __DIR__ . '/../story.php';
+
+$storiesDir = dirname(__DIR__, 2) . '/stories';
+$sourceLangs = story_source_languages($storiesDir);
+$translationLangsBySource = [];
+foreach ($sourceLangs as $code) {
+  $translationLangsBySource[$code] = story_translation_languages_for_source($storiesDir, $code);
 }
-$demoTranslateLang = $translateLangsSelected[0] ?? 'en';
+$uiLang = detect_browser_locale(configured_languages());
+$defaultRead = 'no';
+$translateLangOptions = $translationLangsBySource[$defaultRead] ?? [];
+$defaultTranslate = lang_prefs_list('translate', $translateLangOptions, [$uiLang])[0] ?? ($translateLangOptions[0] ?? 'en');
+$segments = onboarding_demo_segments();
 $demoSource = $segments[$defaultRead] ?? $segments['no'];
-$demoTranslation = $segments[$demoTranslateLang] ?? $segments['en'];
+$demoTranslation = $segments[$defaultTranslate] ?? $segments['en'];
 $storyConfig = [
   'type' => 'default',
   'audioBase' => 'assets/audio/',
@@ -32,6 +31,33 @@ $storyConfig = [
 		<h1 class=onboarding-brand>Readalong <sup style="color:var(--text-tertiary)">b&egrave;ta</sup></h1>
 
 		<div class=onboarding-card>
+			<p class=onboarding-tagline data-i18n=home.tagline><?= e(t('home.tagline')) ?></p>
+
+			<div class=onboarding-languages>
+				<div class=onboarding-languages__row>
+					<label for=onboarding-read data-i18n=onboarding.read_along><?= e(t('onboarding.read_along')) ?></label>
+					<div class="select-wrap onboarding-languages__select">
+						<select id=onboarding-read class=select-medium data-onboarding-read translate=no>
+<?php foreach ($sourceLangs as $code): ?>
+							<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $defaultRead ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
+<?php endforeach; ?>
+						</select>
+						<?php icon('chevron-down', ['size' => 16]); ?>
+					</div>
+				</div>
+				<div class=onboarding-languages__row>
+					<label for=onboarding-translate data-i18n=home.translate_into><?= e(t('home.translate_into')) ?></label>
+					<div class="select-wrap onboarding-languages__select">
+						<select id=onboarding-translate class=select-medium data-onboarding-translate translate=no>
+<?php foreach ($translateLangOptions as $code): ?>
+							<option value="<?= e($code) ?>"<?= $code === $defaultTranslate ? ' selected' : '' ?> lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
+<?php endforeach; ?>
+						</select>
+						<?php icon('chevron-down', ['size' => 16]); ?>
+					</div>
+				</div>
+			</div>
+
 			<div class=onboarding-demo>
 				<article class=story lang=<?= e($defaultRead) ?> translate=no data-onboarding-demo-story>
 					<p>
@@ -57,37 +83,10 @@ $storyConfig = [
 				<audio src="assets/audio/onboarding-silence.wav" preload=auto playsinline muted hidden></audio>
 			</div>
 
-			<div class=onboarding-languages>
-				<div class=onboarding-languages__row>
-					<label for=onboarding-read data-i18n=onboarding.read_along><?= e(t('onboarding.read_along')) ?></label>
-					<select id=onboarding-read class=onboarding-select data-onboarding-read translate=no>
-<?php foreach ($languages as $code): ?>
-						<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $defaultRead ? ' selected' : '' ?>><?= e(lang_endonym($code)) ?></option>
-<?php endforeach; ?>
-					</select>
-					<?php icon('chevron-down', ['size' => 16]); ?>
-				</div>
+			<div class=onboarding-actions>
+				<button type=button class="primary onboarding-continue" data-onboarding-continue data-i18n=onboarding.continue><?= e(t('onboarding.continue')) ?></button>
+				<p class=onboarding-change-later data-i18n=onboarding.change_later><?= e(t('onboarding.change_later')) ?></p>
 			</div>
-
-			<div class=onboarding-translations>
-				<span class=onboarding-translations__label data-i18n=onboarding.translations_label><?= e(t('onboarding.translations_label')) ?></span>
-				<div class="pill-row onboarding-translations__pills" role=group aria-label="<?= e(t('onboarding.translations_label')) ?>">
-<?php foreach ($languages as $code): ?>
-<?php if ($code === $defaultRead) continue; ?>
-					<button type=button class=pill data-onboarding-translate-pill="<?= e($code) ?>" aria-pressed=<?= in_array($code, $translateLangsSelected, true) ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
-						<?php icon('check', ['size' => 16, 'class' => 'pill__check']); ?>
-						<?= e(lang_endonym($code)) ?>
-					</button>
-<?php endforeach; ?>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class=onboarding-footer>
-		<div class=onboarding-footer__inner>
-			<button type=button class="primary onboarding-continue" data-onboarding-continue data-i18n=onboarding.continue><?= e(t('onboarding.continue')) ?></button>
-			<p class=onboarding-change-later data-i18n=onboarding.change_later><?= e(t('onboarding.change_later')) ?></p>
 		</div>
 	</div>
 </div>
@@ -95,9 +94,10 @@ $storyConfig = [
 <script type="application/json" id="story-config"><?= json_encode($storyConfig, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 <script type="text/javascript">
 	window.READALONG_I18N = <?= json_encode(ui_strings(), JSON_UNESCAPED_UNICODE) ?>;
-	window.READALONG_LANGS = <?= json_encode($languages, JSON_UNESCAPED_UNICODE) ?>;
+	window.READALONG_LANGS = <?= json_encode($sourceLangs, JSON_UNESCAPED_UNICODE) ?>;
 	window.READALONG_ENDONYMS = <?= json_encode(lang_endonyms(), JSON_UNESCAPED_UNICODE) ?>;
 	window.READALONG_DEMO = <?= json_encode($segments, JSON_UNESCAPED_UNICODE) ?>;
+	window.TRANSLATION_LANGS_BY_SOURCE = <?= json_encode($translationLangsBySource, JSON_UNESCAPED_UNICODE) ?>;
 </script>
 <script type="text/javascript" src="assets/scripts.js?v=19"></script>
-<script type="text/javascript" src="assets/onboarding.js?v=8"></script>
+<script type="text/javascript" src="assets/onboarding.js?v=9"></script>
