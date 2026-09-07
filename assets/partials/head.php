@@ -17,4 +17,5 @@
 	<link rel=apple-touch-icon href=<?= e($base) ?>assets/favicons/favicon-180.png>
 	<link rel=manifest href=<?= e($base) ?>manifest.json>
 	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/styles.css?v=15">
+	<script src="https://cdn.usefathom.com/script.js" data-site="YNKVLCNV" defer></script>
 </head>
