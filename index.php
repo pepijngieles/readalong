@@ -12,17 +12,18 @@ if (!$needsOnboarding) {
   $storiesDir = __DIR__ . '/stories';
   $sourceLangs = story_source_languages($storiesDir);
   $translationLangs = story_translation_languages($storiesDir);
-  $levelTiers = story_level_tiers($storiesDir);
   $readAlongLang = lang_pref('read', $sourceLangs, 'nl');
   $translationLangsSelected = lang_prefs_list('translate', $translationLangs, [$uiLocale]);
-  $levelFilter = lang_pref('level', array_merge([''], $levelTiers), '');
+  $levelCodes = level_codes();
+  $levelFilter = lang_prefs_list('level', $levelCodes, []);
   $showTranslationLang = count($translationLangsSelected) > 1;
-  $stories = story_list($storiesDir, $translationLangsSelected, $readAlongLang, $levelFilter ?: null);
+  $stories = story_list($storiesDir, $translationLangsSelected, $readAlongLang, $levelFilter);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = [2, 5, 10];
   $kindTiles = story_filter_kinds();
-  $levelSummary = $levelFilter === '' ? t('home.all_levels') : level_tier_label($levelFilter);
+  $levelSummary = $levelFilter === [] ? t('home.all_levels') : implode(' · ', $levelFilter);
   $prefsSummary = lang_label($readAlongLang) . ' · ' . $levelSummary;
+  $prefsDialogLabel = t('home.read_along') . ', ' . t('home.translate_into') . ', ' . t('home.level');
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -38,20 +39,20 @@ if (!$needsOnboarding) {
 
 		<header class=home-header>
 			<h1>Readalong <sup style="color:var(--text-tertiary)">b&egrave;ta</sup></h1>
-			<button type=button class="quiet home-prefs-toggle" data-prefs-toggle aria-expanded=false aria-controls=home-prefs>
+			<button type=button class="quiet home-prefs-toggle" data-prefs-toggle aria-haspopup=dialog aria-expanded=false aria-controls=home-prefs>
 				<?= e($prefsSummary) ?>
 			</button>
 		</header>
 
-		<div id=home-prefs class=home-prefs hidden>
+		<dialog id=home-prefs class=home-prefs aria-label="<?= e($prefsDialogLabel) ?>">
 			<button type=button class="close-button quiet icon-only" data-prefs-close>
 				<span class=visually-hidden><?= e(t('common.close')) ?></span>
 				<?php icon('close-small'); ?>
 			</button>
-			<div class=selection-row>
-				<div class="read-along read-along--primary">
+			<div class=home-prefs__fields>
+				<div class=home-prefs__field>
 					<label for=read-along><?= e(t('home.read_along')) ?></label>
-					<div class=read-along__field>
+					<div class=home-prefs__select>
 						<select id=read-along name=read-along class="quiet read-along-select" data-read-along>
 <?php foreach ($sourceLangs as $code): ?>
 							<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
@@ -60,32 +61,35 @@ if (!$needsOnboarding) {
 						<?php icon('chevron-down', ['size' => 16]); ?>
 					</div>
 				</div>
-				<div class=translation-langs>
-					<span class=translation-langs__label><?= e(t('home.translate_into')) ?></span>
-					<div class="pill-row translation-langs__pills" role=group aria-label="<?= e(t('home.translate_into')) ?>">
+				<div class=home-prefs__field>
+					<label id=home-translate-label><?= e(t('home.translate_into')) ?></label>
+					<div class="pill-row home-prefs__pills" role=group aria-labelledby=home-translate-label>
 <?php foreach ($translationLangs as $code): ?>
-<?php if ($code === $readAlongLang) continue; ?>
-						<button type=button class=pill data-translate-pill="<?= e($code) ?>" aria-pressed=<?= in_array($code, $translationLangsSelected, true) ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
+						<button type=button class=pill data-translate-pill="<?= e($code) ?>" aria-pressed=<?= in_array($code, $translationLangsSelected, true) && $code !== $readAlongLang ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?><?= $code === $readAlongLang ? ' hidden' : '' ?>>
 							<?php icon('check', ['size' => 16, 'class' => 'pill__check']); ?>
 							<?= e(lang_endonym($code)) ?>
 						</button>
 <?php endforeach; ?>
 					</div>
 				</div>
-<?php if ($levelTiers): ?>
-				<div class=story-level>
-					<label for=story-level><?= e(t('home.level')) ?></label>
-					<select id=story-level name=story-level class=quiet data-story-level>
-						<option value=""<?= $levelFilter === '' ? ' selected' : '' ?>><?= e(t('home.all_levels')) ?></option>
-<?php foreach ($levelTiers as $tier): ?>
-						<option value=<?= e($tier) ?><?= $tier === $levelFilter ? ' selected' : '' ?>><?= e(level_tier_label($tier)) ?></option>
+				<div class=home-prefs__field>
+					<label id=home-level-label><?= e(t('home.level')) ?></label>
+					<div class="pill-row home-prefs__pills" role=group aria-labelledby=home-level-label>
+						<button type=button class=pill data-level-all aria-pressed=<?= $levelFilter === [] ? 'true' : 'false' ?>>
+							<?php icon('check', ['size' => 16, 'class' => 'pill__check']); ?>
+							<?= e(t('home.all_levels')) ?>
+						</button>
+<?php foreach ($levelCodes as $code): ?>
+						<button type=button class=pill data-level-pill="<?= e($code) ?>" aria-pressed=<?= in_array($code, $levelFilter, true) ? 'true' : 'false' ?>>
+							<?php icon('check', ['size' => 16, 'class' => 'pill__check']); ?>
+							<?= e($code) ?>
+						</button>
 <?php endforeach; ?>
-					</select>
-					<?php icon('chevron-down', ['size' => 16]); ?>
+					</div>
 				</div>
-<?php endif; ?>
 			</div>
-		</div>
+			<button type=button class="primary home-prefs__save" data-prefs-save><?= e(t('common.save')) ?></button>
+		</dialog>
 
 		<div class="info home-intro" data-home-intro>
 			<button type=button class="close-button quiet icon-only" data-dismiss-intro>
@@ -142,9 +146,9 @@ if (!$needsOnboarding) {
 				<button type=button class="quiet home-clear-filters" data-clear-filters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
 <?php render_story_list($stories, 'data-all-items', $showTranslationLang); ?>
-			<div class=home-empty data-no-results hidden>
-				<p><?= e(t('home.no_results_filters')) ?></p>
-				<button type=button class="quiet home-clear-filters" data-clear-filters><?= e(t('home.clear_filters')) ?></button>
+			<div class="home-empty" data-no-results<?= $stories ? ' hidden' : '' ?> data-i18n-empty="<?= e(t('home.no_results')) ?>" data-i18n-empty-filters="<?= e(t('home.no_results_filters')) ?>">
+				<p data-empty-message><?= e(t('home.no_results')) ?></p>
+				<button type=button class="quiet home-clear-filters" data-clear-filters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
 		</section>
 
@@ -165,25 +169,27 @@ if (!$needsOnboarding) {
 			document.cookie = 'readalong-' + key + '=' + value + '; path=/; max-age=' + COOKIE_MAX_AGE + '; SameSite=Lax';
 		}
 
-		function onLangChange(key) {
-			return function () {
-				setLangPref(key, this.value);
-				location.reload();
-			};
-		}
-
 		function selectedTranslatePills() {
 			return Array.from(document.querySelectorAll('[data-translate-pill][aria-pressed=true]'))
 				.map(function (pill) { return pill.getAttribute('data-translate-pill'); })
 				.filter(Boolean);
 		}
 
-		function saveTranslatePrefs() {
-			const selected = selectedTranslatePills();
-			if (selected.length === 0) return;
-			setLangPref('translate', selected.join(','));
-			location.reload();
+		function selectedLevelPills() {
+			return Array.from(document.querySelectorAll('[data-level-pill][aria-pressed=true]'))
+				.map(function (pill) { return pill.getAttribute('data-level-pill'); })
+				.filter(Boolean);
 		}
+
+		function prefsState() {
+			return {
+				read: document.querySelector('[data-read-along]')?.value || '',
+				translate: selectedTranslatePills().join(','),
+				level: selectedLevelPills().join(',')
+			};
+		}
+
+		const initialPrefs = prefsState();
 
 		function syncTranslatePillsForReadAlong() {
 			const readLang = document.querySelector('[data-read-along]')?.value;
@@ -198,11 +204,43 @@ if (!$needsOnboarding) {
 			});
 			if (selectedTranslatePills().length === 0) {
 				const firstVisible = document.querySelector('[data-translate-pill]:not([hidden])');
-				if (firstVisible) {
-					firstVisible.setAttribute('aria-pressed', 'true');
-					saveTranslatePrefs();
-				}
+				if (firstVisible) firstVisible.setAttribute('aria-pressed', 'true');
 			}
+		}
+
+		function syncLevelPills(selected) {
+			const allPill = document.querySelector('[data-level-all]');
+			const noneSelected = !selected.length;
+			if (allPill) allPill.setAttribute('aria-pressed', noneSelected ? 'true' : 'false');
+			document.querySelectorAll('[data-level-pill]').forEach(function (pill) {
+				const code = pill.getAttribute('data-level-pill');
+				pill.setAttribute('aria-pressed', selected.indexOf(code) !== -1 ? 'true' : 'false');
+			});
+		}
+
+		function revertHomePrefs() {
+			const readSelect = document.querySelector('[data-read-along]');
+			if (readSelect) readSelect.value = initialPrefs.read;
+			const translateSelected = initialPrefs.translate.split(',').filter(Boolean);
+			document.querySelectorAll('[data-translate-pill]').forEach(function (pill) {
+				const code = pill.getAttribute('data-translate-pill');
+				pill.setAttribute('aria-pressed', translateSelected.indexOf(code) !== -1 ? 'true' : 'false');
+			});
+			syncTranslatePillsForReadAlong();
+			syncLevelPills(initialPrefs.level.split(',').filter(Boolean));
+		}
+
+		function saveHomePrefs() {
+			const next = prefsState();
+			if (next.translate.length === 0) return;
+			if (next.read === initialPrefs.read && next.translate === initialPrefs.translate && next.level === initialPrefs.level) {
+				document.getElementById('home-prefs')?.close();
+				return;
+			}
+			setLangPref('read', next.read);
+			setLangPref('translate', next.translate);
+			setLangPref('level', next.level);
+			location.reload();
 		}
 
 		(function syncLangPrefsFromStorage() {
@@ -222,23 +260,30 @@ if (!$needsOnboarding) {
 			if (shouldReload) location.reload();
 		})();
 
-		document.querySelector('[data-read-along]')?.addEventListener('change', function () {
-			setLangPref('read', this.value);
-			syncTranslatePillsForReadAlong();
-			location.reload();
-		});
+		document.querySelector('[data-read-along]')?.addEventListener('change', syncTranslatePillsForReadAlong);
 		document.querySelectorAll('[data-translate-pill]').forEach(function (pill) {
 			pill.addEventListener('click', function () {
 				const pressed = this.getAttribute('aria-pressed') === 'true';
 				const selectedCount = selectedTranslatePills().length;
 				if (pressed && selectedCount <= 1) return;
 				this.setAttribute('aria-pressed', pressed ? 'false' : 'true');
-				saveTranslatePrefs();
 			});
 		});
-		document.querySelector('[data-story-level]')?.addEventListener('change', onLangChange('level'));
+		document.querySelector('[data-level-all]')?.addEventListener('click', function () {
+			syncLevelPills([]);
+		});
+		document.querySelectorAll('[data-level-pill]').forEach(function (pill) {
+			pill.addEventListener('click', function () {
+				const pressed = this.getAttribute('aria-pressed') === 'true';
+				this.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+				syncLevelPills(selectedLevelPills());
+			});
+		});
+		document.querySelector('[data-prefs-save]')?.addEventListener('click', saveHomePrefs);
+		document.getElementById('home-prefs')?.addEventListener('close', revertHomePrefs);
+		syncTranslatePillsForReadAlong();
 	</script>
-	<script type="text/javascript" src="assets/home.js?v=8"></script>
+	<script type="text/javascript" src="assets/home.js?v=10"></script>
 
 <?php endif; ?>
 

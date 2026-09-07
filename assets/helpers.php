@@ -197,6 +197,42 @@ function story_kind_label($kind) {
   return $label === $key ? null : $label;
 }
 
+function level_codes() {
+  return ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+}
+
+function level_codes_in($level) {
+  if (!level_valid($level)) {
+    return [];
+  }
+  if (strpos($level, '-') !== false) {
+    [$low, $high] = explode('-', $level, 2);
+    $min = min(level_score($low), level_score($high));
+    $max = max(level_score($low), level_score($high));
+    $codes = [];
+    foreach (level_codes() as $code) {
+      $score = level_score($code);
+      if ($score !== null && $score >= $min && $score <= $max) {
+        $codes[] = $code;
+      }
+    }
+    return $codes;
+  }
+  return [strtoupper(trim($level))];
+}
+
+function level_matches_codes($level, array $selected) {
+  if ($selected === []) {
+    return true;
+  }
+  foreach (level_codes_in($level) as $code) {
+    if (in_array($code, $selected, true)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function level_tiers() {
   return ['beginner', 'intermediate', 'advanced'];
 }
