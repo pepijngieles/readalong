@@ -1,0 +1,39 @@
+---
+description: CSS tokens, utilities, no BEM — darter-style
+globs: "assets/**/*.css,**/*.php"
+alwaysApply: false
+---
+
+# CSS conventions
+
+Read [AGENTS.md](../../AGENTS.md) for full context. Style reference: sibling project **darter**.
+
+## Layers
+
+1. Tokens in `:root` (`--spacing-*`, `--gap-*`, colors)
+2. Utilities in section 3 Layout (`.flex`, `.grid`, `.gap-*`, `.text-color-*`)
+3. Component CSS only where utilities are insufficient
+
+## Naming
+
+- No BEM (`__` or `--` in class names).
+- Modifiers: extra classes — `.pill.choice`, `li.featured`, `ul.history`.
+- Nest elements: `.story-item .body`, `.settings-segment label > span.button`.
+
+## Spacing
+
+Use `var(--spacing-*)` and gap utilities. Do not tokenize:
+
+- Translation popover close + `.curve` sizes
+- Nav clearance (`12rem`, iOS popover offsets)
+- `calc(... - 1px)` border offsets, shadows
+
+## HTML layout
+
+Prefer utilities over new one-off flex/gap blocks:
+
+```html
+<div class="flex columns gap-small">
+```
+
+Bump `?v=` in `head.php` / `scripts.php` when changing CSS.

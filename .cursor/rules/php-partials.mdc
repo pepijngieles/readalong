@@ -1,0 +1,29 @@
+---
+description: PHP partials, i18n, escaping, story structure
+globs: "**/*.php"
+alwaysApply: false
+---
+
+# PHP conventions
+
+Read [AGENTS.md](../../AGENTS.md) for full context.
+
+## Structure
+
+- Partials: `assets/partials/` — included from `index.php`, `story-shell.php`.
+- Story pages: `stories/<slug>/index.php` → `stories/view.php` → `assets/story-shell.php`.
+- Shared logic: `assets/helpers.php`, `assets/story.php`.
+
+## Output
+
+- Escape: `e($value)`
+- Strings: `t('key')` — add keys to `assets/i18n.php`
+- Icons: `icon('name', ['size' => 16])`
+
+## Preferences
+
+PHP reads language prefs from cookies (`readalong-read`, etc.). Client writes via `setLangPref()` (localStorage + cookie). Do not use Brio storage for prefs.
+
+## New UI
+
+Wire chrome with Brio attributes in partials; implement handlers in the matching JS file (`home.js`, `scripts.js`, `onboarding.js`).

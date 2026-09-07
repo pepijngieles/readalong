@@ -35,8 +35,7 @@ const audioFile = document.querySelector('audio'),
       translationText = document.querySelector('[data-translation-text]'),
       navEl = document.querySelector('nav'),
       navHeight = navEl ? navEl.offsetHeight : 0,
-      settingsPopover = document.querySelector('.settings-popover'),
-      settingsScrim = document.querySelector('.settings-scrim'),
+      settingsDialog = document.getElementById('settings'),
       themeColorEl = document.querySelector("meta[name=theme-color]"),
       parameterList = new URLSearchParams (window.location.search)
 
@@ -354,6 +353,16 @@ function playSentence(number) {
 
 
 
+function playPrevious() {
+  playSentence(currentSentence - 1)
+}
+
+function playNext() {
+  playSentence(currentSentence + 1)
+}
+
+
+
 /* 7. Toggle the translation on/off
 ---------------------------------------------------------------------------- */
 function toggleTranslation() {
@@ -429,7 +438,7 @@ let currentTheme = 'light'
 function updateThemeColor() {
   if (!themeColorEl) return
   const colors = THEME_META_COLORS[currentTheme] || THEME_META_COLORS.light
-  if (settingsPopover && !settingsPopover.hidden && started) themeColorValue = colors.secondary
+  if (settingsDialog && settingsDialog.open && started) themeColorValue = colors.secondary
   else if (started && showTranslation) themeColorValue = colors.secondary
   else themeColorValue = colors.primary
   themeColorEl.setAttribute('content', themeColorValue)
@@ -533,7 +542,7 @@ function loadSettings() {
 }
 
 function initSettingsControls() {
-  if (!settingsPopover) return
+  if (!settingsDialog) return
   document.querySelectorAll('.settings-segment, .settings-themes, .settings-layouts').forEach(function(fieldset) {
     const inputs = Array.from(fieldset.querySelectorAll('input[type=radio]'))
     inputs.forEach(function(input, index) {
@@ -555,21 +564,12 @@ function initSettingsControls() {
   loadSettings()
 }
 
-function closeSettings() {
-  if (!settingsPopover || settingsPopover.hidden) return
-  toggleSettings()
-}
-
-function toggleSettings() {
-  if (!settingsPopover) return
-  settingsPopover.hidden = !settingsPopover.hidden
-  if (settingsScrim) settingsScrim.hidden = settingsPopover.hidden
-  document.body.classList.toggle('show-settings')
-  updateThemeColor()
-}
-
 function updateSettings() {
   applySettingsFromForm(true)
+}
+
+if (settingsDialog) {
+  settingsDialog.addEventListener('close', updateThemeColor)
 }
 
 initSettingsControls()

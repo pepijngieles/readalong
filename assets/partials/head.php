@@ -16,6 +16,7 @@
 	<link rel=icon href=<?= e($base) ?>assets/favicons/favicon.svg type=image/svg+xml>
 	<link rel=apple-touch-icon href=<?= e($base) ?>assets/favicons/favicon-180.png>
 	<link rel=manifest href=<?= e($base) ?>manifest.json>
-	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/styles.css?v=22">
+	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/brio/brio.css?v=1">
+	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/styles.css?v=24">
 	<script src="https://cdn.usefathom.com/script.js" data-site="YNKVLCNV" defer></script>
 </head>
