@@ -1,0 +1,10 @@
+---
+description: Readalong architecture — read AGENTS.md before structural changes
+alwaysApply: true
+---
+
+# Readalong
+
+Before architectural or UI-chrome changes, read [AGENTS.md](../../AGENTS.md).
+
+Key constraints: vendored Brio (no build), native `<dialog>` sheets, CSS tokens + utilities (no BEM), PHP partials + vanilla JS player in `scripts.js`.

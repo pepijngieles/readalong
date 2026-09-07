@@ -38,58 +38,62 @@ if (!$needsOnboarding) {
 
 	<main>
 
-		<header class=home-header>
-			<h1>Readalong <sup style="color:var(--text-tertiary)">b&egrave;ta</sup></h1>
-			<button type=button class="quiet home-prefs-toggle" data-prefs-toggle aria-haspopup=dialog aria-expanded=false aria-controls=home-prefs>
+		<header class="home-header flex gap-small">
+			<h1>Readalong <sup class=text-color-tertiary>b&egrave;ta</sup></h1>
+			<button type=button class="quiet home-prefs-toggle" data-click=openHomePrefs data-prefs-toggle aria-haspopup=dialog aria-expanded=false aria-controls=home-prefs>
 				<?= e($prefsSummary) ?>
 			</button>
 		</header>
 
-		<dialog id=home-prefs class=home-prefs aria-labelledby=home-prefs-title>
-			<button type=button class="close-button quiet icon-only" data-prefs-close>
-				<span class=visually-hidden><?= e(t('common.close')) ?></span>
-				<?php icon('close-small'); ?>
-			</button>
-			<h2 id=home-prefs-title class=home-prefs__title><?= e(t('home.language_settings')) ?></h2>
-			<div class=home-prefs__fields>
-				<div class=home-prefs__field>
-					<label for=read-along><?= e(t('home.read_along')) ?></label>
-					<div class="select-wrap home-prefs__select">
-						<select id=read-along name=read-along class=select-medium data-read-along>
+		<dialog id=home-prefs class="dialog-sheet home-prefs" aria-labelledby=home-prefs-title>
+			<div class=panel>
+				<button type=button class="close-button quiet icon-only" data-el=close-button data-click="closeDialog(home-prefs)">
+					<span class=visually-hidden><?= e(t('common.close')) ?></span>
+					<?php icon('close-small'); ?>
+				</button>
+				<h2 id=home-prefs-title class=font-size-large><?= e(t('home.language_settings')) ?></h2>
+				<div class="flex columns gap-small">
+					<div>
+						<label for=read-along><?= e(t('home.read_along')) ?></label>
+						<div class=select-wrap>
+							<select id=read-along name=read-along class=select-medium data-read-along data-change=syncTranslateSelectForReadAlong>
 <?php foreach ($sourceLangs as $code): ?>
-							<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
+								<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
 <?php endforeach; ?>
-						</select>
-						<?php icon('chevron-down', ['size' => 16]); ?>
+							</select>
+							<?php icon('chevron-down', ['size' => 16]); ?>
+						</div>
 					</div>
-				</div>
-				<div class=home-prefs__field>
-					<label for=translate-into><?= e(t('home.translate_into')) ?></label>
-					<div class="select-wrap home-prefs__select">
-						<select id=translate-into class=select-medium data-translate-along>
+					<div>
+						<label for=translate-into><?= e(t('home.translate_into')) ?></label>
+						<div class=select-wrap>
+							<select id=translate-into class=select-medium data-translate-along>
 <?php foreach ($translateLangOptions as $code): ?>
-							<option value="<?= e($code) ?>"<?= $code === $translateLang ? ' selected' : '' ?> translate=no lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
+								<option value="<?= e($code) ?>"<?= $code === $translateLang ? ' selected' : '' ?> translate=no lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
 <?php endforeach; ?>
-						</select>
-						<?php icon('chevron-down', ['size' => 16]); ?>
+							</select>
+							<?php icon('chevron-down', ['size' => 16]); ?>
+						</div>
 					</div>
 				</div>
+				<footer>
+					<button type=button class="primary full-width" data-click=saveHomePrefs><?= e(t('common.save')) ?></button>
+				</footer>
 			</div>
-			<button type=button class="primary home-prefs__save" data-prefs-save><?= e(t('common.save')) ?></button>
 		</dialog>
 
 		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
-			<div class=home-section__header>
+			<div class="section-header flex gap-small">
 				<h2><?= e(t('home.continue_reading')) ?></h2>
-				<button type=button class="quiet home-section__link" data-continue-history-toggle hidden aria-expanded=false><?= e(t('home.continue_history')) ?></button>
+				<button type=button class="quiet section-link" data-continue-history-toggle data-click=toggleHistory hidden aria-expanded=false><?= e(t('home.continue_history')) ?></button>
 			</div>
 			<ul class="list continue-list" data-continue-featured></ul>
-			<ul class="list continue-list continue-list--history" data-continue-history hidden></ul>
+			<ul class="list continue-list history" data-continue-history hidden></ul>
 		</section>
 
 <?php if ($weatherStories): ?>
 		<section class=home-section data-weather-section>
-			<div class=home-section__header>
+			<div class=section-header>
 				<h2><?= e(t('home.weather')) ?></h2>
 			</div>
 <?php render_story_list($weatherStories, 'data-weather-items', $showTranslationLang); ?>
@@ -97,22 +101,22 @@ if (!$needsOnboarding) {
 <?php endif; ?>
 
 		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>" data-i18n-all-levels="<?= e(t('home.all_levels')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
-			<div class=home-section__header>
+			<div class=section-header>
 				<h2><?= e(t('home.browse_content')) ?></h2>
 			</div>
 			<div class=home-browse-filters>
-				<div class="home-browse-filters__types pill-row" role=group aria-label="<?= e(t('home.kind_filters')) ?>">
+				<div class="home-browse-filters__types pill-row flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>">
 <?php foreach ($kindTiles as $kind): ?>
-					<button type=button class="pill pill--choice" data-kind-filter="<?= e($kind) ?>" aria-pressed=<?= $kind === 'podcast' ? 'true' : 'false' ?>>
+					<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === 'podcast' ? 'true' : 'false' ?>>
 						<?= e(t('home.kind.' . $kind)) ?>
 					</button>
 <?php endforeach; ?>
 				</div>
-				<div class=home-browse-filters__selects>
-					<label class=home-browse-filters__duration>
+				<div class="home-browse-filters__selects flex gap-2xs">
+					<label>
 						<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
 						<div class=select-wrap>
-							<select class=select-medium data-duration-filter>
+							<select class=select-medium data-duration-filter data-change=filterDuration>
 								<option value=""><?= e(t('home.all_lengths')) ?></option>
 <?php foreach ($durationPills as $minutes): ?>
 								<option value="<?= e((string) $minutes) ?>"><?= e(t('home.up_to_minutes', ['n' => (string) $minutes])) ?></option>
@@ -122,17 +126,17 @@ if (!$needsOnboarding) {
 						</div>
 					</label>
 					<div class=custom-select data-level-filter>
-						<button type=button class="custom-select__trigger select-medium" aria-haspopup=listbox aria-expanded=false aria-controls=level-filter-menu>
+						<button type=button class="custom-select__trigger select-medium" data-click=toggleLevelMenu aria-haspopup=listbox aria-expanded=false aria-controls=level-filter-menu>
 							<span class=custom-select__label><?= e(t('home.all_levels')) ?></span>
 							<?php icon('chevron-down', ['size' => 16, 'class' => 'custom-select__chevron']); ?>
 						</button>
 						<div id=level-filter-menu class=custom-select__menu hidden role=listbox aria-multiselectable=true aria-label="<?= e(t('home.level')) ?>">
-							<button type=button class=custom-select__option role=option data-level-all aria-selected=true>
+							<button type=button class=custom-select__option role=option data-level-all data-click=selectAllLevels aria-selected=true>
 								<?php icon('check', ['size' => 16, 'class' => 'custom-select__check']); ?>
 								<?= e(t('home.all_levels')) ?>
 							</button>
 <?php foreach ($levelCodes as $code): ?>
-							<button type=button class=custom-select__option role=option data-level-option="<?= e($code) ?>" aria-selected=false>
+							<button type=button class=custom-select__option role=option data-level-option="<?= e($code) ?>" data-click=toggleLevelOption aria-selected=false>
 								<?php icon('check', ['size' => 16, 'class' => 'custom-select__check']); ?>
 								<?= e($code) ?>
 							</button>
@@ -141,93 +145,35 @@ if (!$needsOnboarding) {
 					</div>
 				</div>
 			</div>
-			<div class=home-results-bar>
-				<p class=home-results-count data-results-count></p>
-				<button type=button class="quiet home-clear-filters" data-clear-filters hidden><?= e(t('home.clear_filters')) ?></button>
+			<div class="home-results-bar flex gap-small">
+				<p class="home-results-count text-color-tertiary" data-results-count></p>
+				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
 <?php render_story_list($stories, 'data-all-items', $showTranslationLang, false); ?>
 			<div class="home-empty" data-no-results<?= $stories ? ' hidden' : '' ?> data-i18n-empty="<?= e(t('home.no_results')) ?>" data-i18n-empty-filters="<?= e(t('home.no_results_filters')) ?>">
 				<p data-empty-message><?= e(t('home.no_results')) ?></p>
-				<button type=button class="quiet home-clear-filters" data-clear-filters hidden><?= e(t('home.clear_filters')) ?></button>
+				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
 		</section>
 
 	</main>
 
 	<script type="text/javascript">
-		const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
-		const TRANSLATION_LANGS_BY_SOURCE = <?= json_encode($translationLangsBySource, JSON_UNESCAPED_UNICODE) ?>;
-		const LANG_ENDONYMS = <?= json_encode(lang_endonyms(), JSON_UNESCAPED_UNICODE) ?>;
+		window.COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+		window.TRANSLATION_LANGS_BY_SOURCE = <?= json_encode($translationLangsBySource, JSON_UNESCAPED_UNICODE) ?>;
+		window.LANG_ENDONYMS = <?= json_encode(lang_endonyms(), JSON_UNESCAPED_UNICODE) ?>;
 
-		function setLangPref(key, value) {
+		window.setLangPref = function (key, value) {
 			localStorage.setItem('readalong-' + key, value);
-			document.cookie = 'readalong-' + key + '=' + value + '; path=/; max-age=' + COOKIE_MAX_AGE + '; SameSite=Lax';
-		}
-
-		function prefsState() {
-			return {
-				read: document.querySelector('[data-read-along]')?.value || '',
-				translate: document.querySelector('[data-translate-along]')?.value || ''
-			};
-		}
-
-		const initialPrefs = prefsState();
-
-		function syncTranslateSelectForReadAlong() {
-			const readLang = document.querySelector('[data-read-along]')?.value;
-			const select = document.querySelector('[data-translate-along]');
-			if (!readLang || !select) return;
-
-			const options = TRANSLATION_LANGS_BY_SOURCE[readLang] || [];
-			const previous = select.value;
-			select.innerHTML = '';
-			options.forEach(function (code) {
-				const option = document.createElement('option');
-				option.value = code;
-				option.textContent = LANG_ENDONYMS[code] || code.toUpperCase();
-				option.setAttribute('translate', 'no');
-				option.lang = code;
-				select.appendChild(option);
-			});
-
-			if (options.indexOf(previous) !== -1) {
-				select.value = previous;
-			} else if (options.length) {
-				select.value = options[0];
-			}
-		}
-
-		function revertHomePrefs() {
-			const readSelect = document.querySelector('[data-read-along]');
-			if (readSelect) readSelect.value = initialPrefs.read;
-			syncTranslateSelectForReadAlong();
-			const translateSelect = document.querySelector('[data-translate-along]');
-			const savedTranslate = (initialPrefs.translate || '').split(',')[0];
-			if (translateSelect && savedTranslate) {
-				const options = TRANSLATION_LANGS_BY_SOURCE[initialPrefs.read] || [];
-				translateSelect.value = options.indexOf(savedTranslate) !== -1 ? savedTranslate : (options[0] || '');
-			}
-		}
-
-		function saveHomePrefs() {
-			const next = prefsState();
-			if (!next.translate) return;
-			const initialTranslate = (initialPrefs.translate || '').split(',')[0];
-			if (next.read === initialPrefs.read && next.translate === initialTranslate) {
-				document.getElementById('home-prefs')?.close();
-				return;
-			}
-			setLangPref('read', next.read);
-			setLangPref('translate', next.translate);
-			location.reload();
-		}
+			document.cookie = 'readalong-' + key + '=' + value + '; path=/; max-age=' + window.COOKIE_MAX_AGE + '; SameSite=Lax';
+		};
 
 		(function syncLangPrefsFromStorage() {
 			const params = new URLSearchParams(location.search);
 			let shouldReload = false;
 
 			if (!localStorage.getItem('readalong-translate') && localStorage.getItem('readalong-ui')) {
-				setLangPref('translate', localStorage.getItem('readalong-ui'));
+				window.setLangPref('translate', localStorage.getItem('readalong-ui'));
 				localStorage.removeItem('readalong-ui');
 				document.cookie = 'readalong-ui=; path=/; max-age=0; SameSite=Lax';
 				shouldReload = true;
@@ -239,18 +185,15 @@ if (!$needsOnboarding) {
 				if (!value) return;
 				const cookieMatch = document.cookie.match(new RegExp('(?:^|; )readalong-' + key + '=([^;]*)'));
 				if (cookieMatch && cookieMatch[1] === value) return;
-				setLangPref(key, value);
+				window.setLangPref(key, value);
 				shouldReload = true;
 			});
 
 			if (shouldReload) location.reload();
 		})();
-
-		document.querySelector('[data-read-along]')?.addEventListener('change', syncTranslateSelectForReadAlong);
-		document.querySelector('[data-prefs-save]')?.addEventListener('click', saveHomePrefs);
-		document.getElementById('home-prefs')?.addEventListener('close', revertHomePrefs);
 	</script>
-	<script type="text/javascript" src="assets/home.js?v=13"></script>
+	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=14" defer></script>
 
 <?php endif; ?>
 

@@ -415,18 +415,18 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
   $lang = $item['language'] ?? '';
   $langAttr = $lang !== '' ? ' lang="' . e($lang) . '"' : '';
   $title = '<p' . $langAttr . '>' . e($item['title']) . '</p>';
-  $metaHtml = $meta !== '' ? '<small class=story-item__meta>' . e($meta) . '</small>' : '';
-  $badge = !empty($item['level']) ? '<span class=story-item__badge>' . e($item['level']) . '</span>' : '';
+  $metaHtml = $meta !== '' ? '<small class=meta>' . e($meta) . '</small>' : '';
+  $badge = !empty($item['level']) ? '<span class=badge>' . e($item['level']) . '</span>' : '';
 
   $html = "\t\t\t<li" . $attrs . ">\n";
   $html .= "\t\t\t\t<a class=story-item href=\"stories/" . e($item['slug']) . "/\">\n";
-  $html .= "\t\t\t\t\t<div class=story-item__body>\n";
+  $html .= "\t\t\t\t\t<div class=body>\n";
   $html .= "\t\t\t\t\t\t" . $title . "\n";
   if ($metaHtml) {
     $html .= "\t\t\t\t\t\t" . $metaHtml . "\n";
   }
-  $html .= "\t\t\t\t\t\t<small class=story-item__remaining data-remaining hidden></small>\n";
-  $html .= "\t\t\t\t\t\t<progress class=story-item__progress data-item-progress hidden value=0 max=100></progress>\n";
+  $html .= "\t\t\t\t\t\t<small class=remaining data-remaining hidden></small>\n";
+  $html .= "\t\t\t\t\t\t<progress data-item-progress hidden value=0 max=100></progress>\n";
   $html .= "\t\t\t\t\t</div>\n";
   if ($badge) {
     $html .= "\t\t\t\t\t" . $badge . "\n";

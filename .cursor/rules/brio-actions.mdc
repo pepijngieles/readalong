@@ -1,0 +1,38 @@
+---
+description: Brio declarative actions — data-click, dialogs, no onclick
+globs: "**/*.{php,js,html}"
+alwaysApply: false
+---
+
+# Brio actions
+
+Read [AGENTS.md](../../AGENTS.md) for full context.
+
+## Chrome → Brio
+
+- Use `data-click`, `data-change`, `data-input` — never `onclick=` or per-button `addEventListener` for UI chrome.
+- Actions are global functions on `window` with signature `(el, event, target)`.
+
+```html
+<!-- good -->
+<button data-click=play>
+<button data-click="openDialog(settings)">
+<select data-change=filterDuration>
+
+<!-- bad -->
+<button onclick="play()">
+```
+
+## Dialogs
+
+- Native `<dialog id=… class="dialog-sheet">` with Brio contract.
+- Close: `data-el=close-button` + `data-click="closeDialog(id)"`.
+- No custom scrim divs.
+
+## Not via Brio
+
+Audio events, sentence clicks, `pagehide`, settings range keyboard, `setLangPref` cookie sync — keep in project JS.
+
+## Updating Brio
+
+Copy from `../brio/` into `assets/brio/` — no build step. Preserve load order: `brio.css` → `styles.css` → `brio.js` → project JS.

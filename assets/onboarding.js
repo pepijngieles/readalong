@@ -79,6 +79,7 @@
   }
 
   function updateContinueButton() {
+    const continueButton = document.querySelector('[data-onboarding-continue]');
     if (!continueButton) return;
     continueButton.disabled = !selectedRead() || !selectedTranslate();
   }
@@ -98,9 +99,9 @@
       el.dataset.translation = translation[index] || '';
     });
 
-    if (translationText) {
+    if (typeof translationText !== 'undefined' && translationText) {
       translationText.lang = translateLang;
-      if (translationPopover) translationPopover.lang = translateLang;
+      if (typeof translationPopover !== 'undefined' && translationPopover) translationPopover.lang = translateLang;
       if (typeof updateTranslation === 'function') updateTranslation();
     }
   }
@@ -110,7 +111,7 @@
     if (typeof pause === 'function') pause();
     currentSentence = 0;
     currentSentenceEl = sentences[0];
-    if (audioFile) {
+    if (typeof audioFile !== 'undefined' && audioFile) {
       try { audioFile.currentTime = 0; } catch (error) {}
     }
     if (typeof changeSentence === 'function') changeSentence();
@@ -123,9 +124,31 @@
     });
   }
 
-  const readSelect = document.querySelector('[data-onboarding-read]');
-  const translateSelect = document.querySelector('[data-onboarding-translate]');
-  const continueButton = document.querySelector('[data-onboarding-continue]');
+  window.onboardingReadChange = function () {
+    syncTranslateSelectForReadAlong();
+    applyLocale(selectedTranslate() || detectSystemLanguage());
+    restartDemo();
+  };
+
+  window.onboardingTranslateChange = function () {
+    applyLocale(selectedTranslate());
+    updateContinueButton();
+    restartDemo();
+  };
+
+  window.completeOnboarding = function () {
+    const read = selectedRead();
+    const translate = selectedTranslate();
+    if (!read || !translate) {
+      updateContinueButton();
+      return;
+    }
+    setLangPref('read', read);
+    setLangPref('translate', translate);
+    setLangPref('onboarding-complete', '1');
+    location.href = location.pathname;
+  };
+
   const initialTranslate = selectedTranslate() || detectSystemLanguage();
 
   applyLocale(initialTranslate);
@@ -137,34 +160,9 @@
     restartDemo();
   });
 
-  if (audioFile) {
+  if (typeof audioFile !== 'undefined' && audioFile) {
     audioFile.addEventListener('ended', function () {
       if (typeof pause === 'function') pause();
     });
   }
-
-  readSelect.addEventListener('change', function () {
-    syncTranslateSelectForReadAlong();
-    applyLocale(selectedTranslate());
-    restartDemo();
-  });
-
-  translateSelect.addEventListener('change', function () {
-    applyLocale(selectedTranslate());
-    updateContinueButton();
-    restartDemo();
-  });
-
-  continueButton.addEventListener('click', function () {
-    const read = selectedRead();
-    const translate = selectedTranslate();
-    if (!read || !translate) {
-      updateContinueButton();
-      return;
-    }
-    setLangPref('read', read);
-    setLangPref('translate', translate);
-    setLangPref('onboarding-complete', '1');
-    location.href = location.pathname;
-  });
 })();

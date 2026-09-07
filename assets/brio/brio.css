@@ -1,0 +1,136 @@
+/* Brio CSS v0.1 — functional baseline
+   ------------------------------------------------------------
+   Purpose: provide minimal, non-opinionated CSS required for
+   Brio behavior to feel usable out-of-the-box.
+
+   Layers:
+   - brio.js   : behavior
+   - brio.css  : functional defaults
+   - project   : visual theme/design
+*/
+
+:root {
+  --brio-backdrop: rgba(0, 0, 0, 0.6);
+  --brio-loading-opacity: 0.7;
+  --brio-message-border-width: 2px;
+  --brio-dialog-z: 900;
+  --brio-modal-scrollbar-gutter: stable;
+}
+
+/* Hidden fallback consistency */
+[hidden] {
+  display: none !important;
+}
+
+/* Native dialog baseline */
+dialog {
+  margin: 0;
+  max-width: min(42rem, calc(100vw - 2rem));
+  max-height: 90vh;
+  overflow: auto;
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+dialog[open] {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--brio-dialog-z);
+}
+
+/* Mobile: dialogs behave like bottom sheets */
+@media (max-width: 48rem) {
+  dialog[open]:not([data-modeless]) {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+dialog::backdrop {
+  background: var(--brio-backdrop);
+}
+
+/* Modeless dialogs: avoid implicit backdrop expectation */
+dialog[data-modeless]::backdrop {
+  background: transparent;
+}
+
+/* Optional dialog-sheet pattern: fixed header/footer + scrolling content */
+dialog.dialog-sheet {
+  border: 0;
+  padding: 0;
+  width: min(var(--dialog-max-width, 420px), calc(100vw - 16px));
+  max-width: min(var(--dialog-max-width, 420px), calc(100vw - 16px));
+  max-height: min(90vh, calc(100dvh - 16px));
+  overflow: hidden;
+}
+
+dialog.dialog-sheet:not([open]) {
+  display: none;
+}
+
+dialog.dialog-sheet[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog.dialog-sheet[open]:not([data-modeless]) {
+  inset: 0;
+  margin: auto;
+  transform: none;
+}
+
+dialog.dialog-sheet::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+dialog .panel {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  min-height: 0;
+}
+
+dialog .content {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+dialog footer {
+  display: flex;
+}
+
+/* Prevent background scroll while a modal dialog is open */
+html[data-brio-modal-open],
+body:has(dialog[open]:not([data-modeless])) {
+  overflow: hidden;
+  scrollbar-gutter: var(--brio-modal-scrollbar-gutter);
+}
+
+/* Feedback baseline */
+[data-message][hidden] {
+  display: none !important;
+}
+
+[data-message][data-type] {
+  border-left: var(--brio-message-border-width) solid currentColor;
+}
+
+/* Submit/loading baseline */
+button[data-state="loading"],
+input[type="submit"][data-state="loading"] {
+  opacity: var(--brio-loading-opacity);
+  pointer-events: none;
+  cursor: progress;
+}

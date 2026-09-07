@@ -9,6 +9,10 @@ Or: `php -S localhost:8765 router.php`
 
 Story URLs work via `.htaccess` on Hostinger (LiteSpeed), or via the thin `index.php` stubs in each story folder when using plain `php -S`.
 
+## Development
+
+See [AGENTS.md](AGENTS.md) for architecture, Brio/CSS conventions, file map, and verification checklist. Cursor rules in `.cursor/rules/` mirror the same guidelines for AI agents.
+
 ## How to contribute
 Your feedback is much appreciated! When trying out the Readalong bèta version you probably have some questions and suggestions. If you're familiar with GitHub you can create a new issue or upvote an existing one. Not sure how this works? You can always send an email to <a href="mailto:support@readalong.io?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">support@readalong.io</a>.
 

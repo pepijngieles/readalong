@@ -27,17 +27,17 @@ $storyConfig = [
 ];
 ?>
 <div class=onboarding-screen data-onboarding-screen>
-	<div class=onboarding-screen__inner>
-		<h1 class=onboarding-brand>Readalong <sup style="color:var(--text-tertiary)">b&egrave;ta</sup></h1>
+	<div class="flex columns gap-small page-width">
+		<h1 class=onboarding-brand>Readalong <sup class=text-color-tertiary>b&egrave;ta</sup></h1>
 
-		<div class=onboarding-card>
-			<p class=onboarding-tagline data-i18n=home.tagline><?= e(t('home.tagline')) ?></p>
+		<div class="onboarding-card flex columns gap-medium">
+			<p class="onboarding-tagline text-color-secondary" data-i18n=home.tagline><?= e(t('home.tagline')) ?></p>
 
-			<div class=onboarding-languages>
-				<div class=onboarding-languages__row>
+			<div class="flex columns gap-small">
+				<div class="flex columns gap-3xs">
 					<label for=onboarding-read data-i18n=onboarding.read_along><?= e(t('onboarding.read_along')) ?></label>
-					<div class="select-wrap onboarding-languages__select">
-						<select id=onboarding-read class=select-medium data-onboarding-read translate=no>
+					<div class="select-wrap full-width">
+						<select id=onboarding-read class=select-medium data-onboarding-read data-change=onboardingReadChange translate=no>
 <?php foreach ($sourceLangs as $code): ?>
 							<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $defaultRead ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
 <?php endforeach; ?>
@@ -45,10 +45,10 @@ $storyConfig = [
 						<?php icon('chevron-down', ['size' => 16]); ?>
 					</div>
 				</div>
-				<div class=onboarding-languages__row>
+				<div class="flex columns gap-3xs">
 					<label for=onboarding-translate data-i18n=home.translate_into><?= e(t('home.translate_into')) ?></label>
-					<div class="select-wrap onboarding-languages__select">
-						<select id=onboarding-translate class=select-medium data-onboarding-translate translate=no>
+					<div class="select-wrap full-width">
+						<select id=onboarding-translate class=select-medium data-onboarding-translate data-change=onboardingTranslateChange translate=no>
 <?php foreach ($translateLangOptions as $code): ?>
 							<option value="<?= e($code) ?>"<?= $code === $defaultTranslate ? ' selected' : '' ?> lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
 <?php endforeach; ?>
@@ -68,12 +68,12 @@ $storyConfig = [
 
 <?php include __DIR__ . '/translation-popover.php'; ?>
 
-				<div class=onboarding-demo-controls>
-					<button type=button class="play icon-only rounded" data-action=play onclick=play()>
+				<div class="onboarding-demo-controls flex gap-xs">
+					<button type=button class="play icon-only rounded" data-action=play data-click=play>
 						<span class=visually-hidden data-i18n=nav.play><?= e(t('nav.play')) ?></span>
 						<?php icon('play'); ?>
 					</button>
-					<button type=button class="pause icon-only rounded pressed" data-action=pause onclick=pause()>
+					<button type=button class="pause icon-only rounded pressed" data-action=pause data-click=pause>
 						<span class=visually-hidden data-i18n=nav.pause><?= e(t('nav.pause')) ?></span>
 						<?php icon('pause'); ?>
 					</button>
@@ -83,9 +83,9 @@ $storyConfig = [
 				<audio src="assets/audio/onboarding-silence.wav" preload=auto playsinline muted hidden></audio>
 			</div>
 
-			<div class=onboarding-actions>
-				<button type=button class="primary onboarding-continue" data-onboarding-continue data-i18n=onboarding.continue><?= e(t('onboarding.continue')) ?></button>
-				<p class=onboarding-change-later data-i18n=onboarding.change_later><?= e(t('onboarding.change_later')) ?></p>
+			<div class="flex columns gap-xs">
+				<button type=button class="primary full-width onboarding-continue" data-onboarding-continue data-click=completeOnboarding data-i18n=onboarding.continue><?= e(t('onboarding.continue')) ?></button>
+				<p class="onboarding-change-later text-color-tertiary font-size-small" data-i18n=onboarding.change_later><?= e(t('onboarding.change_later')) ?></p>
 			</div>
 		</div>
 	</div>
@@ -99,5 +99,6 @@ $storyConfig = [
 	window.READALONG_DEMO = <?= json_encode($segments, JSON_UNESCAPED_UNICODE) ?>;
 	window.TRANSLATION_LANGS_BY_SOURCE = <?= json_encode($translationLangsBySource, JSON_UNESCAPED_UNICODE) ?>;
 </script>
-<script type="text/javascript" src="assets/scripts.js?v=19"></script>
-<script type="text/javascript" src="assets/onboarding.js?v=9"></script>
+<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
+<script type="text/javascript" src="assets/scripts.js?v=20" defer></script>
+<script type="text/javascript" src="assets/onboarding.js?v=10" defer></script>
