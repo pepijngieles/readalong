@@ -181,7 +181,7 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=13" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=14" defer></script>
 
 <?php endif; ?>
 
