@@ -93,7 +93,6 @@ if (!$needsOnboarding) {
 				<?php icon('close-small'); ?>
 			</button>
 			<p><?= e(t('home.tagline')) ?></p>
-			<p class="dummy-content-notice"><?= e(t('home.dummy_notice')) ?></p>
 		</div>
 
 		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
@@ -239,7 +238,7 @@ if (!$needsOnboarding) {
 		});
 		document.querySelector('[data-story-level]')?.addEventListener('change', onLangChange('level'));
 	</script>
-	<script type="text/javascript" src="assets/home.js?v=7"></script>
+	<script type="text/javascript" src="assets/home.js?v=8"></script>
 
 <?php endif; ?>
 
