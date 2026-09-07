@@ -110,11 +110,7 @@ function ui_locale() {
   $allowed = configured_languages();
   $default = detect_browser_locale($allowed);
 
-  if (empty($_COOKIE['readalong-translate']) && !empty($_COOKIE['readalong-ui'])) {
-    return $locale = lang_pref('ui', $allowed, $default);
-  }
-
-  return $locale = lang_pref('translate', $allowed, $default);
+  return $locale = lang_pref('ui', $allowed, $default);
 }
 
 function t($key, array $replacements = [], $locale = null) {
