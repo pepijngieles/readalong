@@ -145,6 +145,7 @@
 
   readSelect.addEventListener('change', function () {
     syncTranslateSelectForReadAlong();
+    applyLocale(selectedTranslate());
     restartDemo();
   });
 
