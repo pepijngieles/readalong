@@ -144,7 +144,7 @@ function syncFilterState() {
 }
 
 function filtersActive() {
-  return kindFilter !== DEFAULT_KIND || !!durationLimit
+  return !!durationLimit
 }
 
 function applyAllItems() {
@@ -293,7 +293,6 @@ function fillContinueReading() {
 }
 
 function clearFilters() {
-  kindFilter = DEFAULT_KIND
   durationLimit = 0
   syncFilterState()
   applyAllItems()
