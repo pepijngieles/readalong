@@ -93,12 +93,17 @@
       item.hidden = !show
       if (show) visible++
     })
-    if (noResults) noResults.hidden = visible > 0 || !filtersActive()
+    if (noResults) {
+      const emptyMessage = noResults.querySelector('[data-empty-message]')
+      const emptyKey = filtersActive() ? 'data-i18n-empty-filters' : 'data-i18n-empty'
+      const emptyText = noResults.getAttribute(emptyKey)
+      if (emptyMessage && emptyText) emptyMessage.textContent = emptyText
+      noResults.hidden = visible > 0
+    }
     if (resultsCount) {
       resultsCount.textContent = resultsTemplate.replace('{n}', String(visible))
     }
     clearButtons.forEach(function (button) {
-      if (button.closest('[data-no-results]')) return
       button.hidden = !filtersActive()
     })
     writeFiltersToUrl()
@@ -214,8 +219,14 @@
 
   function setPrefsOpen(open) {
     if (!prefsToggle || !prefsPanel) return
-    prefsPanel.hidden = !open
-    prefsToggle.setAttribute('aria-expanded', open ? 'true' : 'false')
+    if (open) {
+      if (!prefsPanel.open && typeof prefsPanel.showModal === 'function') {
+        prefsPanel.showModal()
+      }
+    } else if (prefsPanel.open && typeof prefsPanel.close === 'function') {
+      prefsPanel.close()
+    }
+    prefsToggle.setAttribute('aria-expanded', prefsPanel.open ? 'true' : 'false')
   }
 
   kindChips.forEach(function (chip) {
@@ -259,7 +270,16 @@
 
   if (prefsToggle && prefsPanel) {
     prefsToggle.addEventListener('click', function () {
-      setPrefsOpen(prefsPanel.hidden)
+      setPrefsOpen(!prefsPanel.open)
+    })
+    prefsPanel.addEventListener('close', function () {
+      prefsToggle.setAttribute('aria-expanded', 'false')
+    })
+    prefsPanel.addEventListener('click', function (event) {
+      const rect = prefsPanel.getBoundingClientRect()
+      const inside = event.clientX >= rect.left && event.clientX <= rect.right &&
+        event.clientY >= rect.top && event.clientY <= rect.bottom
+      if (!inside) setPrefsOpen(false)
     })
   }
 
@@ -269,13 +289,6 @@
       if (prefsToggle) prefsToggle.focus()
     })
   }
-
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' && prefsPanel && !prefsPanel.hidden) {
-      setPrefsOpen(false)
-      if (prefsToggle) prefsToggle.focus()
-    }
-  })
 
   if (intro) {
     try {

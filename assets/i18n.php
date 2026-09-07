@@ -77,6 +77,7 @@ function ui_strings() {
       'settings.align_start' => 'Links ausrichten',
       'settings.justify' => 'Blocksatz',
       'common.close' => 'Schließen',
+      'common.save' => 'Speichern',
     ],
     'en' => [
       'onboarding.read_along' => 'Read along in',
@@ -153,6 +154,7 @@ function ui_strings() {
       'settings.align_start' => 'Align start',
       'settings.justify' => 'Justify',
       'common.close' => 'Close',
+      'common.save' => 'Save',
     ],
     'es' => [
       'onboarding.read_along' => 'Leer en',
@@ -229,6 +231,7 @@ function ui_strings() {
       'settings.align_start' => 'Alinear al inicio',
       'settings.justify' => 'Justificar',
       'common.close' => 'Cerrar',
+      'common.save' => 'Guardar',
     ],
     'fr' => [
       'onboarding.read_along' => 'Lire en',
@@ -305,6 +308,7 @@ function ui_strings() {
       'settings.align_start' => 'Aligner au début',
       'settings.justify' => 'Justifier',
       'common.close' => 'Fermer',
+      'common.save' => 'Enregistrer',
     ],
     'nl' => [
       'onboarding.read_along' => 'Meelezen in',
@@ -381,6 +385,7 @@ function ui_strings() {
       'settings.align_start' => 'Links uitlijnen',
       'settings.justify' => 'Uitvullen',
       'common.close' => 'Sluiten',
+      'common.save' => 'Opslaan',
     ],
     'no' => [
       'onboarding.read_along' => 'Lese med på',
@@ -457,6 +462,7 @@ function ui_strings() {
       'settings.align_start' => 'Venstrejuster',
       'settings.justify' => 'Blokkjustér',
       'common.close' => 'Lukk',
+      'common.save' => 'Lagre',
     ],
   ];
 }
