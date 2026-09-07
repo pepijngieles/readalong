@@ -2,9 +2,12 @@
   const PROGRESS_KEY = 'readalong-progress'
   const DEFAULT_KIND = 'podcast'
   const DURATION_OPTIONS = [2, 5, 10, 20]
+  const LEVEL_CODES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+  const LEVEL_SCORES = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 }
 
   const kindChips = document.querySelectorAll('[data-kind-filter]')
   const durationSelect = document.querySelector('[data-duration-filter]')
+  const levelFilterRoot = document.querySelector('[data-level-filter]')
   const allList = document.querySelector('[data-all-items]')
   const continueSection = document.querySelector('[data-continue-section]')
   const continueFeatured = document.querySelector('[data-continue-featured]')
@@ -22,11 +25,43 @@
 
   const remainingTemplate = (allSection && allSection.getAttribute('data-i18n-remaining')) || '{n} min'
   const resultsTemplate = (allSection && allSection.getAttribute('data-i18n-results')) || '{n}'
+  const allLevelsLabel = (allSection && allSection.getAttribute('data-i18n-all-levels')) || 'All levels'
   const historyLabel = (continueSection && continueSection.getAttribute('data-i18n-history')) || 'All history'
   const hideHistoryLabel = (continueSection && continueSection.getAttribute('data-i18n-hide-history')) || 'Hide history'
 
   let kindFilter = DEFAULT_KIND
   let durationLimit = 0
+  let levelFilter = []
+
+  function levelScore(code) {
+    return LEVEL_SCORES[code] ?? null
+  }
+
+  function levelCodesIn(level) {
+    if (!level) return []
+    const trimmed = level.trim()
+    if (!trimmed) return []
+    if (trimmed.indexOf('-') !== -1) {
+      const parts = trimmed.split('-', 2)
+      const lowScore = levelScore(parts[0])
+      const highScore = levelScore(parts[1])
+      if (lowScore === null || highScore === null) return []
+      const min = Math.min(lowScore, highScore)
+      const max = Math.max(lowScore, highScore)
+      return LEVEL_CODES.filter(function (code) {
+        const score = levelScore(code)
+        return score !== null && score >= min && score <= max
+      })
+    }
+    return [trimmed.toUpperCase()]
+  }
+
+  function levelMatchesCodes(level, selected) {
+    if (!selected.length) return true
+    return levelCodesIn(level).some(function (code) {
+      return selected.indexOf(code) !== -1
+    })
+  }
 
   function knownKinds() {
     const kinds = []
@@ -36,12 +71,22 @@
     return kinds
   }
 
+  function parseLevelParam(raw) {
+    if (!raw) return []
+    return raw.split(',').map(function (code) {
+      return code.trim()
+    }).filter(function (code) {
+      return LEVEL_CODES.indexOf(code) !== -1
+    })
+  }
+
   function readFiltersFromUrl() {
     const params = new URLSearchParams(location.search)
     const kind = params.get('kind') || DEFAULT_KIND
     const duration = parseInt(params.get('duration'), 10)
     kindFilter = knownKinds().indexOf(kind) !== -1 ? kind : DEFAULT_KIND
     durationLimit = DURATION_OPTIONS.indexOf(duration) !== -1 ? duration * 60 : 0
+    levelFilter = parseLevelParam(params.get('level'))
   }
 
   function writeFiltersToUrl() {
@@ -50,6 +95,8 @@
     else params.delete('kind')
     if (durationLimit) params.set('duration', String(durationLimit / 60))
     else params.delete('duration')
+    if (levelFilter.length) params.set('level', levelFilter.join(','))
+    else params.delete('level')
     params.delete('q')
     const qs = params.toString()
     const url = qs ? location.pathname + '?' + qs + location.hash : location.pathname + location.hash
@@ -65,10 +112,11 @@
     if (durationSelect) {
       durationSelect.value = durationLimit ? String(durationLimit / 60) : ''
     }
+    syncLevelDropdown()
   }
 
   function filtersActive() {
-    return kindFilter !== DEFAULT_KIND || !!durationLimit
+    return kindFilter !== DEFAULT_KIND || !!durationLimit || levelFilter.length > 0
   }
 
   function applyAllItems() {
@@ -76,9 +124,11 @@
     allList.querySelectorAll('li').forEach(function (item) {
       const kind = item.getAttribute('data-kind') || ''
       const seconds = parseInt(item.getAttribute('data-duration-seconds'), 10) || 0
+      const level = item.getAttribute('data-level') || ''
       const matchKind = kind === kindFilter
       const matchDuration = !durationLimit || (seconds > 0 && seconds <= durationLimit)
-      const show = matchKind && matchDuration
+      const matchLevel = levelMatchesCodes(level, levelFilter)
+      const show = matchKind && matchDuration && matchLevel
       item.hidden = !show
       if (show) visible++
     })
@@ -200,6 +250,7 @@
   function clearFilters() {
     kindFilter = DEFAULT_KIND
     durationLimit = 0
+    levelFilter = []
     syncFilterState()
     applyAllItems()
   }
@@ -214,6 +265,79 @@
       prefsPanel.close()
     }
     prefsToggle.setAttribute('aria-expanded', prefsPanel.open ? 'true' : 'false')
+  }
+
+  function syncLevelDropdown() {
+    if (!levelFilterRoot) return
+    const label = levelFilterRoot.querySelector('.custom-select__label')
+    const allOption = levelFilterRoot.querySelector('[data-level-all]')
+    const noneSelected = !levelFilter.length
+
+    if (allOption) allOption.setAttribute('aria-selected', noneSelected ? 'true' : 'false')
+    levelFilterRoot.querySelectorAll('[data-level-option]').forEach(function (option) {
+      const code = option.getAttribute('data-level-option')
+      option.setAttribute('aria-selected', levelFilter.indexOf(code) !== -1 ? 'true' : 'false')
+    })
+
+    if (label) {
+      label.textContent = noneSelected ? allLevelsLabel : levelFilter.join(' · ')
+    }
+  }
+
+  function setLevelMenuOpen(open) {
+    if (!levelFilterRoot) return
+    const trigger = levelFilterRoot.querySelector('.custom-select__trigger')
+    const menu = levelFilterRoot.querySelector('.custom-select__menu')
+    if (!trigger || !menu) return
+
+    levelFilterRoot.classList.toggle('custom-select--open', open)
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false')
+    menu.hidden = !open
+  }
+
+  function initLevelDropdown() {
+    if (!levelFilterRoot) return
+    const trigger = levelFilterRoot.querySelector('.custom-select__trigger')
+    const menu = levelFilterRoot.querySelector('.custom-select__menu')
+    if (!trigger || !menu) return
+
+    trigger.addEventListener('click', function () {
+      setLevelMenuOpen(menu.hidden)
+    })
+
+    levelFilterRoot.querySelector('[data-level-all]')?.addEventListener('click', function () {
+      levelFilter = []
+      syncLevelDropdown()
+      applyAllItems()
+    })
+
+    levelFilterRoot.querySelectorAll('[data-level-option]').forEach(function (option) {
+      option.addEventListener('click', function () {
+        const code = this.getAttribute('data-level-option')
+        if (!code) return
+        const index = levelFilter.indexOf(code)
+        if (index === -1) levelFilter.push(code)
+        else levelFilter.splice(index, 1)
+        levelFilter.sort(function (a, b) {
+          return LEVEL_CODES.indexOf(a) - LEVEL_CODES.indexOf(b)
+        })
+        syncLevelDropdown()
+        applyAllItems()
+      })
+    })
+
+    document.addEventListener('click', function (event) {
+      if (!levelFilterRoot.classList.contains('custom-select--open')) return
+      if (levelFilterRoot.contains(event.target)) return
+      setLevelMenuOpen(false)
+    })
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && levelFilterRoot.classList.contains('custom-select--open')) {
+        setLevelMenuOpen(false)
+        trigger.focus()
+      }
+    })
   }
 
   kindChips.forEach(function (chip) {
@@ -269,6 +393,7 @@
     })
   }
 
+  initLevelDropdown()
   readFiltersFromUrl()
   syncFilterState()
   fillContinueReading()

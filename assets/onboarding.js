@@ -12,7 +12,12 @@
   }
 
   if (localStorage.getItem('readalong-onboarding-complete') === '1' || localStorage.getItem('readalong-read')) {
-    ['read', 'translate', 'ui', 'level', 'onboarding-complete'].forEach(function (key) {
+    if (!localStorage.getItem('readalong-translate') && localStorage.getItem('readalong-ui')) {
+      setLangPref('translate', localStorage.getItem('readalong-ui'));
+      localStorage.removeItem('readalong-ui');
+      document.cookie = 'readalong-ui=; path=/; max-age=0; SameSite=Lax';
+    }
+    ['read', 'translate', 'level', 'onboarding-complete'].forEach(function (key) {
       const value = localStorage.getItem('readalong-' + key);
       if (value) setLangPref(key, value);
     });
@@ -121,9 +126,9 @@
   const readSelect = document.querySelector('[data-onboarding-read]');
   const translateSelect = document.querySelector('[data-onboarding-translate]');
   const continueButton = document.querySelector('[data-onboarding-continue]');
-  const systemLang = detectSystemLanguage();
+  const initialTranslate = selectedTranslate() || detectSystemLanguage();
 
-  applyLocale(systemLang);
+  applyLocale(initialTranslate);
   updateContinueButton();
   renderDemo();
 
@@ -144,6 +149,7 @@
   });
 
   translateSelect.addEventListener('change', function () {
+    applyLocale(selectedTranslate());
     updateContinueButton();
     restartDemo();
   });
