@@ -6,6 +6,7 @@ $storyClass = 'story';
 <?php include $partials . '/head.php'; ?>
 <?php $showTranslation = ($translationLang ?? '') !== ($story['languageCode'] ?? ''); ?>
 <body<?= $showTranslation ? ' class=show-translation' : '' ?>>
+<?php include $partials . '/theme-bootstrap.php'; ?>
 
 	<main>
 

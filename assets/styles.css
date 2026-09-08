@@ -99,11 +99,9 @@ body.theme-cream{
   --background-popover: var(--background-cream);
 }
 
-body.theme-dark{
+body.theme-dark,
+body.theme-black{
   color: var(--text-secondary);
-  --background-primary: #333333;
-  --background-secondary: #2a2a2a;
-  --background-popover: #333333;
   --background-yellow: #4a3d1a;
   --text-primary: rgba(255,255,255,.95);
   --text-secondary: rgba(255,255,255,.84);
@@ -118,6 +116,18 @@ body.theme-dark{
   --shade-strong: rgba(255,255,255,.12);
   --settings-label-muted: rgba(255,255,255,.45);
   --slider-thumb: #ffffff;
+}
+
+body.theme-dark{
+  --background-primary: #333333;
+  --background-secondary: #2a2a2a;
+  --background-popover: #333333;
+}
+
+body.theme-black{
+  --background-primary: #000000;
+  --background-secondary: #0a0a0a;
+  --background-popover: #000000;
 }
 
 body.layout-justify .story{
@@ -357,15 +367,18 @@ body.started [data-sentence]:not([aria-current]){
   color: var(--text-tertiary);
 }
 
-body.theme-dark .story [data-sentence]{
+body.theme-dark .story [data-sentence],
+body.theme-black .story [data-sentence]{
   color: var(--text-secondary);
 }
 
-body.theme-dark.started [data-sentence]:not([aria-current]){
+body.theme-dark.started [data-sentence]:not([aria-current]),
+body.theme-black.started [data-sentence]:not([aria-current]){
   color: var(--text-tertiary);
 }
 
-body.theme-dark [data-sentence][aria-current]{
+body.theme-dark [data-sentence][aria-current],
+body.theme-black [data-sentence][aria-current]{
   color: var(--text-primary);
 }
 
@@ -1057,7 +1070,8 @@ body.ios:not(.started.show-translation) .translation-popover{
   transform: translateX(-50%);
 }
 
-body.theme-dark .settings-grabber{
+body.theme-dark .settings-grabber,
+body.theme-black .settings-grabber{
   background-color: rgba(255, 255, 255, .24);
 }
 
@@ -1103,7 +1117,8 @@ body.theme-dark .settings-grabber{
   color: rgba(0, 0, 0, .8);
 }
 
-body.theme-dark .settings-segment .preview{
+body.theme-dark .settings-segment .preview,
+body.theme-black .settings-segment .preview{
   color: var(--text-primary);
 }
 
@@ -1272,6 +1287,11 @@ body.theme-dark .settings-segment .preview{
 .settings-theme .swatch.dark{
   background-color: #333333;
   border-color: #333333;
+}
+
+.settings-theme .swatch.black{
+  background-color: #000000;
+  border-color: #000000;
 }
 
 .settings-theme input:checked + .swatch{
