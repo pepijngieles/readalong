@@ -41,7 +41,7 @@ if (!$needsOnboarding) {
 	<main>
 
 		<header class="home-header flex gap-small">
-			<h1>Readalong <sup class=text-color-tertiary>b&egrave;ta</sup></h1>
+			<h1>Readalong</h1>
 			<button type=button class="quiet home-prefs-toggle" data-click=openHomePrefs data-prefs-toggle aria-haspopup=dialog aria-expanded=false aria-controls=home-prefs>
 				<?= e($prefsSummary) ?>
 			</button>
@@ -181,7 +181,7 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=14" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=15" defer></script>
 
 <?php endif; ?>
 
