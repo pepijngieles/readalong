@@ -31,6 +31,7 @@ if (!$needsOnboarding) {
 ?>
 <?php include $partials . '/head.php'; ?>
 <body<?= $needsOnboarding ? ' class="onboarding-page show-translation started paused"' : '' ?>>
+<?php include $partials . '/theme-bootstrap.php'; ?>
 
 <?php if ($needsOnboarding): ?>
 

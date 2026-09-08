@@ -79,6 +79,11 @@
 							<span class="swatch dark" aria-hidden=true></span>
 							<span class=visually-hidden><?= e(t('settings.dark')) ?></span>
 						</label>
+						<label class=settings-theme>
+							<input type=radio name=theme value=black>
+							<span class="swatch black" aria-hidden=true></span>
+							<span class=visually-hidden><?= e(t('settings.black')) ?></span>
+						</label>
 					</fieldset>
 
 					<fieldset class="settings-layouts flex gap-2xs">

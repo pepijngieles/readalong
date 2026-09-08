@@ -425,7 +425,8 @@ const SETTINGS_DEFAULTS = {
 const THEME_META_COLORS = {
   light: { primary: '#ffffff', secondary: '#fafafa' },
   cream: { primary: '#fef5e5', secondary: '#f5ebd5' },
-  dark: { primary: '#333333', secondary: '#2a2a2a' }
+  dark: { primary: '#333333', secondary: '#2a2a2a' },
+  black: { primary: '#000000', secondary: '#0a0a0a' }
 }
 const FONT_FAMILIES = {
   sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif',
@@ -465,10 +466,19 @@ function applyFontFamily(value) {
 }
 
 function applyTheme(value) {
-  document.body.classList.remove('theme-light', 'theme-cream', 'theme-dark')
+  document.body.classList.remove('theme-light', 'theme-cream', 'theme-dark', 'theme-black')
   if (value !== 'light') document.body.classList.add('theme-' + value)
   currentTheme = value
   updateThemeColor()
+}
+
+function loadThemeFromStorage() {
+  let theme = SETTINGS_DEFAULTS.theme
+  try {
+    const stored = localStorage.getItem(SETTINGS_KEY)
+    if (stored) theme = Object.assign({}, SETTINGS_DEFAULTS, JSON.parse(stored)).theme
+  } catch (error) {}
+  applyTheme(theme)
 }
 
 function applyLayout(value) {
@@ -522,6 +532,7 @@ function applySettingsFromForm(save) {
 }
 
 function loadSettings() {
+  loadThemeFromStorage()
   if (!document.forms.settings) return
   let settings = SETTINGS_DEFAULTS
   try {
@@ -570,9 +581,10 @@ function updateSettings() {
 
 if (settingsDialog) {
   settingsDialog.addEventListener('close', updateThemeColor)
+  initSettingsControls()
+} else {
+  loadThemeFromStorage()
 }
-
-initSettingsControls()
 
 if (currentSentence > 0 && currentSentenceEl) {
   start()
