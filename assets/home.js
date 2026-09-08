@@ -1,6 +1,8 @@
 const PROGRESS_KEY = 'readalong-progress'
 const DEFAULT_KIND = 'podcast'
 const DURATION_OPTIONS = [2, 5, 10, 20]
+const LEVEL_CODES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+const LEVEL_SCORES = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 }
 
 let kindFilter = DEFAULT_KIND
 let durationLimit = 0
@@ -18,6 +20,49 @@ function selectedLevelPills() {
   return Array.from(homeAll('[data-level-pill][aria-pressed=true]'))
     .map(function (pill) { return pill.getAttribute('data-level-pill') })
     .filter(Boolean)
+}
+
+function savedLevelFilter() {
+  const raw = localStorage.getItem('readalong-level') || ''
+  return raw.split(',').map(function (code) { return code.trim() }).filter(function (code) {
+    return LEVEL_CODES.indexOf(code) !== -1
+  })
+}
+
+function levelScore(code) {
+  return LEVEL_SCORES[code] ?? null
+}
+
+function levelCodesIn(level) {
+  if (!level) return []
+  const trimmed = level.trim()
+  if (!trimmed) return []
+  if (trimmed.indexOf('-') !== -1) {
+    const parts = trimmed.split('-', 2)
+    const lowScore = levelScore(parts[0])
+    const highScore = levelScore(parts[1])
+    if (lowScore === null || highScore === null) return []
+    const min = Math.min(lowScore, highScore)
+    const max = Math.max(lowScore, highScore)
+    return LEVEL_CODES.filter(function (code) {
+      const score = levelScore(code)
+      return score !== null && score >= min && score <= max
+    })
+  }
+  return [trimmed.toUpperCase()]
+}
+
+function levelMatchesCodes(level, selected) {
+  if (!selected.length) return true
+  return levelCodesIn(level).some(function (code) {
+    return selected.indexOf(code) !== -1
+  })
+}
+
+function normalizeLevelPref(level) {
+  return level.split(',').filter(Boolean).sort(function (a, b) {
+    return LEVEL_CODES.indexOf(a) - LEVEL_CODES.indexOf(b)
+  }).join(',')
 }
 
 function prefsState() {
@@ -83,7 +128,8 @@ function saveHomePrefs() {
   const next = prefsState()
   if (!next.translate) return
   const initialTranslate = (initialPrefs.translate || '').split(',')[0]
-  if (next.read === initialPrefs.read && next.translate === initialTranslate && next.level === initialPrefs.level) {
+  if (next.read === initialPrefs.read && next.translate === initialTranslate &&
+      normalizeLevelPref(next.level) === normalizeLevelPref(initialPrefs.level)) {
     closeDialog(null, null, 'home-prefs')
     return
   }
@@ -158,12 +204,16 @@ function applyAllItems() {
   const resultsTemplate = (allSection && allSection.getAttribute('data-i18n-results')) || '{n}'
   let visible = 0
 
+  const levelFilter = savedLevelFilter()
+
   allList.querySelectorAll('li').forEach(function (item) {
     const kind = item.getAttribute('data-kind') || ''
     const seconds = parseInt(item.getAttribute('data-duration-seconds'), 10) || 0
-    const matchKind = kind === kindFilter
+    const level = item.getAttribute('data-level') || ''
+    const matchKind = !kind || kind === kindFilter
     const matchDuration = !durationLimit || (seconds > 0 && seconds <= durationLimit)
-    const show = matchKind && matchDuration
+    const matchLevel = levelMatchesCodes(level, levelFilter)
+    const show = matchKind && matchDuration && matchLevel
     item.hidden = !show
     if (show) visible++
   })
@@ -354,5 +404,15 @@ function initHome() {
     })
   }
 }
+
+window.syncTranslateSelectForReadAlong = syncTranslateSelectForReadAlong
+window.saveHomePrefs = saveHomePrefs
+window.selectAllLevels = selectAllLevels
+window.toggleLevelPill = toggleLevelPill
+window.openHomePrefs = openHomePrefs
+window.clearFilters = clearFilters
+window.filterKind = filterKind
+window.filterDuration = filterDuration
+window.toggleHistory = toggleHistory
 
 document.addEventListener('DOMContentLoaded', initHome)

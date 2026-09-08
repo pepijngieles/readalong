@@ -155,7 +155,15 @@ function lang_pref($key, array $allowed, $default) {
 }
 
 function lang_prefs_list($key, array $allowed, $default) {
-  $raw = $_GET[$key] ?? $_COOKIE['readalong-' . $key] ?? $default;
+  $cookieKey = 'readalong-' . $key;
+  if (array_key_exists($key, $_GET)) {
+    $raw = $_GET[$key];
+  } elseif (array_key_exists($cookieKey, $_COOKIE)) {
+    $raw = $_COOKIE[$cookieKey];
+  } else {
+    $raw = $default;
+  }
+
   if (is_array($raw)) {
     $values = $raw;
   } else {
@@ -166,7 +174,7 @@ function lang_prefs_list($key, array $allowed, $default) {
     return in_array($code, $allowed, true);
   })));
 
-  if ($values === []) {
+  if ($values === [] && !array_key_exists($key, $_GET) && !array_key_exists($cookieKey, $_COOKIE)) {
     $fallback = is_array($default) ? $default : [$default];
     $values = array_values(array_filter($fallback, function ($code) use ($allowed) {
       return in_array($code, $allowed, true);

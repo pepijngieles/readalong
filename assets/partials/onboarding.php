@@ -28,7 +28,7 @@ $storyConfig = [
 ?>
 <div class=onboarding-screen data-onboarding-screen>
 	<div class="flex columns gap-small page-width">
-		<h1 class=onboarding-brand>Readalong <sup class=text-color-tertiary>b&egrave;ta</sup></h1>
+		<h1 class=onboarding-brand>Readalong</h1>
 
 		<div class="onboarding-card flex columns gap-medium">
 			<p class="onboarding-tagline text-color-secondary" data-i18n=home.tagline><?= e(t('home.tagline')) ?></p>
