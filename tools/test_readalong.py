@@ -230,5 +230,71 @@ class ResegmentBlocksTest(unittest.TestCase):
         self.assertEqual(sum(len(parts) for _, parts in split_map), len(b2[0]["sentences"]))
 
 
+class ParagraphiseTest(unittest.TestCase):
+    def test_short_literary_block_stays(self):
+        block = {"sentences": [
+            "Er was eens een grote groep kikkers die altijd naar het bos ging "
+            "om rond te hangen en zich te vermaken.",
+            "Ze zongen en sprongen allemaal tot de avond viel.",
+            "Ze lachten altijd heel hard en waren onafscheidelijk.",
+        ]}
+        self.assertEqual(ra.paragraphise_block(block), [block])
+
+    def test_spoken_wall_splits_and_keeps_speaker(self):
+        block = {
+            "speaker": "Ane",
+            "sentences": [
+                "Før så bestemte jo ikke vi så mye, eller på åttitallet så "
+                "bestemte ikke ungene alt, men det gjør de i dag,",
+                "så det er liksom sånn det er taco på fredag og pizza på "
+                "lørdag i liksom 90% av norske hjem trur jeg.",
+                "Ingen slingringsmonn, hvis du prøver på noe annet så blir "
+                "det grining så men sånn var det ikke hos oss.",
+                "Det var mamma som bestemte menyen og vi hadde f.eks. "
+                "hjemmelagd lasagne ofte noen ganger moussakka også",
+                "fordi hun ferierte i Hellas og plukka opp noen ideer der og "
+                "tzatziki og med ja gryteretter som hadde stått lenge litt sånn.",
+                "Hu hun hadde med seg litt fra syttitallet, ikke sant, så hun "
+                "kommer var jo sånn raddismiljø egentlig,",
+                "så det var jo en sånn spansk oksegryte og den typen ting "
+                "hadde de liksom med seg litt fra syttitallet.",
+                "Rødvin lagde dem jo sjøl på baderomsgulvet i en sånn stor tank, da.",
+            ],
+        }
+        new = ra.paragraphise_block(block)
+        self.assertGreater(len(new), 1)
+        self.assertEqual(ra.flatten(new), block["sentences"])
+        self.assertTrue(all(part.get("speaker") == "Ane" for part in new))
+        self.assertTrue(all(
+            sum(len(s.split()) for s in part["sentences"]) <= ra.MAX_PARAGRAPH_WORDS + 25
+            for part in new
+        ))
+
+    def test_does_not_break_before_lowercase_continuation(self):
+        block = {"sentences": [
+            "Det var mamma som bestemte menyen og vi hadde f.eks. hjemmelagd "
+            "lasagne ofte noen ganger moussakka også",
+            "fordi hun ferierte i Hellas og plukka opp noen ideer der.",
+            "Hu hun hadde med seg litt fra syttitallet, ikke sant.",
+        ] * 4}
+        new = ra.paragraphise_block(block)
+        joined = " ".join(ra.flatten(new))
+        self.assertNotIn("fordi hun ferierte", [p["sentences"][0] for p in new])
+        self.assertEqual(joined, " ".join(block["sentences"]))
+
+    def test_paragraphise_blocks_is_idempotent_on_short_stories(self):
+        blocks = [
+            {"sentences": [
+                "De anderen waren verbaasd.",
+                "Een van hen vroeg: “Hoe heb je het gedaan?”",
+                "De kikker gaf echter geen antwoord.",
+                "Hij was doof.",
+            ]}
+        ]
+        once = ra.paragraphise_blocks(blocks)
+        self.assertEqual(once, blocks)
+        self.assertEqual(ra.paragraphise_blocks(once), once)
+
+
 if __name__ == "__main__":
     unittest.main()

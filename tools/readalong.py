@@ -9,6 +9,7 @@ index.php-stub en de mp3 op de juiste plek. Twee bronnen, dezelfde uitvoer:
   add-voice    extra stem bij een bestaand verhaal (tekst blijft ongewijzigd)
   resegment    bestaande verhalen in 2–3 halfzinnen knippen (tekst, vertalingen, timestamps)
   retranslate  vertaal alle segmenten opnieuw per halfzin (DeepL)
+  reparagraph  te lange beurten in alinea's knippen (zinsvolgorde blijft gelijk)
   check        valideer bestaande verhalen tegen de invarianten uit story.php
 
 Vereist de omgevingsvariabele XI_API_KEY. Voor from-audio is de permissie
@@ -38,6 +39,8 @@ Voorbeelden:
     python3 tools/readalong.py resegment --slug taco-pa-fredag
     python3 tools/readalong.py retranslate
     python3 tools/readalong.py retranslate --slug taco-pa-fredag
+    python3 tools/readalong.py reparagraph
+    python3 tools/readalong.py reparagraph --slug taco-pa-fredag
 
 Bij verwerking schat de agent het CEFR-niveau per bron (--level B1-B2) en vult
 attribution (publiek) en rights (intern) in. Voorbeeld:
@@ -109,6 +112,12 @@ KEEP_MAX = 22          # korter blijft heel, tenzij een sterke breuk in het midd
 TARGET_PART = 22       # gewenste lengte per halfzin
 HARD_MAX_PART = 28     # daarboven nog een keer knippen als het kan
 FLOOR_MIN = 6          # geen restjes korter dan dit (tenzij de hele zin korter is)
+
+# Alinea's in de UI. Blokken tot MAX_PARAGRAPH_WORDS blijven heel (two-frogs,
+# korte spreekbeurten). Langere lappen worden op zinsgrenzen geknipt.
+TARGET_PARAGRAPH_WORDS = 50
+MIN_PARAGRAPH_WORDS = 20
+MAX_PARAGRAPH_WORDS = 80
 
 # De handmatig afgestemde timestamps in de bestaande verhalen liggen niet op
 # het eerste woord, maar in de stilte ervoor. Gemeten over de 61 zinnen van
@@ -666,11 +675,14 @@ def build_blocks(raw_text, max_words, min_words, literal_lines=False):
     return blocks, speakers
 
 
-def blocks_from_pauses(sentences, timestamps, gap_threshold):
+def blocks_from_pauses(sentences, timestamps, gap_threshold, sentence_ends=None):
     """Zonder script kennen we geen alinea's; leid ze af uit de lange stiltes."""
     blocks, current = [], []
     for i, sentence in enumerate(sentences):
-        gap = timestamps[i] - timestamps[i - 1] if i else 0.0
+        if sentence_ends is not None and i:
+            gap = timestamps[i] - sentence_ends[i - 1]
+        else:
+            gap = timestamps[i] - timestamps[i - 1] if i else 0.0
         if current and i and gap > gap_threshold:
             blocks.append({"sentences": current})
             current = []
@@ -678,6 +690,85 @@ def blocks_from_pauses(sentences, timestamps, gap_threshold):
     if current:
         blocks.append({"sentences": current})
     return blocks
+
+
+def ends_sentence(text):
+    """True als het segment op een echt zinseinde stopt, geen f.eks. of 14."""
+    tokens = text.split()
+    if not tokens:
+        return False
+    last = tokens[-1]
+    if not SENTENCE_END.search(last):
+        return False
+    if last.lower() in ABBREVIATIONS or re.fullmatch(r"[A-ZÆØÅ]\.", last):
+        return False
+    if re.fullmatch(r"\d+\.", last):
+        return False
+    return True
+
+
+def starts_sentence(text):
+    """True als het segment als nieuwe zin leest (hoofdletter na aanhalingstekens)."""
+    stripped = text.lstrip("«»\"'“”‘’")
+    return bool(stripped) and stripped[0].isupper()
+
+
+def paragraphise_block(block, target=TARGET_PARAGRAPH_WORDS,
+                       min_words=MIN_PARAGRAPH_WORDS,
+                       max_words=MAX_PARAGRAPH_WORDS):
+    """Splits een te lange beurt in alinea's; zinsvolgorde blijft gelijk."""
+    sentences = list(block.get("sentences") or [])
+    total = sum(len(s.split()) for s in sentences)
+    if total <= max_words or len(sentences) < 2:
+        return [block]
+
+    paragraphs = []
+    current = []
+    current_words = 0
+
+    def flush():
+        nonlocal current, current_words
+        if current:
+            paragraphs.append(current)
+            current, current_words = [], 0
+
+    for sentence in sentences:
+        words = max(1, len(sentence.split()))
+        if current:
+            prev = current[-1]
+            at_boundary = ends_sentence(prev) or starts_sentence(sentence)
+            prev_tokens = prev.split()
+            clause_end = bool(prev_tokens and CLAUSE_END.search(prev_tokens[-1]))
+            if current_words >= target and at_boundary:
+                flush()
+            elif current_words >= max_words and (at_boundary or clause_end):
+                flush()
+        current.append(sentence)
+        current_words += words
+    flush()
+
+    if len(paragraphs) >= 2:
+        tail_words = sum(len(s.split()) for s in paragraphs[-1])
+        if tail_words < min_words:
+            paragraphs[-2].extend(paragraphs[-1])
+            paragraphs.pop()
+
+    if len(paragraphs) <= 1:
+        return [block]
+
+    meta = {k: v for k, v in block.items() if k != "sentences"}
+    return [{**meta, "sentences": part} for part in paragraphs]
+
+
+def paragraphise_blocks(blocks, target=TARGET_PARAGRAPH_WORDS,
+                        min_words=MIN_PARAGRAPH_WORDS,
+                        max_words=MAX_PARAGRAPH_WORDS):
+    """Splits te lange blocks; korte alinea's en sprekers blijven intact."""
+    out = []
+    for block in blocks:
+        out.extend(paragraphise_block(
+            block, target=target, min_words=min_words, max_words=max_words))
+    return out
 
 
 def flatten(blocks):
@@ -992,6 +1083,7 @@ def write_story(slug, heading, language, story_type, blocks, translation_sets, t
                 voice, order=None, published=False, speakers=None, level=None,
                 attribution=None, rights=None, kind=None):
     story_dir = REPO / "stories" / slug
+    blocks = paragraphise_blocks(blocks)
     sentences = flatten(blocks)
 
     for lang, translated in translation_sets.items():
@@ -1282,12 +1374,12 @@ def cmd_from_audio(args):
         sentences = flatten(blocks)
         timestamps, sentence_ends, last_end = sentence_times_from_words(
             sentences, result["words"], args.lead_in, allow_intro)
-        # Eén alinea per block in de UI; zonder script alles in één <p> tenzij
-        # --split-on-pauses (pauzes zijn in leer-podcasts te kort om op te splitsen).
+        # Transcripties zijn vaak één lap tekst. Alinea's komen uit
+        # paragraphise_blocks (in write_story); --split-on-pauses gebruikt
+        # echte stiltes als extra signaal.
         if args.split_on_pauses:
-            blocks = blocks_from_pauses(sentences, timestamps, args.paragraph_gap)
-        else:
-            blocks = [{"sentences": sentences}]
+            blocks = blocks_from_pauses(
+                sentences, timestamps, args.paragraph_gap, sentence_ends)
 
     if args.max_duration:
         blocks, timestamps, audio_end = trim_to_sentence_boundary(
@@ -1305,6 +1397,7 @@ def cmd_from_audio(args):
 
     print("Wegschrijven")
     level, attribution, rights = story_metadata(args)
+    blocks = paragraphise_blocks(blocks)
     write_story(args.slug, args.heading, args.language,
                 resolve_type(args.type, speakers), blocks, translation_sets,
                 build_titles(args), voice_entry(args, timestamps, duration),
@@ -1338,6 +1431,7 @@ def cmd_from_text(args):
 
     print("Wegschrijven")
     level, attribution, rights = story_metadata(args)
+    blocks = paragraphise_blocks(blocks)
     write_story(args.slug, args.heading, args.language,
                 resolve_type(args.type, speakers), blocks, translation_sets,
                 build_titles(args), voice_entry(args, timestamps, duration),
@@ -1385,7 +1479,7 @@ def resegment_story(slug, max_words, min_words):
     translation_sets = refresh_translations(
         sentences, split_map, translation_lists, language, langs, min_words)
 
-    text["blocks"] = new_blocks
+    text["blocks"] = paragraphise_blocks(new_blocks)
     write_json(text_path, text)
     for path, doc in zip(translation_paths, translation_docs):
         doc["sentences"] = translation_sets[path.stem]
@@ -1459,6 +1553,40 @@ def cmd_resegment(args):
     print(f"\n{changed}/{len(slugs)} verhaal(en) aangepast")
 
 
+def reparagraph_story(slug):
+    """Splits te lange blocks in alinea's; zinnen, vertalingen en timestamps blijven."""
+    story_dir = REPO / "stories" / slug
+    story_json = story_dir / "story.json"
+    if not story_json.exists():
+        sys.exit(f"Geen verhaal '{slug}' in stories/")
+
+    meta = json.loads(story_json.read_text(encoding="utf-8"))
+    language = meta["language"]
+    text_path = story_dir / "text" / f"{language}.json"
+    text = json.loads(text_path.read_text(encoding="utf-8"))
+    old_blocks = text["blocks"]
+    new_blocks = paragraphise_blocks(old_blocks)
+    if new_blocks == old_blocks:
+        print(f"{slug}: {len(old_blocks)} alinea's, ongewijzigd")
+        return False
+    if flatten(new_blocks) != flatten(old_blocks):
+        sys.exit(f"{slug}: alinea-splitsing veranderde de zinsvolgorde")
+    text["blocks"] = new_blocks
+    write_json(text_path, text)
+    print(f"{slug}: {len(old_blocks)} → {len(new_blocks)} alinea's")
+    return True
+
+
+def cmd_reparagraph(args):
+    slugs = ([args.slug] if args.slug
+             else [p.parent.name for p in sorted((REPO / "stories").glob("*/story.json"))])
+    changed = 0
+    for slug in slugs:
+        if reparagraph_story(slug):
+            changed += 1
+    print(f"\n{changed}/{len(slugs)} verhaal(en) in alinea's geknipt")
+
+
 def cmd_add_voice(args):
     """Extra stem bij een bestaand verhaal: tekst en vertalingen blijven zoals ze zijn."""
     story_dir = REPO / "stories" / args.slug
@@ -1506,7 +1634,7 @@ def main():
     p.add_argument("--paragraph-gap", type=float, default=1.4,
                    help="stilte voor nieuwe alinea bij --split-on-pauses")
     p.add_argument("--split-on-pauses", action="store_true",
-                   help="splits alinea's op stilte (standaard: alles in één alinea)")
+                   help="splits alinea's op stilte tussen zinnen (aanvulling op tekstalinea's)")
     p.add_argument("--cache", help="bewaar/hergebruik de Scribe-respons")
     p.set_defaults(func=cmd_from_audio)
 
@@ -1547,6 +1675,11 @@ def main():
     p.add_argument("--slug", help="één verhaal; zonder dit argument alle verhalen")
     p.add_argument("--translations", help="kommagescheiden doeltalen (bijv. nl,en); standaard alle")
     p.set_defaults(func=cmd_retranslate)
+
+    p = sub.add_parser("reparagraph",
+                       help="knip te lange beurten in alinea's")
+    p.add_argument("--slug", help="één verhaal; zonder dit argument alle verhalen")
+    p.set_defaults(func=cmd_reparagraph)
 
     args = parser.parse_args()
     args.func(args)
