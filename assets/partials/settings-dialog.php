@@ -15,17 +15,6 @@ $settingsReader = !empty($settingsReader);
 
 				<div class="settings-catalog flex columns gap-small">
 					<div>
-						<label for=read-along><?= e(t('home.read_along')) ?></label>
-						<div class=select-wrap>
-							<select id=read-along name=read-along class=select-medium data-read-along data-change=syncTranslateSelectForReadAlong>
-<?php foreach ($sourceLangs as $code): ?>
-								<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
-<?php endforeach; ?>
-							</select>
-							<?php icon('chevron-down', ['size' => 16]); ?>
-						</div>
-					</div>
-					<div>
 						<label for=translate-into><?= e(t('home.translate_into')) ?></label>
 						<div class=select-wrap>
 							<select id=translate-into class=select-medium data-translate-along>
@@ -34,16 +23,6 @@ $settingsReader = !empty($settingsReader);
 <?php endforeach; ?>
 							</select>
 							<?php icon('chevron-down', ['size' => 16]); ?>
-						</div>
-					</div>
-					<div>
-						<label id=settings-level-label data-i18n-level="<?= e(t('home.level')) ?>" data-i18n-all-levels="<?= e(t('home.all_levels')) ?>"><?= e($allLevelsSelected ? t('home.all_levels') : t('home.level')) ?></label>
-						<div class="pill-row flex gap-2xs" role=group aria-labelledby=settings-level-label>
-<?php foreach ($levelCodes as $code): ?>
-							<button type=button class=pill data-level-pill="<?= e($code) ?>" data-click=toggleLevelPill aria-pressed=<?= $allLevelsSelected || in_array($code, $levelFilter, true) ? 'true' : 'false' ?>>
-								<?= e($code) ?>
-							</button>
-<?php endforeach; ?>
 						</div>
 					</div>
 				</div>

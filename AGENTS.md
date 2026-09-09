@@ -63,7 +63,7 @@ UI chrome (buttons, dialogs, filters, form changes) uses **declarative Brio attr
 |-----------|---------|
 | `data-click="actionName"` | Buttons, links that trigger a global action |
 | `data-click="openDialog(settings)"` | Open a `<dialog>` by id |
-| `data-click="closeDialog(home-prefs)"` | Close a dialog |
+| `data-click="closeDialog(settings)"` | Close a dialog |
 | `data-change="actionName"` | `<select>` change |
 | `data-input="actionName"` | Form input (live updates) |
 | `data-el="close-button"` | Close control inside a dialog (Escape/backdrop) |
@@ -81,7 +81,7 @@ function updateSettings() { /* called from settings form */ }
 - Play / pause / rewind / forward (`data-click=play`, `pause`, `playPrevious`, `playNext`)
 - Translation toggle (`data-click=toggleTranslation`)
 - Settings open/close (`openDialog(settings)`, `closeDialog(settings)`)
-- Home prefs, filters, history toggle, onboarding controls
+- Home title dropdowns (`data-change=changeReadAlong`, `changeLevel`), filters, history toggle, onboarding controls
 - Developer nav controls (`data-click`, `data-input`)
 
 ### Do not use Brio for
@@ -98,12 +98,11 @@ Language prefs use **`setLangPref(key, value)`** — writes both `localStorage` 
 
 ## Dialogs
 
-Both settings and home prefs are native `<dialog>` elements:
+Settings is a native `<dialog>`:
 
 | Id | Where | Role |
 |----|-------|------|
-| `#settings` | `assets/partials/settings-dialog.php` | Story player settings (bottom sheet) |
-| `#home-prefs` | `index.php` | Language / level prefs |
+| `#settings` | `assets/partials/settings-dialog.php` | Bottom sheet: theme; on home also translation language; in the player also reader controls |
 
 **Contract**
 
@@ -117,10 +116,10 @@ Both settings and home prefs are native `<dialog>` elements:
 ```
 
 - No custom scrim — use native `::backdrop`
-- Project CSS wins over Brio’s centered dialog on wide viewports (`#settings`, `#home-prefs` stay bottom sheets)
+- Project CSS wins over Brio’s centered dialog on wide viewports (`#settings` stays a bottom sheet)
 - `updateThemeColor()` in `scripts.js` checks `settingsDialog.open`, not `.hidden`
 
-Home prefs: `openHomePrefs` wraps `openDialog`; `#home-prefs` `close` event reverts unsaved changes via `revertHomePrefs()`.
+Home read-along language and levels live in the header as native `<select>` dropdowns (`changeReadAlong`, `changeLevel`) — they apply immediately via `setLangPref` + reload. They are not in `#settings`.
 
 ---
 
@@ -129,7 +128,7 @@ Home prefs: `openHomePrefs` wraps `openDialog`; `#home-prefs` `close` event reve
 | File | Scope |
 |------|-------|
 | `assets/scripts.js` | Story player: audio, sentences, settings, translation, progress |
-| `assets/home.js` | Home: filters, continue reading, prefs dialog actions |
+| `assets/home.js` | Home: filters, continue reading, header language/level dropdowns |
 | `assets/onboarding.js` | First-run flow; exposes `onboardingReadChange`, `completeOnboarding`, etc. |
 
 New **chrome** actions → global function + `data-click`/`data-change` in HTML.
@@ -220,7 +219,10 @@ After UI or chrome changes, test:
 
 **Home**
 
-- [ ] Prefs dialog: open, Escape, backdrop, close X, save + reload
+- [ ] Header reads as one title: Readalong, language dropdown, level dropdown
+- [ ] Language and level dropdowns apply immediately (reload)
+- [ ] Settings gear: translation language + theme only (not read-along/level)
+- [ ] Settings: open, Escape, backdrop, close X; save translation + reload
 - [ ] Filters: kind pills, duration select, clear filters
 - [ ] History toggle (only when 2+ continue items)
 - [ ] Featured continue card layout

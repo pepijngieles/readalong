@@ -26,8 +26,8 @@ if (!$needsOnboarding) {
   $durationPills = story_duration_filter_minutes();
   $kindTiles = story_filter_kinds();
   $allLevelsSelected = level_filter_is_all($levelFilter);
-  $levelSummary = $allLevelsSelected ? t('home.all_levels') : implode(' · ', $levelFilter);
-  $prefsSummary = lang_label($readAlongLang) . ' · ' . $levelSummary;
+  $levelSelectValue = $allLevelsSelected ? '' : implode(',', $levelFilter);
+  $levelSelectLabel = $allLevelsSelected ? t('home.all_levels') : implode(' · ', $levelFilter);
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -43,16 +43,39 @@ if (!$needsOnboarding) {
 	<main>
 
 		<header class="home-header flex gap-small">
-			<h1>Readalong</h1>
-			<div class="home-header-actions flex gap-2xs">
-				<button type=button class="quiet home-prefs-toggle" data-click=openSettings data-settings-toggle aria-haspopup=dialog aria-expanded=false aria-controls=settings>
-					<?= e($prefsSummary) ?>
-				</button>
-				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
-					<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
-					<?php icon('gear', ['size' => 20]); ?>
-				</button>
+			<div class="home-title flex">
+				<h1>Readalong</h1>
+				<label class="home-title-control">
+					<span class=visually-hidden><?= e(t('home.read_along')) ?></span>
+					<div class="select-wrap home-title-select" data-label="<?= e(lang_label($readAlongLang)) ?>">
+						<select class=quiet data-read-along data-change=changeReadAlong>
+<?php foreach ($sourceLangs as $code): ?>
+							<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
+<?php endforeach; ?>
+						</select>
+						<?php icon('chevron-down', ['size' => 16]); ?>
+					</div>
+				</label>
+				<label class="home-title-control">
+					<span class=visually-hidden><?= e(t('home.level')) ?></span>
+					<div class="select-wrap home-title-select" data-label="<?= e($levelSelectLabel) ?>">
+						<select class=quiet data-level-filter data-change=changeLevel>
+							<option value=""><?= e(t('home.all_levels')) ?></option>
+<?php if ($levelSelectValue !== '' && !in_array($levelSelectValue, $levelCodes, true)): ?>
+							<option value="<?= e($levelSelectValue) ?>" selected><?= e($levelSelectLabel) ?></option>
+<?php endif; ?>
+<?php foreach ($levelCodes as $code): ?>
+							<option value="<?= e($code) ?>"<?= $levelSelectValue === $code ? ' selected' : '' ?>><?= e($code) ?></option>
+<?php endforeach; ?>
+						</select>
+						<?php icon('chevron-down', ['size' => 16]); ?>
+					</div>
+				</label>
 			</div>
+			<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
+				<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
+				<?php icon('gear', ['size' => 20]); ?>
+			</button>
 		</header>
 
 		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
@@ -139,8 +162,8 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/settings.js?v=2" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=18" defer></script>
+	<script type="text/javascript" src="assets/settings.js?v=3" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=19" defer></script>
 
 <?php endif; ?>
 
