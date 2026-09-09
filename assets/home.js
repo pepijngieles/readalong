@@ -148,6 +148,11 @@ function revertHomePrefs() {
   syncLevelPills(levelsFromPref(initialPrefs.level))
 }
 
+function uiLocaleFromTranslate(code) {
+  const allowed = Object.keys(window.LANG_ENDONYMS || window.READALONG_ENDONYMS || {})
+  return allowed.indexOf(code) !== -1 ? code : 'en'
+}
+
 function saveHomePrefs() {
   const next = prefsState()
   if (!next.translate) return
@@ -159,6 +164,7 @@ function saveHomePrefs() {
   }
   window.setLangPref('read', next.read)
   window.setLangPref('translate', next.translate)
+  window.setLangPref('ui', uiLocaleFromTranslate(next.translate))
   window.setLangPref('level', next.level)
   location.reload()
 }

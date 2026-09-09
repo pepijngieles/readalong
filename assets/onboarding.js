@@ -129,6 +129,11 @@
     restartDemo();
   };
 
+  function uiLocaleFromTranslate(code) {
+    const allowed = Object.keys(window.READALONG_ENDONYMS || window.LANG_ENDONYMS || {});
+    return allowed.indexOf(code) !== -1 ? code : 'en';
+  }
+
   window.completeOnboarding = function () {
     const read = selectedRead();
     const translate = selectedTranslate();
@@ -138,6 +143,7 @@
     }
     setLangPref('read', read);
     setLangPref('translate', translate);
+    setLangPref('ui', uiLocaleFromTranslate(translate));
     setLangPref('onboarding-complete', '1');
     location.href = location.pathname;
   };

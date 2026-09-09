@@ -1,3 +1,4 @@
+<?php $settingsReader = !empty($settingsReader); ?>
 	<dialog id=settings class="dialog-sheet settings" aria-labelledby=settings-title>
 		<div class=panel>
 			<div class=settings-grabber aria-hidden=true></div>
@@ -7,6 +8,7 @@
 			</button>
 			<h2 id=settings-title class=visually-hidden><?= e(t('nav.settings')) ?></h2>
 			<form name=settings class="content grid gap-medium" data-input=updateSettings data-change=updateSettings>
+<?php if ($settingsReader): ?>
 
 				<fieldset class="settings-segment flex gap-xs">
 					<legend class=visually-hidden><?= e(t('settings.font')) ?></legend>
@@ -61,6 +63,7 @@
 					<output name=sentencePauseOut id=sentencePauseOut for=sentencePause>0s</output>
 				</div>
 
+<?php endif; ?>
 				<div class="settings-row flex gap-medium">
 					<fieldset class="settings-themes flex gap-2xs">
 						<legend class=visually-hidden><?= e(t('settings.theme')) ?></legend>
@@ -85,6 +88,7 @@
 							<span class=visually-hidden><?= e(t('settings.black')) ?></span>
 						</label>
 					</fieldset>
+<?php if ($settingsReader): ?>
 
 					<fieldset class="settings-layouts flex gap-2xs">
 						<legend class=visually-hidden><?= e(t('settings.text_alignment')) ?></legend>
@@ -99,6 +103,8 @@
 							<span class=visually-hidden><?= e(t('settings.justify')) ?></span>
 						</label>
 					</fieldset>
+<?php endif; ?>
+
 				</div>
 
 			</form>

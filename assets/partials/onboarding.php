@@ -100,5 +100,6 @@ $storyConfig = [
 	window.TRANSLATION_LANGS_BY_SOURCE = <?= json_encode($translationLangsBySource, JSON_UNESCAPED_UNICODE) ?>;
 </script>
 <script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-<script type="text/javascript" src="assets/scripts.js?v=21" defer></script>
-<script type="text/javascript" src="assets/onboarding.js?v=10" defer></script>
+<script type="text/javascript" src="assets/settings.js?v=1" defer></script>
+<script type="text/javascript" src="assets/scripts.js?v=23" defer></script>
+<script type="text/javascript" src="assets/onboarding.js?v=11" defer></script>

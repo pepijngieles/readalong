@@ -44,9 +44,15 @@ if (!$needsOnboarding) {
 
 		<header class="home-header flex gap-small">
 			<h1>Readalong</h1>
-			<button type=button class="quiet home-prefs-toggle" data-click=openHomePrefs data-prefs-toggle aria-haspopup=dialog aria-expanded=false aria-controls=home-prefs>
-				<?= e($prefsSummary) ?>
-			</button>
+			<div class="home-header-actions flex gap-2xs">
+				<button type=button class="quiet home-prefs-toggle" data-click=openHomePrefs data-prefs-toggle aria-haspopup=dialog aria-expanded=false aria-controls=home-prefs>
+					<?= e($prefsSummary) ?>
+				</button>
+				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click="openDialog(settings)" aria-haspopup=dialog aria-controls=settings>
+					<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
+					<?php icon('gear', ['size' => 20]); ?>
+				</button>
+			</div>
 		</header>
 
 		<dialog id=home-prefs class="dialog-sheet home-prefs" aria-labelledby=home-prefs-title>
@@ -150,6 +156,8 @@ if (!$needsOnboarding) {
 
 	</main>
 
+<?php include $partials . '/settings-dialog.php'; ?>
+
 	<script type="text/javascript">
 		window.COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 		window.TRANSLATION_LANGS_BY_SOURCE = <?= json_encode($translationLangsBySource, JSON_UNESCAPED_UNICODE) ?>;
@@ -178,7 +186,8 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=16" defer></script>
+	<script type="text/javascript" src="assets/settings.js?v=1" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=17" defer></script>
 
 <?php endif; ?>
 
