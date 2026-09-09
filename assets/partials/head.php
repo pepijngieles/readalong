@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="theme-color" content="#ffffff" />
+	<meta name="theme-color" content="" />
 
 	<title><?= e($story['title']) ?></title>
 
@@ -17,6 +17,6 @@
 	<link rel=apple-touch-icon href=<?= e($base) ?>assets/favicons/favicon-180.png>
 	<link rel=manifest href=<?= e($base) ?>manifest.json>
 	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/brio/brio.css?v=1">
-	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/styles.css?v=26">
+	<link rel="stylesheet" type="text/css" href="<?= e($base) ?>assets/styles.css?v=27">
 	<script src="https://cdn.usefathom.com/script.js" data-site="YNKVLCNV" defer></script>
 </head>

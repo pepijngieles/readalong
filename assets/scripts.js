@@ -53,7 +53,7 @@ let   started = false,
       popoverOffsetX = 0,
       playbackRate = 1,
       volume = 1,
-      themeColorValue = '#ffffff'
+      themeColorValue = cssToken('--theme-meta-light-primary') || ''
 
 const storyConfig = JSON.parse(document.getElementById('story-config').textContent)
 const timestamps = Object.fromEntries(
@@ -422,26 +422,30 @@ const SETTINGS_DEFAULTS = {
   theme: 'light',
   layout: 'start'
 }
-const THEME_META_COLORS = {
-  light: { primary: '#ffffff', secondary: '#fafafa' },
-  cream: { primary: '#fef5e5', secondary: '#f5ebd5' },
-  dark: { primary: '#333333', secondary: '#2a2a2a' },
-  black: { primary: '#000000', secondary: '#0a0a0a' }
-}
+const THEME_META_PREFIX = '--theme-meta-'
 const FONT_FAMILIES = {
   sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif',
   serif: 'Georgia, "Times New Roman", Times, serif',
   mono: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
 }
 
+function cssToken(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+}
+
+function themeMetaColor(theme, variant) {
+  const value = cssToken(THEME_META_PREFIX + theme + '-' + variant)
+  return value || cssToken(THEME_META_PREFIX + 'light-' + variant)
+}
+
 let currentTheme = 'light'
 
 function updateThemeColor() {
   if (!themeColorEl) return
-  const colors = THEME_META_COLORS[currentTheme] || THEME_META_COLORS.light
-  if (settingsDialog && settingsDialog.open && started) themeColorValue = colors.secondary
-  else if (started && showTranslation) themeColorValue = colors.secondary
-  else themeColorValue = colors.primary
+  const variant = (settingsDialog && settingsDialog.open && started) || (started && showTranslation)
+    ? 'secondary'
+    : 'primary'
+  themeColorValue = themeMetaColor(currentTheme, variant)
   themeColorEl.setAttribute('content', themeColorValue)
 }
 
