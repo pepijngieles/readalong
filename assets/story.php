@@ -362,6 +362,10 @@ function story_render($storyDir, $base, $translationLang = 'en') {
 
   $storyConfig['audioBase'] = $base . 'audio/' . $meta['id'] . '/' . $meta['language'] . '/';
 
+  $storiesDir = dirname($storyDir);
+  $storyTranslationLangOptions = story_translation_languages($storiesDir);
+  $storyTranslateLang = $translationLang;
+
   $partials = __DIR__ . '/partials';
   include __DIR__ . '/story-shell.php';
 }

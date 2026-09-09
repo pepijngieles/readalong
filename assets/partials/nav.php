@@ -25,7 +25,7 @@
 			</button>
 		</div>
 		<div class="js-only text-align-right">
-			<button class="settings quiet icon-only rounded" data-click="openDialog(settings)">
+			<button class="settings quiet icon-only rounded" data-click=openSettings>
 				<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
 				<?php icon('gear'); ?>
 			</button>

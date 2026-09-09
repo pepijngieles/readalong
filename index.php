@@ -45,62 +45,15 @@ if (!$needsOnboarding) {
 		<header class="home-header flex gap-small">
 			<h1>Readalong</h1>
 			<div class="home-header-actions flex gap-2xs">
-				<button type=button class="quiet home-prefs-toggle" data-click=openHomePrefs data-prefs-toggle aria-haspopup=dialog aria-expanded=false aria-controls=home-prefs>
+				<button type=button class="quiet home-prefs-toggle" data-click=openSettings data-settings-toggle aria-haspopup=dialog aria-expanded=false aria-controls=settings>
 					<?= e($prefsSummary) ?>
 				</button>
-				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click="openDialog(settings)" aria-haspopup=dialog aria-controls=settings>
+				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
 					<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
 					<?php icon('gear', ['size' => 20]); ?>
 				</button>
 			</div>
 		</header>
-
-		<dialog id=home-prefs class="dialog-sheet home-prefs" aria-labelledby=home-prefs-title>
-			<div class=panel>
-				<button type=button class="close-button quiet icon-only" data-el=close-button data-click="closeDialog(home-prefs)">
-					<span class=visually-hidden><?= e(t('common.close')) ?></span>
-					<?php icon('close-small'); ?>
-				</button>
-				<h2 id=home-prefs-title class=font-size-large><?= e(t('home.language_settings')) ?></h2>
-				<div class="flex columns gap-small">
-					<div>
-						<label for=read-along><?= e(t('home.read_along')) ?></label>
-						<div class=select-wrap>
-							<select id=read-along name=read-along class=select-medium data-read-along data-change=syncTranslateSelectForReadAlong>
-<?php foreach ($sourceLangs as $code): ?>
-								<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
-<?php endforeach; ?>
-							</select>
-							<?php icon('chevron-down', ['size' => 16]); ?>
-						</div>
-					</div>
-					<div>
-						<label for=translate-into><?= e(t('home.translate_into')) ?></label>
-						<div class=select-wrap>
-							<select id=translate-into class=select-medium data-translate-along>
-<?php foreach ($translateLangOptions as $code): ?>
-								<option value="<?= e($code) ?>"<?= $code === $translateLang ? ' selected' : '' ?> translate=no lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
-<?php endforeach; ?>
-							</select>
-							<?php icon('chevron-down', ['size' => 16]); ?>
-						</div>
-					</div>
-					<div>
-						<label id=home-level-label data-i18n-level="<?= e(t('home.level')) ?>" data-i18n-all-levels="<?= e(t('home.all_levels')) ?>"><?= e($allLevelsSelected ? t('home.all_levels') : t('home.level')) ?></label>
-						<div class="pill-row flex gap-2xs" role=group aria-labelledby=home-level-label>
-<?php foreach ($levelCodes as $code): ?>
-							<button type=button class=pill data-level-pill="<?= e($code) ?>" data-click=toggleLevelPill aria-pressed=<?= $allLevelsSelected || in_array($code, $levelFilter, true) ? 'true' : 'false' ?>>
-								<?= e($code) ?>
-							</button>
-<?php endforeach; ?>
-						</div>
-					</div>
-				</div>
-				<footer>
-					<button type=button class="primary full-width" data-click=saveHomePrefs><?= e(t('common.save')) ?></button>
-				</footer>
-			</div>
-		</dialog>
 
 		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
 			<div class="section-header flex gap-small">
@@ -156,7 +109,7 @@ if (!$needsOnboarding) {
 
 	</main>
 
-<?php include $partials . '/settings-dialog.php'; ?>
+<?php $settingsCatalog = true; include $partials . '/settings-dialog.php'; ?>
 
 	<script type="text/javascript">
 		window.COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
@@ -186,8 +139,8 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/settings.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=17" defer></script>
+	<script type="text/javascript" src="assets/settings.js?v=2" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=18" defer></script>
 
 <?php endif; ?>
 
