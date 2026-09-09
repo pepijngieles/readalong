@@ -1609,12 +1609,10 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .pill-row{
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   margin-block: var(--spacing-12) 0;
   min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .pill{
@@ -1635,16 +1633,6 @@ body.ios:not(.started.show-translation) .translation-popover{
 .pill[aria-pressed=true]{
   border-color: transparent;
   box-shadow: inset 0 0 0 2px var(--focus-outline);
-}
-
-.pill .check{
-  display: none;
-  width: var(--spacing-16);
-  height: var(--spacing-16);
-}
-
-.pill[aria-pressed=true] .check{
-  display: block;
 }
 
 .pill.choice[aria-pressed=true]{

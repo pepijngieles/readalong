@@ -233,8 +233,12 @@ function level_codes_in($level) {
   return [strtoupper(trim($level))];
 }
 
+function level_filter_is_all(array $selected) {
+  return $selected === [] || array_diff(level_codes(), $selected) === [];
+}
+
 function level_matches_codes($level, array $selected) {
-  if ($selected === []) {
+  if (level_filter_is_all($selected)) {
     return true;
   }
   foreach (level_codes_in($level) as $code) {

@@ -305,7 +305,7 @@ function story_list($storiesDir, $translationLangs = 'en', $readAlongLang = null
       continue;
     }
 
-    if ($levelFilter !== []) {
+    if (!level_filter_is_all($levelFilter)) {
       if (empty($meta['level']) || !level_matches_codes($meta['level'], $levelFilter)) {
         continue;
       }

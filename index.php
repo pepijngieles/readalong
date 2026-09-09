@@ -25,7 +25,8 @@ if (!$needsOnboarding) {
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = story_duration_filter_minutes();
   $kindTiles = story_filter_kinds();
-  $levelSummary = $levelFilter === [] ? t('home.all_levels') : implode(' · ', $levelFilter);
+  $allLevelsSelected = level_filter_is_all($levelFilter);
+  $levelSummary = $allLevelsSelected ? t('home.all_levels') : implode(' · ', $levelFilter);
   $prefsSummary = lang_label($readAlongLang) . ' · ' . $levelSummary;
 }
 ?>
@@ -79,15 +80,10 @@ if (!$needsOnboarding) {
 						</div>
 					</div>
 					<div>
-						<label id=home-level-label><?= e(t('home.level')) ?></label>
+						<label id=home-level-label data-i18n-level="<?= e(t('home.level')) ?>" data-i18n-all-levels="<?= e(t('home.all_levels')) ?>"><?= e($allLevelsSelected ? t('home.all_levels') : t('home.level')) ?></label>
 						<div class="pill-row flex gap-2xs" role=group aria-labelledby=home-level-label>
-							<button type=button class=pill data-level-all data-click=selectAllLevels aria-pressed=<?= $levelFilter === [] ? 'true' : 'false' ?>>
-								<?php icon('check', ['size' => 16, 'class' => 'icon check']); ?>
-								<?= e(t('home.all_levels')) ?>
-							</button>
 <?php foreach ($levelCodes as $code): ?>
-							<button type=button class=pill data-level-pill="<?= e($code) ?>" data-click=toggleLevelPill aria-pressed=<?= in_array($code, $levelFilter, true) ? 'true' : 'false' ?>>
-								<?php icon('check', ['size' => 16, 'class' => 'icon check']); ?>
+							<button type=button class=pill data-level-pill="<?= e($code) ?>" data-click=toggleLevelPill aria-pressed=<?= $allLevelsSelected || in_array($code, $levelFilter, true) ? 'true' : 'false' ?>>
 								<?= e($code) ?>
 							</button>
 <?php endforeach; ?>
@@ -182,7 +178,7 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=15" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=16" defer></script>
 
 <?php endif; ?>
 
