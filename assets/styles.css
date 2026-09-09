@@ -906,6 +906,7 @@ dialog.dialog-sheet::backdrop{
   gap: var(--spacing-32);
   padding: var(--spacing-32) var(--spacing-24);
   padding-block-end: calc(var(--spacing-32) + env(safe-area-inset-bottom, 0px));
+  min-width: 0;
   user-select: none;
 }
 
@@ -915,6 +916,11 @@ dialog.dialog-sheet::backdrop{
   top: var(--spacing-12);
   right: var(--spacing-12);
   z-index: 1;
+}
+
+#settings .content{
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 #home-prefs[open]{
@@ -1197,6 +1203,8 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 .settings-slider{
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .settings-slider .icon{
@@ -1285,11 +1293,14 @@ body.ios:not(.started.show-translation) .translation-popover{
 .settings-row{
   align-items: center;
   justify-content: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .settings-themes,
 .settings-layouts{
   align-items: center;
+  min-width: 0;
   padding: 0;
   margin: 0;
   border: none;
@@ -1348,14 +1359,20 @@ body.ios:not(.started.show-translation) .translation-popover{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--spacing-32);
+  width: 2rem;
   height: 2.5rem;
+  min-width: 0;
+  padding: var(--spacing-2);
+  overflow: visible;
   border: 1px solid var(--border-warm);
   border-radius: var(--border-radius-small);
   background-color: var(--background-popover);
+  box-shadow: none;
+  white-space: normal;
 }
 
 .settings-layout .button .icon{
+  flex-shrink: 0;
   color: var(--settings-label-muted);
 }
 
@@ -1513,8 +1530,13 @@ body.ios:not(.started.show-translation) .translation-popover{
 /* 20. Homepage sections
 ---------------------------------------------------------------------------- */
 .home-header{
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+}
+
+.home-header-actions{
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .home-header h1{

@@ -14,7 +14,7 @@
   6. Play a sentence when clicking on it
   7. Toggle the translation on/off
   8. Switch voice
-  9. Settings
+  9. Settings (reader)
   10. Detect iOS
   X. Developer controls
 
@@ -35,8 +35,6 @@ const audioFile = document.querySelector('audio'),
       translationText = document.querySelector('[data-translation-text]'),
       navEl = document.querySelector('nav'),
       navHeight = navEl ? navEl.offsetHeight : 0,
-      settingsDialog = document.getElementById('settings'),
-      themeColorEl = document.querySelector("meta[name=theme-color]"),
       parameterList = new URLSearchParams (window.location.search)
 
 let   started = false,
@@ -52,8 +50,7 @@ let   started = false,
       popoverOffsetY = 0,
       popoverOffsetX = 0,
       playbackRate = 1,
-      volume = 1,
-      themeColorValue = cssToken('--theme-meta-light-primary') || ''
+      volume = 1
 
 const storyConfig = JSON.parse(document.getElementById('story-config').textContent)
 const timestamps = Object.fromEntries(
@@ -142,8 +139,8 @@ function seekAudio(seconds) {
 ---------------------------------------------------------------------------- */
 function start() {
   started = true
-  updateThemeColor()
   document.body.classList.add('started','paused')
+  updateThemeColor()
   currentSentenceEl.setAttribute('aria-current', 'true')
   updateTranslation()
 }
@@ -209,11 +206,11 @@ function end() {
   currentSentence = 0
   const startTime = sentenceStart(0)
   seekAudio(Number.isFinite(startTime) ? startTime : 0)
-  updateThemeColor()
   document.body.classList.remove('started')
+  started = false
+  updateThemeColor()
   changeSentence()
   playing = false
-  started = false
   clearInterval(interval)
 }
 
@@ -410,43 +407,12 @@ function audioReady() {
 
 
 
-/* 9. Settings
+/* 9. Settings (reader)
 ---------------------------------------------------------------------------- */
-const SETTINGS_KEY = 'readalong-settings'
-const SETTINGS_DEFAULTS = {
-  fontFamily: 'sans',
-  fontSize: 100,
-  lineHeight: 1.5,
-  playbackRate: 1,
-  sentencePause: 0,
-  theme: 'light',
-  layout: 'start'
-}
-const THEME_META_PREFIX = '--theme-meta-'
 const FONT_FAMILIES = {
   sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif',
   serif: 'Georgia, "Times New Roman", Times, serif',
   mono: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
-}
-
-function cssToken(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
-}
-
-function themeMetaColor(theme, variant) {
-  const value = cssToken(THEME_META_PREFIX + theme + '-' + variant)
-  return value || cssToken(THEME_META_PREFIX + 'light-' + variant)
-}
-
-let currentTheme = 'light'
-
-function updateThemeColor() {
-  if (!themeColorEl) return
-  const variant = (settingsDialog && settingsDialog.open && started) || (started && showTranslation)
-    ? 'secondary'
-    : 'primary'
-  themeColorValue = themeMetaColor(currentTheme, variant)
-  themeColorEl.setAttribute('content', themeColorValue)
 }
 
 function formatSpeed(value) {
@@ -469,27 +435,6 @@ function applyFontFamily(value) {
   )
 }
 
-function applyTheme(value) {
-  document.body.classList.remove('theme-light', 'theme-cream', 'theme-dark', 'theme-black')
-  if (value !== 'light') document.body.classList.add('theme-' + value)
-  currentTheme = value
-  updateThemeColor()
-}
-
-function loadThemeFromStorage() {
-  let theme = SETTINGS_DEFAULTS.theme
-  try {
-    const stored = localStorage.getItem(SETTINGS_KEY)
-    if (stored) theme = Object.assign({}, SETTINGS_DEFAULTS, JSON.parse(stored)).theme
-  } catch (error) {}
-  applyTheme(theme)
-}
-
-function applyLayout(value) {
-  document.body.classList.remove('layout-start', 'layout-justify', 'layout-dense', 'layout-spaced')
-  if (value === 'justify') document.body.classList.add('layout-justify')
-}
-
 function updateRangeProgress(input) {
   const min = parseFloat(input.min)
   const max = parseFloat(input.max)
@@ -502,93 +447,22 @@ function updateAllRangeProgress() {
   document.querySelectorAll('.settings-slider input[type=range]').forEach(updateRangeProgress)
 }
 
-function getSettingsFromForm() {
+window.applyReaderSettings = function () {
   const form = document.forms.settings
-  return {
-    fontFamily: form.fontFamily.value,
-    fontSize: parseInt(form.fontSize.value, 10),
-    lineHeight: parseFloat(form.lineHeight.value),
-    playbackRate: parseFloat(form.playbackRate.value),
-    sentencePause: parseInt(form.sentencePause.value, 10),
-    theme: form.theme.value,
-    layout: form.layout.value
-  }
-}
-
-function saveSettings() {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(getSettingsFromForm()))
-}
-
-function applySettingsFromForm(save) {
-  const form = document.forms.settings
-  audioFile.playbackRate = form.playbackRate.value
-  sentencePause = form.sentencePause.value
-  document.documentElement.style.setProperty('--font-size', form.fontSize.value + '%')
-  document.querySelector('.story').style.setProperty('--line-height', form.lineHeight.value)
+  if (!form || !form.fontFamily) return
+  if (audioFile && form.playbackRate) audioFile.playbackRate = form.playbackRate.value
+  if (form.sentencePause) sentencePause = form.sentencePause.value
+  if (form.fontSize) document.documentElement.style.setProperty('--font-size', form.fontSize.value + '%')
+  const story = document.querySelector('.story')
+  if (story && form.lineHeight) story.style.setProperty('--line-height', form.lineHeight.value)
   applyFontFamily(form.fontFamily.value)
-  applyTheme(form.theme.value)
-  applyLayout(form.layout.value)
-  form.playbackRateOut.value = formatSpeed(form.playbackRate.value)
-  form.sentencePauseOut.value = formatPause(form.sentencePause.value)
+  if (form.playbackRateOut) form.playbackRateOut.value = formatSpeed(form.playbackRate.value)
+  if (form.sentencePauseOut) form.sentencePauseOut.value = formatPause(form.sentencePause.value)
   updateAllRangeProgress()
-  updateTranslation()
-  if (save !== false) saveSettings()
+  if (typeof updateTranslation === 'function') updateTranslation()
 }
 
-function loadSettings() {
-  loadThemeFromStorage()
-  if (!document.forms.settings) return
-  let settings = SETTINGS_DEFAULTS
-  try {
-    const stored = localStorage.getItem(SETTINGS_KEY)
-    if (stored) settings = Object.assign({}, SETTINGS_DEFAULTS, JSON.parse(stored))
-  } catch (error) {}
-  if (settings.layout === 'dense') settings.layout = 'start'
-  if (settings.layout === 'spaced') settings.layout = 'justify'
-  const form = document.forms.settings
-  form.fontFamily.value = settings.fontFamily
-  form.fontSize.value = settings.fontSize
-  form.lineHeight.value = settings.lineHeight
-  form.playbackRate.value = settings.playbackRate
-  form.sentencePause.value = settings.sentencePause
-  form.theme.value = settings.theme
-  form.layout.value = settings.layout
-  applySettingsFromForm(false)
-}
-
-function initSettingsControls() {
-  if (!settingsDialog) return
-  document.querySelectorAll('.settings-segment, .settings-themes, .settings-layouts').forEach(function(fieldset) {
-    const inputs = Array.from(fieldset.querySelectorAll('input[type=radio]'))
-    inputs.forEach(function(input, index) {
-      input.addEventListener('keydown', function(event) {
-        let nextIndex = index
-        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-          nextIndex = (index + 1) % inputs.length
-          event.preventDefault()
-        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-          nextIndex = (index - 1 + inputs.length) % inputs.length
-          event.preventDefault()
-        } else return
-        inputs[nextIndex].checked = true
-        inputs[nextIndex].focus()
-        updateSettings()
-      })
-    })
-  })
-  loadSettings()
-}
-
-function updateSettings() {
-  applySettingsFromForm(true)
-}
-
-if (settingsDialog) {
-  settingsDialog.addEventListener('close', updateThemeColor)
-  initSettingsControls()
-} else {
-  loadThemeFromStorage()
-}
+applyReaderSettings()
 
 if (currentSentence > 0 && currentSentenceEl) {
   start()

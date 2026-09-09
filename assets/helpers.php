@@ -108,8 +108,12 @@ function ui_locale() {
   }
 
   $allowed = configured_languages();
-  $default = detect_browser_locale($allowed);
+  $fromTranslate = lang_prefs_list('translate', $allowed, []);
+  if ($fromTranslate !== []) {
+    return $locale = $fromTranslate[0];
+  }
 
+  $default = detect_browser_locale($allowed);
   return $locale = lang_pref('ui', $allowed, $default);
 }
 

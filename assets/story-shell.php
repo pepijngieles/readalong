@@ -32,7 +32,7 @@ $storyClass = 'story';
 
 <?php include $partials . '/nav.php'; ?>
 
-<?php include $partials . '/settings-dialog.php'; ?>
+<?php $settingsReader = true; include $partials . '/settings-dialog.php'; ?>
 
 <?php include $partials . '/story-config.php'; ?>
 
