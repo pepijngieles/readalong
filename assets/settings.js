@@ -9,16 +9,11 @@ const SETTINGS_DEFAULTS = {
   layout: 'start'
 }
 const THEME_META_PREFIX = '--theme-meta-'
-const LEVEL_CODES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 
 let initialCatalogPrefs = null
 
 function settingsEl(selector) {
   return document.querySelector(selector)
-}
-
-function settingsAll(selector) {
-  return document.querySelectorAll(selector)
 }
 
 function cssToken(name) {
@@ -119,105 +114,17 @@ function loadSettings() {
   applyAppearanceFromForm(false)
 }
 
-function selectedLevelPills() {
-  return Array.from(settingsAll('[data-level-pill][aria-pressed=true]'))
-    .map(function (pill) { return pill.getAttribute('data-level-pill') })
-    .filter(Boolean)
-}
-
-function isAllLevelsSelected(selected) {
-  return !selected.length || selected.length === LEVEL_CODES.length
-}
-
-function levelsFromPref(raw) {
-  const codes = (raw || '').split(',').map(function (code) { return code.trim() }).filter(function (code) {
-    return LEVEL_CODES.indexOf(code) !== -1
-  })
-  if (!codes.length || codes.length === LEVEL_CODES.length) return LEVEL_CODES.slice()
-  return codes
-}
-
-function levelPrefValue() {
-  const selected = selectedLevelPills()
-  return isAllLevelsSelected(selected) ? '' : selected.join(',')
-}
-
-function normalizeLevelPref(level) {
-  const selected = levelsFromPref(level || '')
-  if (isAllLevelsSelected(selected)) return ''
-  return selected.sort(function (a, b) {
-    return LEVEL_CODES.indexOf(a) - LEVEL_CODES.indexOf(b)
-  }).join(',')
-}
-
 function catalogPrefsState() {
   return {
-    read: settingsEl('[data-read-along]')?.value || '',
-    translate: settingsEl('[data-translate-along]')?.value || '',
-    level: levelPrefValue()
+    translate: settingsEl('[data-translate-along]')?.value || ''
   }
-}
-
-function syncTranslateSelectForReadAlong() {
-  const readLang = settingsEl('[data-read-along]')?.value
-  const select = settingsEl('[data-translate-along]')
-  const langsBySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
-  const endonyms = window.LANG_ENDONYMS || {}
-  if (!readLang || !select) return
-
-  const options = langsBySource[readLang] || []
-  const previous = select.value
-  select.innerHTML = ''
-  options.forEach(function (code) {
-    const option = document.createElement('option')
-    option.value = code
-    option.textContent = endonyms[code] || code.toUpperCase()
-    option.setAttribute('translate', 'no')
-    option.lang = code
-    select.appendChild(option)
-  })
-
-  if (options.indexOf(previous) !== -1) {
-    select.value = previous
-  } else if (options.length) {
-    select.value = options[0]
-  }
-}
-
-function syncLevelPills(selected) {
-  settingsAll('[data-level-pill]').forEach(function (pill) {
-    const code = pill.getAttribute('data-level-pill')
-    pill.setAttribute('aria-pressed', selected.indexOf(code) !== -1 ? 'true' : 'false')
-  })
-  syncLevelLabel()
-}
-
-function syncLevelLabel() {
-  const label = settingsEl('#settings-level-label')
-  if (!label) return
-  const selected = selectedLevelPills()
-  const allLevels = label.getAttribute('data-i18n-all-levels') || 'All levels'
-  const levelLabel = label.getAttribute('data-i18n-level') || 'Level'
-  label.textContent = isAllLevelsSelected(selected) ? allLevels : levelLabel
 }
 
 function revertCatalogPrefs() {
   if (!initialCatalogPrefs) return
-  const readSelect = settingsEl('[data-read-along]')
-  if (readSelect) readSelect.value = initialCatalogPrefs.read
-  syncTranslateSelectForReadAlong()
   const translateSelect = settingsEl('[data-translate-along]')
   const savedTranslate = (initialCatalogPrefs.translate || '').split(',')[0]
-  if (translateSelect && savedTranslate) {
-    const langsBySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
-    const options = langsBySource[initialCatalogPrefs.read] || []
-    if (!readSelect) {
-      translateSelect.value = savedTranslate
-    } else {
-      translateSelect.value = options.indexOf(savedTranslate) !== -1 ? savedTranslate : (options[0] || '')
-    }
-  }
-  syncLevelPills(levelsFromPref(initialCatalogPrefs.level))
+  if (translateSelect && savedTranslate) translateSelect.value = savedTranslate
 }
 
 function uiLocaleFromTranslate(code) {
@@ -229,16 +136,7 @@ function saveCatalogPrefs() {
   const next = catalogPrefsState()
   if (!next.translate) return
   const initialTranslate = (initialCatalogPrefs.translate || '').split(',')[0]
-  const onHome = !!settingsEl('[data-read-along]')
-  if (onHome) {
-    if (next.read === initialCatalogPrefs.read && next.translate === initialTranslate &&
-        normalizeLevelPref(next.level) === normalizeLevelPref(initialCatalogPrefs.level)) {
-      closeDialog(null, null, 'settings')
-      return
-    }
-    window.setLangPref('read', next.read)
-    window.setLangPref('level', next.level)
-  } else if (next.translate === initialTranslate) {
+  if (next.translate === initialTranslate) {
     closeDialog(null, null, 'settings')
     return
   }
@@ -247,27 +145,11 @@ function saveCatalogPrefs() {
   location.reload()
 }
 
-function toggleLevelPill(el) {
-  const pressed = el.getAttribute('aria-pressed') === 'true'
-  if (pressed && selectedLevelPills().length <= 1) return
-  el.setAttribute('aria-pressed', pressed ? 'false' : 'true')
-  syncLevelLabel()
-}
-
-function syncSettingsToggleExpanded() {
-  const toggle = settingsEl('[data-settings-toggle]')
-  const panel = document.getElementById('settings')
-  if (toggle && panel) {
-    toggle.setAttribute('aria-expanded', panel.open ? 'true' : 'false')
-  }
-}
-
 function openSettings(el, event) {
   if (settingsEl('[data-translate-along]')) {
     initialCatalogPrefs = catalogPrefsState()
   }
   openDialog(el, event, 'settings')
-  syncSettingsToggleExpanded()
 }
 
 function initSettingsControls() {
@@ -297,7 +179,6 @@ function initSettingsControls() {
   settingsDialog.addEventListener('close', function () {
     revertCatalogPrefs()
     updateThemeColor()
-    syncSettingsToggleExpanded()
   })
   loadSettings()
 }
@@ -311,7 +192,5 @@ function updateSettings() {
 
 initSettingsControls()
 
-window.syncTranslateSelectForReadAlong = syncTranslateSelectForReadAlong
 window.saveCatalogPrefs = saveCatalogPrefs
-window.toggleLevelPill = toggleLevelPill
 window.openSettings = openSettings

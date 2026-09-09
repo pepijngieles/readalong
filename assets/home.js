@@ -287,6 +287,29 @@ function toggleHistory(el) {
   el.textContent = expanded ? historyLabel : hideHistoryLabel
 }
 
+function changeReadAlong(el) {
+  const read = el.value
+  if (!read) return
+  window.setLangPref('read', read)
+
+  const langsBySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
+  const options = langsBySource[read] || []
+  const translateSelect = homeEl('[data-translate-along]')
+  const currentTranslate = translateSelect ? translateSelect.value : ''
+  if (options.length && options.indexOf(currentTranslate) === -1) {
+    window.setLangPref('translate', options[0])
+    const allowed = Object.keys(window.LANG_ENDONYMS || {})
+    window.setLangPref('ui', allowed.indexOf(options[0]) !== -1 ? options[0] : 'en')
+  }
+
+  location.reload()
+}
+
+function changeLevel(el) {
+  window.setLangPref('level', el.value)
+  location.reload()
+}
+
 function initHome() {
   if (!homeEl('[data-all-items]')) return
 
@@ -300,5 +323,7 @@ window.clearFilters = clearFilters
 window.filterKind = filterKind
 window.filterDuration = filterDuration
 window.toggleHistory = toggleHistory
+window.changeReadAlong = changeReadAlong
+window.changeLevel = changeLevel
 
 document.addEventListener('DOMContentLoaded', initHome)
