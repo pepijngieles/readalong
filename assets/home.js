@@ -6,7 +6,6 @@ const LEVEL_SCORES = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 }
 
 let kindFilter = DEFAULT_KIND
 let durationLimit = 0
-let initialPrefs = null
 
 function homeEl(selector) {
   return document.querySelector(selector)
@@ -16,22 +15,16 @@ function homeAll(selector) {
   return document.querySelectorAll(selector)
 }
 
-function selectedLevelPills() {
-  return Array.from(homeAll('[data-level-pill][aria-pressed=true]'))
-    .map(function (pill) { return pill.getAttribute('data-level-pill') })
-    .filter(Boolean)
-}
-
-function isAllLevelsSelected(selected) {
-  return !selected.length || selected.length === LEVEL_CODES.length
-}
-
 function levelsFromPref(raw) {
   const codes = (raw || '').split(',').map(function (code) { return code.trim() }).filter(function (code) {
     return LEVEL_CODES.indexOf(code) !== -1
   })
   if (!codes.length || codes.length === LEVEL_CODES.length) return LEVEL_CODES.slice()
   return codes
+}
+
+function isAllLevelsSelected(selected) {
+  return !selected.length || selected.length === LEVEL_CODES.length
 }
 
 function savedLevelFilter() {
@@ -67,113 +60,6 @@ function levelMatchesCodes(level, selected) {
   return levelCodesIn(level).some(function (code) {
     return selected.indexOf(code) !== -1
   })
-}
-
-function levelPrefValue() {
-  const selected = selectedLevelPills()
-  return isAllLevelsSelected(selected) ? '' : selected.join(',')
-}
-
-function normalizeLevelPref(level) {
-  const selected = levelsFromPref(level || '')
-  if (isAllLevelsSelected(selected)) return ''
-  return selected.sort(function (a, b) {
-    return LEVEL_CODES.indexOf(a) - LEVEL_CODES.indexOf(b)
-  }).join(',')
-}
-
-function prefsState() {
-  return {
-    read: homeEl('[data-read-along]')?.value || '',
-    translate: homeEl('[data-translate-along]')?.value || '',
-    level: levelPrefValue()
-  }
-}
-
-function syncTranslateSelectForReadAlong() {
-  const readLang = homeEl('[data-read-along]')?.value
-  const select = homeEl('[data-translate-along]')
-  const langsBySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
-  const endonyms = window.LANG_ENDONYMS || {}
-  if (!readLang || !select) return
-
-  const options = langsBySource[readLang] || []
-  const previous = select.value
-  select.innerHTML = ''
-  options.forEach(function (code) {
-    const option = document.createElement('option')
-    option.value = code
-    option.textContent = endonyms[code] || code.toUpperCase()
-    option.setAttribute('translate', 'no')
-    option.lang = code
-    select.appendChild(option)
-  })
-
-  if (options.indexOf(previous) !== -1) {
-    select.value = previous
-  } else if (options.length) {
-    select.value = options[0]
-  }
-}
-
-function syncLevelPills(selected) {
-  homeAll('[data-level-pill]').forEach(function (pill) {
-    const code = pill.getAttribute('data-level-pill')
-    pill.setAttribute('aria-pressed', selected.indexOf(code) !== -1 ? 'true' : 'false')
-  })
-  syncLevelLabel()
-}
-
-function syncLevelLabel() {
-  const label = homeEl('#home-level-label')
-  if (!label) return
-  const selected = selectedLevelPills()
-  const allLevels = label.getAttribute('data-i18n-all-levels') || 'All levels'
-  const levelLabel = label.getAttribute('data-i18n-level') || 'Level'
-  label.textContent = isAllLevelsSelected(selected) ? allLevels : levelLabel
-}
-
-function revertHomePrefs() {
-  if (!initialPrefs) return
-  const readSelect = homeEl('[data-read-along]')
-  if (readSelect) readSelect.value = initialPrefs.read
-  syncTranslateSelectForReadAlong()
-  const translateSelect = homeEl('[data-translate-along]')
-  const savedTranslate = (initialPrefs.translate || '').split(',')[0]
-  if (translateSelect && savedTranslate) {
-    const langsBySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
-    const options = langsBySource[initialPrefs.read] || []
-    translateSelect.value = options.indexOf(savedTranslate) !== -1 ? savedTranslate : (options[0] || '')
-  }
-  syncLevelPills(levelsFromPref(initialPrefs.level))
-}
-
-function uiLocaleFromTranslate(code) {
-  const allowed = Object.keys(window.LANG_ENDONYMS || window.READALONG_ENDONYMS || {})
-  return allowed.indexOf(code) !== -1 ? code : 'en'
-}
-
-function saveHomePrefs() {
-  const next = prefsState()
-  if (!next.translate) return
-  const initialTranslate = (initialPrefs.translate || '').split(',')[0]
-  if (next.read === initialPrefs.read && next.translate === initialTranslate &&
-      normalizeLevelPref(next.level) === normalizeLevelPref(initialPrefs.level)) {
-    closeDialog(null, null, 'home-prefs')
-    return
-  }
-  window.setLangPref('read', next.read)
-  window.setLangPref('translate', next.translate)
-  window.setLangPref('ui', uiLocaleFromTranslate(next.translate))
-  window.setLangPref('level', next.level)
-  location.reload()
-}
-
-function toggleLevelPill(el) {
-  const pressed = el.getAttribute('aria-pressed') === 'true'
-  if (pressed && selectedLevelPills().length <= 1) return
-  el.setAttribute('aria-pressed', pressed ? 'false' : 'true')
-  syncLevelLabel()
 }
 
 function knownKinds() {
@@ -401,41 +287,15 @@ function toggleHistory(el) {
   el.textContent = expanded ? historyLabel : hideHistoryLabel
 }
 
-function syncPrefsToggleExpanded() {
-  const prefsToggle = homeEl('[data-prefs-toggle]')
-  const prefsPanel = document.getElementById('home-prefs')
-  if (prefsToggle && prefsPanel) {
-    prefsToggle.setAttribute('aria-expanded', prefsPanel.open ? 'true' : 'false')
-  }
-}
-
-function openHomePrefs(el, event) {
-  openDialog(el, event, 'home-prefs')
-  syncPrefsToggleExpanded()
-}
-
 function initHome() {
   if (!homeEl('[data-all-items]')) return
 
-  initialPrefs = prefsState()
   readFiltersFromUrl()
   syncFilterState()
   fillContinueReading()
   applyAllItems()
-
-  const prefsPanel = document.getElementById('home-prefs')
-  if (prefsPanel) {
-    prefsPanel.addEventListener('close', function () {
-      revertHomePrefs()
-      syncPrefsToggleExpanded()
-    })
-  }
 }
 
-window.syncTranslateSelectForReadAlong = syncTranslateSelectForReadAlong
-window.saveHomePrefs = saveHomePrefs
-window.toggleLevelPill = toggleLevelPill
-window.openHomePrefs = openHomePrefs
 window.clearFilters = clearFilters
 window.filterKind = filterKind
 window.filterDuration = filterDuration

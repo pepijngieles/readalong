@@ -871,8 +871,7 @@ dialog.dialog-sheet::backdrop{
   background: var(--dialog-backdrop);
 }
 
-#settings.dialog-sheet,
-#home-prefs.dialog-sheet{
+#settings.dialog-sheet{
   width: 100%;
   max-width: var(--page-width);
   max-height: min(90vh, 100dvh);
@@ -886,8 +885,7 @@ dialog.dialog-sheet::backdrop{
     0 0 1.5px var(--shadow-outline);
 }
 
-#settings.dialog-sheet[open],
-#home-prefs.dialog-sheet[open]{
+#settings.dialog-sheet[open]{
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -898,8 +896,7 @@ dialog.dialog-sheet::backdrop{
   transform: none;
 }
 
-#settings .panel,
-#home-prefs .panel{
+#settings .panel{
   position: relative;
   display: flex;
   flex-direction: column;
@@ -910,8 +907,7 @@ dialog.dialog-sheet::backdrop{
   user-select: none;
 }
 
-#settings .close-button,
-#home-prefs .close-button{
+#settings .close-button{
   position: absolute;
   top: var(--spacing-12);
   right: var(--spacing-12);
@@ -923,42 +919,12 @@ dialog.dialog-sheet::backdrop{
   overflow-x: hidden;
 }
 
-#home-prefs[open]{
-  width: calc(100% - var(--spacing-32));
-  max-width: min(var(--page-width), calc(100vw - var(--spacing-32)));
-  top: 50%;
-  bottom: auto;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: var(--border-radius-large);
-  box-shadow:
-    0 4px 24px var(--shadow-elevated),
-    0 0 1.5px var(--shadow-outline);
-}
-
-@media (max-width: 48rem){
-  #home-prefs[open]{
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transform: none;
-    width: 100%;
-    max-width: 100%;
-    border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
-  }
-
-  #home-prefs .panel{
-    padding-block-end: calc(var(--spacing-24) + env(safe-area-inset-bottom, 0px));
-  }
-}
-
-#home-prefs h2{
+#settings h2{
   margin: 0 var(--spacing-32) 0 0;
   padding-block-end: var(--spacing-4);
 }
 
-#home-prefs footer{
+#settings footer{
   margin-block-start: var(--spacing-24);
 }
 
