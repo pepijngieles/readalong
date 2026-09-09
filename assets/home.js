@@ -22,11 +22,21 @@ function selectedLevelPills() {
     .filter(Boolean)
 }
 
-function savedLevelFilter() {
-  const raw = localStorage.getItem('readalong-level') || ''
-  return raw.split(',').map(function (code) { return code.trim() }).filter(function (code) {
+function isAllLevelsSelected(selected) {
+  return !selected.length || selected.length === LEVEL_CODES.length
+}
+
+function levelsFromPref(raw) {
+  const codes = (raw || '').split(',').map(function (code) { return code.trim() }).filter(function (code) {
     return LEVEL_CODES.indexOf(code) !== -1
   })
+  if (!codes.length || codes.length === LEVEL_CODES.length) return LEVEL_CODES.slice()
+  return codes
+}
+
+function savedLevelFilter() {
+  const selected = levelsFromPref(localStorage.getItem('readalong-level') || '')
+  return isAllLevelsSelected(selected) ? [] : selected
 }
 
 function levelScore(code) {
@@ -53,14 +63,21 @@ function levelCodesIn(level) {
 }
 
 function levelMatchesCodes(level, selected) {
-  if (!selected.length) return true
+  if (isAllLevelsSelected(selected)) return true
   return levelCodesIn(level).some(function (code) {
     return selected.indexOf(code) !== -1
   })
 }
 
+function levelPrefValue() {
+  const selected = selectedLevelPills()
+  return isAllLevelsSelected(selected) ? '' : selected.join(',')
+}
+
 function normalizeLevelPref(level) {
-  return level.split(',').filter(Boolean).sort(function (a, b) {
+  const selected = levelsFromPref(level || '')
+  if (isAllLevelsSelected(selected)) return ''
+  return selected.sort(function (a, b) {
     return LEVEL_CODES.indexOf(a) - LEVEL_CODES.indexOf(b)
   }).join(',')
 }
@@ -69,7 +86,7 @@ function prefsState() {
   return {
     read: homeEl('[data-read-along]')?.value || '',
     translate: homeEl('[data-translate-along]')?.value || '',
-    level: selectedLevelPills().join(',')
+    level: levelPrefValue()
   }
 }
 
@@ -100,13 +117,20 @@ function syncTranslateSelectForReadAlong() {
 }
 
 function syncLevelPills(selected) {
-  const allPill = homeEl('[data-level-all]')
-  const noneSelected = !selected.length
-  if (allPill) allPill.setAttribute('aria-pressed', noneSelected ? 'true' : 'false')
   homeAll('[data-level-pill]').forEach(function (pill) {
     const code = pill.getAttribute('data-level-pill')
     pill.setAttribute('aria-pressed', selected.indexOf(code) !== -1 ? 'true' : 'false')
   })
+  syncLevelLabel()
+}
+
+function syncLevelLabel() {
+  const label = homeEl('#home-level-label')
+  if (!label) return
+  const selected = selectedLevelPills()
+  const allLevels = label.getAttribute('data-i18n-all-levels') || 'All levels'
+  const levelLabel = label.getAttribute('data-i18n-level') || 'Level'
+  label.textContent = isAllLevelsSelected(selected) ? allLevels : levelLabel
 }
 
 function revertHomePrefs() {
@@ -121,7 +145,7 @@ function revertHomePrefs() {
     const options = langsBySource[initialPrefs.read] || []
     translateSelect.value = options.indexOf(savedTranslate) !== -1 ? savedTranslate : (options[0] || '')
   }
-  syncLevelPills(initialPrefs.level.split(',').filter(Boolean))
+  syncLevelPills(levelsFromPref(initialPrefs.level))
 }
 
 function saveHomePrefs() {
@@ -139,14 +163,11 @@ function saveHomePrefs() {
   location.reload()
 }
 
-function selectAllLevels() {
-  syncLevelPills([])
-}
-
 function toggleLevelPill(el) {
   const pressed = el.getAttribute('aria-pressed') === 'true'
+  if (pressed && selectedLevelPills().length <= 1) return
   el.setAttribute('aria-pressed', pressed ? 'false' : 'true')
-  syncLevelPills(selectedLevelPills())
+  syncLevelLabel()
 }
 
 function knownKinds() {
@@ -407,7 +428,6 @@ function initHome() {
 
 window.syncTranslateSelectForReadAlong = syncTranslateSelectForReadAlong
 window.saveHomePrefs = saveHomePrefs
-window.selectAllLevels = selectAllLevels
 window.toggleLevelPill = toggleLevelPill
 window.openHomePrefs = openHomePrefs
 window.clearFilters = clearFilters
