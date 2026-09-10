@@ -924,10 +924,6 @@ dialog.dialog-sheet::backdrop{
   padding-block-end: var(--spacing-4);
 }
 
-#settings footer{
-  margin-block-start: var(--spacing-24);
-}
-
 
 
 /* 13. Popovers
@@ -1506,17 +1502,14 @@ body.ios:not(.started.show-translation) .translation-popover{
   min-width: 0;
 }
 
-.home-title > * + *::before{
-  content: ",";
-  margin-inline-end: 0.35em;
-}
-
 .home-header h1{
   margin: 0;
+  margin-inline-end: 0.35em;
   white-space: nowrap;
 }
 
 .home-title-control{
+  position: relative;
   display: inline-flex;
   align-items: baseline;
   padding: 0;
@@ -1524,49 +1517,103 @@ body.ios:not(.started.show-translation) .translation-popover{
   line-height: 1.5rem;
   color: var(--text-secondary);
   white-space: nowrap;
-  cursor: pointer;
 }
 
-.home-title-select{
-  display: inline-grid;
-  align-items: center;
+.home-title > .home-title-control + .home-title-control::before{
+  content: ",";
+  margin-inline-end: 0.35em;
 }
 
-.home-title-select::before{
-  content: attr(data-label);
-  grid-area: 1 / 1;
-  visibility: hidden;
-  white-space: nowrap;
-  padding-inline-end: 1.125rem;
-  pointer-events: none;
-}
-
-.home-title-select select{
-  grid-area: 1 / 1;
-  width: 100%;
+.home-title-trigger{
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
   height: 1.5rem;
-  margin: 0;
-  padding: 0 1.125rem 0 0;
+  padding: 0;
   border: none;
   border-radius: var(--border-radius-small);
-  background-color: transparent;
+  background: none;
+  box-shadow: none;
   color: inherit;
   font: inherit;
   font-size: inherit;
   line-height: inherit;
+  text-align: start;
   cursor: pointer;
 }
 
-.home-title-select .icon{
-  right: 0;
+.home-title-trigger .icon{
+  position: static;
   width: 0.875rem;
   height: 0.875rem;
+  margin: 0;
   color: var(--text-tertiary);
+  transform: none;
 }
 
-.home-title-select select:focus-visible{
+.home-title-trigger:focus-visible{
   outline: 2px solid var(--focus-outline);
   outline-offset: 2px;
+}
+
+.title-menu{
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + var(--spacing-8));
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 12rem;
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-medium);
+  background-color: var(--background-popover);
+  box-shadow:
+    0 .25rem .5rem var(--shadow-ambient),
+    0 0 3px var(--shadow-outline);
+}
+
+.title-menu[hidden]{
+  display: none;
+}
+
+.title-menu label{
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2xs);
+  padding: var(--spacing-8) var(--spacing-12);
+  border-radius: var(--border-radius-small);
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.title-menu input{
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.title-menu label .icon{
+  position: static;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  color: var(--text-secondary);
+  transform: none;
+  visibility: hidden;
+}
+
+.title-menu input:checked + .icon{
+  visibility: visible;
+}
+
+.home-title-control:last-child .title-menu{
+  left: auto;
+  right: 0;
 }
 
 @media (hover: hover) {
@@ -1574,8 +1621,19 @@ body.ios:not(.started.show-translation) .translation-popover{
     color: var(--text-primary);
   }
 
-  .home-title-control:hover .icon{
+  .home-title-control:hover .home-title-trigger .icon{
     color: var(--text-secondary);
+  }
+
+  .home-title-trigger:hover,
+  .home-title-trigger:active{
+    background: none;
+    box-shadow: none;
+    filter: none;
+  }
+
+  .title-menu label:hover{
+    background-color: var(--background-secondary);
   }
 }
 

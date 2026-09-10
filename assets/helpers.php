@@ -237,8 +237,47 @@ function level_codes_in($level) {
   return [strtoupper(trim($level))];
 }
 
+function language_filter_is_all(array $selected, array $allowed) {
+  return $selected === [] || array_diff($allowed, $selected) === [];
+}
+
 function level_filter_is_all(array $selected) {
   return $selected === [] || array_diff(level_codes(), $selected) === [];
+}
+
+function pref_filter_summary(array $selected, array $allowed, array $labels, $allLabel) {
+  if (language_filter_is_all($selected, $allowed)) {
+    return $allLabel;
+  }
+  $parts = [];
+  foreach ($allowed as $code) {
+    if (in_array($code, $selected, true)) {
+      $parts[] = $labels[$code] ?? $code;
+    }
+  }
+  return implode(' · ', $parts);
+}
+
+function render_title_menu($id, $pref, $groupLabel, $summaryLabel, $allLabel, array $options, array $selected, array $allowed, $optionLang = false) {
+  $allSelected = language_filter_is_all($selected, $allowed);
+  ?>
+				<div class="home-title-control" data-i18n-all="<?= e($allLabel) ?>">
+					<button type=button class="quiet home-title-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls="<?= e($id) ?>">
+						<span class=visually-hidden><?= e($groupLabel) ?></span>
+						<span data-title-label><?= e($summaryLabel) ?></span>
+						<?php icon('chevron-down', ['size' => 16]); ?>
+					</button>
+					<div id="<?= e($id) ?>" class=title-menu hidden role=listbox aria-multiselectable=true data-pref="<?= e($pref) ?>" data-change=updateTitleFilter>
+<?php foreach ($options as $code => $label): ?>
+						<label role=option aria-selected=<?= $allSelected || in_array($code, $selected, true) ? 'true' : 'false' ?><?= $optionLang ? ' translate=no lang=' . e($code) : '' ?>>
+							<input type=checkbox value="<?= e($code) ?>"<?= $allSelected || in_array($code, $selected, true) ? ' checked' : '' ?>>
+							<?php icon('check', ['size' => 16]); ?>
+							<span><?= e($label) ?></span>
+						</label>
+<?php endforeach; ?>
+					</div>
+				</div>
+<?php
 }
 
 function level_matches_codes($level, array $selected) {

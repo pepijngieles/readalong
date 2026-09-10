@@ -356,6 +356,33 @@ function story_list($storiesDir, $translationLangs = 'en', $readAlongLang = null
   return $stories;
 }
 
+function story_apply_home_hidden(array $items, array $readAlongLangs, array $sourceLangs, array $levelFilter) {
+  $allLangs = language_filter_is_all($readAlongLangs, $sourceLangs);
+  $allLevels = level_filter_is_all($levelFilter);
+  foreach ($items as &$item) {
+    $matchLang = $allLangs || in_array($item['language'] ?? '', $readAlongLangs, true);
+    $matchLevel = $allLevels || (!empty($item['level']) && level_matches_codes($item['level'], $levelFilter));
+    $item['hidden'] = !($matchLang && $matchLevel);
+  }
+  unset($item);
+  return $items;
+}
+
+function story_translation_languages_for_sources(array $bySource, array $readLangs, array $sourceLangs) {
+  $langs = [];
+  $sources = language_filter_is_all($readLangs, $sourceLangs) ? $sourceLangs : $readLangs;
+  foreach ($sources as $code) {
+    foreach ($bySource[$code] ?? [] as $lang) {
+      $langs[$lang] = true;
+    }
+  }
+  $codes = array_keys($langs);
+  usort($codes, function ($a, $b) {
+    return strcasecmp(lang_endonym($a), lang_endonym($b));
+  });
+  return $codes;
+}
+
 function story_render($storyDir, $base, $translationLang = 'en') {
   $voiceId = $_GET['voice'] ?? null;
   extract(story_load($storyDir, $translationLang, $voiceId));

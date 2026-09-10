@@ -15,21 +15,35 @@ function homeAll(selector) {
   return document.querySelectorAll(selector)
 }
 
-function levelsFromPref(raw) {
+function codesFromPref(raw, allowed) {
   const codes = (raw || '').split(',').map(function (code) { return code.trim() }).filter(function (code) {
-    return LEVEL_CODES.indexOf(code) !== -1
+    return allowed.indexOf(code) !== -1
   })
-  if (!codes.length || codes.length === LEVEL_CODES.length) return LEVEL_CODES.slice()
+  if (!codes.length || codes.length === allowed.length) return allowed.slice()
   return codes
 }
 
-function isAllLevelsSelected(selected) {
-  return !selected.length || selected.length === LEVEL_CODES.length
+function isAllFilter(selected, allowed) {
+  if (!allowed.length) return true
+  return !selected.length || selected.length === allowed.length
+}
+
+function allowedCodesFromMenu(pref) {
+  const menu = homeEl('[data-pref="' + pref + '"]')
+  if (!menu) return []
+  return Array.from(menu.querySelectorAll('input[type=checkbox]')).map(function (input) {
+    return input.value
+  })
+}
+
+function savedReadFilter() {
+  const allowed = allowedCodesFromMenu('read')
+  if (!allowed.length) return []
+  return codesFromPref(localStorage.getItem('readalong-read') || '', allowed)
 }
 
 function savedLevelFilter() {
-  const selected = levelsFromPref(localStorage.getItem('readalong-level') || '')
-  return isAllLevelsSelected(selected) ? [] : selected
+  return codesFromPref(localStorage.getItem('readalong-level') || '', LEVEL_CODES)
 }
 
 function levelScore(code) {
@@ -56,7 +70,7 @@ function levelCodesIn(level) {
 }
 
 function levelMatchesCodes(level, selected) {
-  if (isAllLevelsSelected(selected)) return true
+  if (isAllFilter(selected, LEVEL_CODES)) return true
   return levelCodesIn(level).some(function (code) {
     return selected.indexOf(code) !== -1
   })
@@ -113,23 +127,44 @@ function applyAllItems() {
   const allSection = homeEl('[data-all-section]')
   if (!allList) return
 
-  const remainingTemplate = (allSection && allSection.getAttribute('data-i18n-remaining')) || '{n} min'
   const resultsTemplate = (allSection && allSection.getAttribute('data-i18n-results')) || '{n}'
   let visible = 0
 
+  const sourceLangs = allowedCodesFromMenu('read')
+  const readFilter = savedReadFilter()
   const levelFilter = savedLevelFilter()
 
-  allList.querySelectorAll('li').forEach(function (item) {
+  function matchesHomeFilters(item, includeKindDuration) {
+    const language = item.getAttribute('data-language') || ''
+    const level = item.getAttribute('data-level') || ''
+    const matchLang = isAllFilter(readFilter, sourceLangs) || readFilter.indexOf(language) !== -1
+    const matchLevel = levelMatchesCodes(level, levelFilter)
+    if (!matchLang || !matchLevel) return false
+    if (!includeKindDuration) return true
     const kind = item.getAttribute('data-kind') || ''
     const seconds = parseInt(item.getAttribute('data-duration-seconds'), 10) || 0
-    const level = item.getAttribute('data-level') || ''
     const matchKind = !kind || kind === kindFilter
     const matchDuration = !durationLimit || (seconds > 0 && seconds <= durationLimit)
-    const matchLevel = levelMatchesCodes(level, levelFilter)
-    const show = matchKind && matchDuration && matchLevel
+    return matchKind && matchDuration
+  }
+
+  allList.querySelectorAll('li').forEach(function (item) {
+    const show = matchesHomeFilters(item, true)
     item.hidden = !show
     if (show) visible++
   })
+
+  const weatherList = homeEl('[data-weather-items]')
+  const weatherSection = homeEl('[data-weather-section]')
+  if (weatherList) {
+    let weatherVisible = 0
+    weatherList.querySelectorAll('li').forEach(function (item) {
+      const show = matchesHomeFilters(item, false)
+      item.hidden = !show
+      if (show) weatherVisible++
+    })
+    if (weatherSection) weatherSection.hidden = weatherVisible === 0
+  }
 
   if (noResults) {
     const emptyMessage = noResults.querySelector('[data-empty-message]')
@@ -287,27 +322,115 @@ function toggleHistory(el) {
   el.textContent = expanded ? historyLabel : hideHistoryLabel
 }
 
-function changeReadAlong(el) {
-  const read = el.value
-  if (!read) return
-  window.setLangPref('read', read)
+function closeTitleMenus(except) {
+  homeAll('.home-title-trigger').forEach(function (button) {
+    if (except && button === except) return
+    button.setAttribute('aria-expanded', 'false')
+    const menu = document.getElementById(button.getAttribute('aria-controls'))
+    if (menu) menu.hidden = true
+  })
+}
 
-  const langsBySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
-  const options = langsBySource[read] || []
+function toggleTitleMenu(el) {
+  const menu = document.getElementById(el.getAttribute('aria-controls'))
+  if (!menu) return
+  const open = el.getAttribute('aria-expanded') === 'true'
+  closeTitleMenus(open ? null : el)
+  if (!open) {
+    el.setAttribute('aria-expanded', 'true')
+    menu.hidden = false
+  }
+}
+
+function titleOptionLabel(input) {
+  const label = input.closest('label')
+  const text = label ? label.querySelector('span') : null
+  return (text && text.textContent.trim()) || input.value
+}
+
+function syncTranslateForRead(readLangs) {
+  const bySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
+  const sourceLangs = Object.keys(bySource)
+  const sources = isAllFilter(readLangs, sourceLangs) ? sourceLangs : readLangs
+  const seen = {}
+  sources.forEach(function (code) {
+    (bySource[code] || []).forEach(function (lang) {
+      seen[lang] = true
+    })
+  })
+  const options = Object.keys(seen)
   const translateSelect = homeEl('[data-translate-along]')
-  const currentTranslate = translateSelect ? translateSelect.value : ''
-  if (options.length && options.indexOf(currentTranslate) === -1) {
+  const current = translateSelect
+    ? translateSelect.value
+    : (localStorage.getItem('readalong-translate') || '').split(',')[0]
+  if (options.length && options.indexOf(current) === -1) {
     window.setLangPref('translate', options[0])
     const allowed = Object.keys(window.LANG_ENDONYMS || {})
     window.setLangPref('ui', allowed.indexOf(options[0]) !== -1 ? options[0] : 'en')
+    location.reload()
+    return
   }
-
-  location.reload()
+  if (!translateSelect) return
+  const endonyms = window.LANG_ENDONYMS || {}
+  const keep = translateSelect.value
+  translateSelect.innerHTML = ''
+  options.sort(function (a, b) {
+    return String(endonyms[a] || a).localeCompare(endonyms[b] || b)
+  }).forEach(function (code) {
+    const option = document.createElement('option')
+    option.value = code
+    option.lang = code
+    option.setAttribute('translate', 'no')
+    option.textContent = endonyms[code] || code
+    if (code === keep) option.selected = true
+    translateSelect.appendChild(option)
+  })
 }
 
-function changeLevel(el) {
-  window.setLangPref('level', el.value)
-  location.reload()
+function updateTitleFilter(el) {
+  const menu = el.classList && el.classList.contains('title-menu') ? el : el.closest('.title-menu')
+  const control = menu && menu.closest('.home-title-control')
+  if (!menu || !control) return
+
+  const inputs = Array.from(menu.querySelectorAll('input[type=checkbox]'))
+  const all = inputs.map(function (input) { return input.value })
+  let selected = inputs.filter(function (input) { return input.checked }).map(function (input) { return input.value })
+
+  if (!selected.length) {
+    inputs.forEach(function (input) { input.checked = true })
+    selected = all.slice()
+  }
+
+  inputs.forEach(function (input) {
+    const option = input.closest('[role=option]')
+    if (option) option.setAttribute('aria-selected', input.checked ? 'true' : 'false')
+  })
+
+  window.setLangPref(menu.getAttribute('data-pref'), selected.join(','))
+
+  const labelEl = control.querySelector('[data-title-label]')
+  if (labelEl) {
+    const allLabel = control.getAttribute('data-i18n-all') || ''
+    labelEl.textContent = selected.length === all.length
+      ? allLabel
+      : selected.map(function (code) {
+        const input = menu.querySelector('input[value="' + code + '"]')
+        return input ? titleOptionLabel(input) : code
+      }).join(' · ')
+  }
+
+  if (menu.getAttribute('data-pref') === 'read') syncTranslateForRead(selected)
+  applyAllItems()
+}
+
+function initTitleMenus() {
+  document.addEventListener('click', function (event) {
+    if (event.target.closest('.home-title-control')) return
+    closeTitleMenus()
+  })
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closeTitleMenus()
+  })
 }
 
 function initHome() {
@@ -317,13 +440,14 @@ function initHome() {
   syncFilterState()
   fillContinueReading()
   applyAllItems()
+  initTitleMenus()
 }
 
 window.clearFilters = clearFilters
 window.filterKind = filterKind
 window.filterDuration = filterDuration
 window.toggleHistory = toggleHistory
-window.changeReadAlong = changeReadAlong
-window.changeLevel = changeLevel
+window.toggleTitleMenu = toggleTitleMenu
+window.updateTitleFilter = updateTitleFilter
 
 document.addEventListener('DOMContentLoaded', initHome)
