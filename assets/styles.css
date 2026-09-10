@@ -1510,8 +1510,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 .home-title-control{
   position: relative;
-  display: inline-flex;
-  align-items: baseline;
+  display: inline-block;
   padding: 0;
   font-size: 1.125rem;
   line-height: 1.5rem;
