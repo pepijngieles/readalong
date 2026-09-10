@@ -81,7 +81,7 @@ function updateSettings() { /* called from settings form */ }
 - Play / pause / rewind / forward (`data-click=play`, `pause`, `playPrevious`, `playNext`)
 - Translation toggle (`data-click=toggleTranslation`)
 - Settings open/close (`openDialog(settings)`, `closeDialog(settings)`)
-- Home title dropdowns (`data-change=changeReadAlong`, `changeLevel`), filters, history toggle, onboarding controls
+- Home title dropdowns (`data-click=toggleTitleMenu`, `data-change=updateTitleFilter`), filters, history toggle, onboarding controls
 - Developer nav controls (`data-click`, `data-input`)
 
 ### Do not use Brio for
@@ -91,6 +91,7 @@ function updateSettings() { /* called from settings form */ }
 - `pagehide` progress persistence
 - Range slider keyboard handling in settings
 - Cookie ↔ localStorage sync (`setLangPref` in `index.php` / `onboarding.js`)
+- Title-menu light dismiss (outside click / Escape) in `home.js`
 
 Language prefs use **`setLangPref(key, value)`** — writes both `localStorage` and cookies so PHP can read them on next request. Do not replace with Brio’s storage helpers.
 
@@ -117,9 +118,9 @@ Settings is a native `<dialog>`:
 
 - No custom scrim — use native `::backdrop`
 - Project CSS wins over Brio’s centered dialog on wide viewports (`#settings` stays a bottom sheet)
-- `updateThemeColor()` in `scripts.js` checks `settingsDialog.open`, not `.hidden`
+- `updateThemeColor()` in `settings.js` checks `settingsDialog.open`, not `.hidden`
 
-Home read-along language and levels live in the header as native `<select>` dropdowns (`changeReadAlong`, `changeLevel`) — they apply immediately via `setLangPref` + reload. They are not in `#settings`.
+Home read-along language and levels live in the header as custom multi-selects (`toggleTitleMenu`, `updateTitleFilter`). The trigger width follows the active label. A comma sits only between the two menus, not after “Readalong”. They apply immediately via `setLangPref` (no reload). They are not in `#settings`. Translation language in the settings sheet applies on change (`data-change=saveCatalogPrefs`) and reloads. There is no save button; the reader sheet has no title.
 
 ---
 
@@ -219,10 +220,11 @@ After UI or chrome changes, test:
 
 **Home**
 
-- [ ] Header reads as one title: Readalong, language dropdown, level dropdown
-- [ ] Language and level dropdowns apply immediately (reload)
+- [ ] Header reads as one title: Readalong language dropdown, level dropdown (comma only between the two menus)
+- [ ] Language and level menus are multi-select; trigger width follows the active label
+- [ ] Language and level filters apply immediately (no reload)
 - [ ] Settings gear: translation language + theme only (not read-along/level)
-- [ ] Settings: open, Escape, backdrop, close X; save translation + reload
+- [ ] Settings: open, Escape, backdrop, close X; translation language applies on change + reload; no save button
 - [ ] Filters: kind pills, duration select, clear filters
 - [ ] History toggle (only when 2+ continue items)
 - [ ] Featured continue card layout
@@ -237,7 +239,7 @@ After UI or chrome changes, test:
 
 - [ ] Play / pause / rewind / forward
 - [ ] Translation show/hide; popover close button alignment
-- [ ] Settings sheet: sliders, theme, font, layout
+- [ ] Settings sheet: sliders, theme, font, layout (no title, no save button)
 - [ ] Settings bottom sheet on desktop and ~390px width
 
 **Regressions**

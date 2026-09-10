@@ -15,19 +15,38 @@ if (!$needsOnboarding) {
   foreach ($sourceLangs as $code) {
     $translationLangsBySource[$code] = story_translation_languages_for_source($storiesDir, $code);
   }
-  $readAlongLang = lang_pref('read', $sourceLangs, 'nl');
-  $translateLangOptions = $translationLangsBySource[$readAlongLang] ?? [];
+  $readAlongLangs = lang_prefs_list('read', $sourceLangs, ['nl']);
+  $translateLangOptions = story_translation_languages_for_sources($translationLangsBySource, $readAlongLangs, $sourceLangs);
   $translateLang = lang_prefs_list('translate', $translateLangOptions, [ui_locale()])[0] ?? ($translateLangOptions[0] ?? ui_locale());
   $levelCodes = level_codes();
   $levelFilter = lang_prefs_list('level', $levelCodes, []);
   $showTranslationLang = false;
-  $stories = story_list($storiesDir, [$translateLang], $readAlongLang, $levelFilter);
+  $stories = story_list($storiesDir, [$translateLang], null, []);
+  $stories = story_apply_home_hidden($stories, $readAlongLangs, $sourceLangs, $levelFilter);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = story_duration_filter_minutes();
   $kindTiles = story_filter_kinds();
-  $allLevelsSelected = level_filter_is_all($levelFilter);
-  $levelSelectValue = $allLevelsSelected ? '' : implode(',', $levelFilter);
-  $levelSelectLabel = $allLevelsSelected ? t('home.all_levels') : implode(' · ', $levelFilter);
+  $readLabels = [];
+  foreach ($sourceLangs as $code) {
+    $readLabels[$code] = lang_label($code);
+  }
+  $readSelectLabel = pref_filter_summary($readAlongLangs, $sourceLangs, $readLabels, t('home.all_languages'));
+  $levelLabels = array_combine($levelCodes, $levelCodes);
+  $levelSelectLabel = pref_filter_summary($levelFilter, $levelCodes, $levelLabels, t('home.all_levels'));
+  $weatherVisible = false;
+  foreach ($weatherStories as $item) {
+    if (empty($item['hidden'])) {
+      $weatherVisible = true;
+      break;
+    }
+  }
+  $visibleStories = false;
+  foreach ($stories as $item) {
+    if (empty($item['hidden'])) {
+      $visibleStories = true;
+      break;
+    }
+  }
 }
 ?>
 <?php include $partials . '/head.php'; ?>
@@ -45,32 +64,29 @@ if (!$needsOnboarding) {
 		<header class="home-header flex gap-small">
 			<div class="home-title flex">
 				<h1>Readalong</h1>
-				<label class="home-title-control">
-					<span class=visually-hidden><?= e(t('home.read_along')) ?></span>
-					<div class="select-wrap home-title-select" data-label="<?= e(lang_label($readAlongLang)) ?>">
-						<select class=quiet data-read-along data-change=changeReadAlong>
-<?php foreach ($sourceLangs as $code): ?>
-							<option value=<?= e($code) ?><?= $code === $readAlongLang ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
-<?php endforeach; ?>
-						</select>
-						<?php icon('chevron-down', ['size' => 16]); ?>
-					</div>
-				</label>
-				<label class="home-title-control">
-					<span class=visually-hidden><?= e(t('home.level')) ?></span>
-					<div class="select-wrap home-title-select" data-label="<?= e($levelSelectLabel) ?>">
-						<select class=quiet data-level-filter data-change=changeLevel>
-							<option value=""><?= e(t('home.all_levels')) ?></option>
-<?php if ($levelSelectValue !== '' && !in_array($levelSelectValue, $levelCodes, true)): ?>
-							<option value="<?= e($levelSelectValue) ?>" selected><?= e($levelSelectLabel) ?></option>
-<?php endif; ?>
-<?php foreach ($levelCodes as $code): ?>
-							<option value="<?= e($code) ?>"<?= $levelSelectValue === $code ? ' selected' : '' ?>><?= e($code) ?></option>
-<?php endforeach; ?>
-						</select>
-						<?php icon('chevron-down', ['size' => 16]); ?>
-					</div>
-				</label>
+<?php
+				render_title_menu(
+					'read-menu',
+					'read',
+					t('home.read_along'),
+					$readSelectLabel,
+					t('home.all_languages'),
+					$readLabels,
+					$readAlongLangs,
+					$sourceLangs,
+					true
+				);
+				render_title_menu(
+					'level-menu',
+					'level',
+					t('home.level'),
+					$levelSelectLabel,
+					t('home.all_levels'),
+					$levelLabels,
+					$levelFilter,
+					$levelCodes
+				);
+?>
 			</div>
 			<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
 				<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
@@ -88,7 +104,7 @@ if (!$needsOnboarding) {
 		</section>
 
 <?php if ($weatherStories): ?>
-		<section class=home-section data-weather-section>
+		<section class=home-section data-weather-section<?= $weatherVisible ? '' : ' hidden' ?>>
 			<div class=section-header>
 				<h2><?= e(t('home.weather')) ?></h2>
 			</div>
@@ -124,7 +140,7 @@ if (!$needsOnboarding) {
 				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
 <?php render_story_list($stories, 'data-all-items', $showTranslationLang, false); ?>
-			<div class="home-empty" data-no-results<?= $stories ? ' hidden' : '' ?> data-i18n-empty="<?= e(t('home.no_results')) ?>" data-i18n-empty-filters="<?= e(t('home.no_results_filters')) ?>">
+			<div class="home-empty" data-no-results<?= $visibleStories ? ' hidden' : '' ?> data-i18n-empty="<?= e(t('home.no_results')) ?>" data-i18n-empty-filters="<?= e(t('home.no_results_filters')) ?>">
 				<p data-empty-message><?= e(t('home.no_results')) ?></p>
 				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
@@ -162,8 +178,8 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/settings.js?v=3" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=19" defer></script>
+	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=20" defer></script>
 
 <?php endif; ?>
 

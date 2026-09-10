@@ -10,8 +10,6 @@ const SETTINGS_DEFAULTS = {
 }
 const THEME_META_PREFIX = '--theme-meta-'
 
-let initialCatalogPrefs = null
-
 function settingsEl(selector) {
   return document.querySelector(selector)
 }
@@ -114,41 +112,25 @@ function loadSettings() {
   applyAppearanceFromForm(false)
 }
 
-function catalogPrefsState() {
-  return {
-    translate: settingsEl('[data-translate-along]')?.value || ''
-  }
-}
-
-function revertCatalogPrefs() {
-  if (!initialCatalogPrefs) return
-  const translateSelect = settingsEl('[data-translate-along]')
-  const savedTranslate = (initialCatalogPrefs.translate || '').split(',')[0]
-  if (translateSelect && savedTranslate) translateSelect.value = savedTranslate
-}
-
 function uiLocaleFromTranslate(code) {
   const allowed = Object.keys(window.LANG_ENDONYMS || window.READALONG_ENDONYMS || {})
   return allowed.indexOf(code) !== -1 ? code : 'en'
 }
 
-function saveCatalogPrefs() {
-  const next = catalogPrefsState()
-  if (!next.translate) return
-  const initialTranslate = (initialCatalogPrefs.translate || '').split(',')[0]
-  if (next.translate === initialTranslate) {
-    closeDialog(null, null, 'settings')
-    return
-  }
-  window.setLangPref('translate', next.translate)
-  window.setLangPref('ui', uiLocaleFromTranslate(next.translate))
+function saveCatalogPrefs(el) {
+  const translateSelect = (el && el.matches && el.matches('[data-translate-along]'))
+    ? el
+    : settingsEl('[data-translate-along]')
+  const next = translateSelect ? translateSelect.value : ''
+  if (!next) return
+  const current = (localStorage.getItem('readalong-translate') || '').split(',')[0]
+  if (next === current) return
+  window.setLangPref('translate', next)
+  window.setLangPref('ui', uiLocaleFromTranslate(next))
   location.reload()
 }
 
 function openSettings(el, event) {
-  if (settingsEl('[data-translate-along]')) {
-    initialCatalogPrefs = catalogPrefsState()
-  }
   openDialog(el, event, 'settings')
 }
 
@@ -177,7 +159,6 @@ function initSettingsControls() {
     })
   })
   settingsDialog.addEventListener('close', function () {
-    revertCatalogPrefs()
     updateThemeColor()
   })
   loadSettings()

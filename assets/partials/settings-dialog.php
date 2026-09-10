@@ -2,14 +2,16 @@
 $settingsCatalog = !empty($settingsCatalog);
 $settingsReader = !empty($settingsReader);
 ?>
-	<dialog id=settings class="dialog-sheet settings" aria-labelledby=settings-title>
+	<dialog id=settings class="dialog-sheet settings"<?php if ($settingsCatalog): ?> aria-labelledby=settings-title<?php else: ?> aria-label="<?= e(t('nav.settings')) ?>"<?php endif; ?>>
 		<div class=panel>
 			<div class=settings-grabber aria-hidden=true></div>
 			<button type=button class="close-button quiet icon-only" data-el=close-button data-click="closeDialog(settings)">
 				<span class=visually-hidden><?= e(t('common.close')) ?></span>
 				<?php icon('close-small'); ?>
 			</button>
+<?php if ($settingsCatalog): ?>
 			<h2 id=settings-title class=font-size-large><?= e(t('nav.settings')) ?></h2>
+<?php endif; ?>
 			<form name=settings class="content grid gap-medium" data-input=updateSettings data-change=updateSettings>
 <?php if ($settingsCatalog): ?>
 
@@ -17,7 +19,7 @@ $settingsReader = !empty($settingsReader);
 					<div>
 						<label for=translate-into><?= e(t('home.translate_into')) ?></label>
 						<div class=select-wrap>
-							<select id=translate-into class=select-medium data-translate-along>
+							<select id=translate-into class=select-medium data-translate-along data-change=saveCatalogPrefs>
 <?php foreach ($translateLangOptions as $code): ?>
 								<option value="<?= e($code) ?>"<?= $code === $translateLang ? ' selected' : '' ?> translate=no lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
 <?php endforeach; ?>
@@ -32,7 +34,7 @@ $settingsReader = !empty($settingsReader);
 					<div>
 						<label for=story-translate-into><?= e(t('home.translate_into')) ?></label>
 						<div class=select-wrap>
-							<select id=story-translate-into class=select-medium data-translate-along>
+							<select id=story-translate-into class=select-medium data-translate-along data-change=saveCatalogPrefs>
 <?php foreach ($storyTranslationLangOptions as $code): ?>
 								<option value="<?= e($code) ?>"<?= $code === $storyTranslateLang ? ' selected' : '' ?> translate=no lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
 <?php endforeach; ?>
@@ -142,12 +144,6 @@ $settingsReader = !empty($settingsReader);
 				</div>
 
 			</form>
-<?php if ($settingsCatalog || ($settingsReader && !empty($storyTranslationLangOptions))): ?>
-
-			<footer>
-				<button type=button class="primary full-width" data-click=saveCatalogPrefs><?= e(t('common.save')) ?></button>
-			</footer>
-<?php endif; ?>
 
 		</div>
 	</dialog>
