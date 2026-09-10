@@ -1501,11 +1501,11 @@ body.ios:not(.started.show-translation) .translation-popover{
   flex-wrap: wrap;
   min-width: 0;
   font-size: 0;
+  gap: 0.35em;
 }
 
 .home-header h1{
   margin: 0;
-  margin-inline-end: 0.35em;
   white-space: nowrap;
 }
 
@@ -1517,11 +1517,6 @@ body.ios:not(.started.show-translation) .translation-popover{
   line-height: 1.5rem;
   color: var(--text-secondary);
   white-space: nowrap;
-}
-
-.home-title > .home-title-control + .home-title-control::before{
-  content: ",";
-  margin-inline-end: 0.35em;
 }
 
 .home-title-trigger{

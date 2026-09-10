@@ -258,13 +258,46 @@ function pref_filter_summary(array $selected, array $allowed, array $labels, $al
   return implode(' · ', $parts);
 }
 
-function render_title_menu($id, $pref, $groupLabel, $summaryLabel, $allLabel, array $options, array $selected, array $allowed, $optionLang = false) {
-  $allSelected = language_filter_is_all($selected, $allowed);
+function level_filter_summary(array $selected, $allLabel) {
+  $allowed = level_codes();
+  if (level_filter_is_all($selected)) {
+    return $allLabel;
+  }
+  $ordered = [];
+  foreach ($allowed as $code) {
+    if (in_array($code, $selected, true)) {
+      $ordered[] = $code;
+    }
+  }
+  if ($ordered === []) {
+    return $allLabel;
+  }
+  $ranges = [];
+  $start = $ordered[0];
+  $prev = $ordered[0];
+  $count = count($ordered);
+  for ($i = 1; $i <= $count; $i++) {
+    $curr = $ordered[$i] ?? null;
+    if ($curr !== null && level_score($curr) === level_score($prev) + 1) {
+      $prev = $curr;
+      continue;
+    }
+    $ranges[] = $start === $prev ? $start : $start . '-' . $prev;
+    $start = $curr;
+    $prev = $curr;
+  }
+  return implode(' · ', $ranges);
+}
+
+function render_title_menu($id, $pref, $groupLabel, $summaryLabel, $allLabel, array $options, array $selected, array $allowed, $optionLang = false, $multiple = true) {
+  $allSelected = $multiple && language_filter_is_all($selected, $allowed);
+  $inputType = $multiple ? 'checkbox' : 'radio';
   ?>
-				<div class="home-title-control" data-i18n-all="<?= e($allLabel) ?>"><button type=button class="quiet home-title-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls="<?= e($id) ?>"><span class=visually-hidden><?= e($groupLabel) ?></span><span data-title-label><?= e($summaryLabel) ?></span><?php icon('chevron-down', ['size' => 16]); ?></button><div id="<?= e($id) ?>" class=title-menu hidden role=listbox aria-multiselectable=true data-pref="<?= e($pref) ?>" data-change=updateTitleFilter>
+				<div class="home-title-control" data-i18n-all="<?= e($allLabel) ?>"><button type=button class="quiet home-title-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls="<?= e($id) ?>"><span class=visually-hidden><?= e($groupLabel) ?></span><span data-title-label><?= e($summaryLabel) ?></span><?php icon('chevron-down', ['size' => 16]); ?></button><div id="<?= e($id) ?>" class=title-menu hidden role=listbox<?= $multiple ? ' aria-multiselectable=true' : '' ?> data-pref="<?= e($pref) ?>"<?= $multiple ? '' : ' data-multiple=false' ?> data-change=updateTitleFilter>
 <?php foreach ($options as $code => $label): ?>
-						<label role=option aria-selected=<?= $allSelected || in_array($code, $selected, true) ? 'true' : 'false' ?><?= $optionLang ? ' translate=no lang=' . e($code) : '' ?>>
-							<input type=checkbox value="<?= e($code) ?>"<?= $allSelected || in_array($code, $selected, true) ? ' checked' : '' ?>>
+<?php $checked = $allSelected || in_array($code, $selected, true); ?>
+						<label role=option aria-selected=<?= $checked ? 'true' : 'false' ?><?= $optionLang ? ' translate=no lang=' . e($code) : '' ?>>
+							<input type=<?= e($inputType) ?><?= $multiple ? '' : ' name="title-' . e($id) . '"' ?> value="<?= e($code) ?>"<?= $checked ? ' checked' : '' ?>>
 							<?php icon('check', ['size' => 16]); ?>
 							<span><?= e($label) ?></span>
 						</label>

@@ -31,7 +31,7 @@ function isAllFilter(selected, allowed) {
 function allowedCodesFromMenu(pref) {
   const menu = homeEl('[data-pref="' + pref + '"]')
   if (!menu) return []
-  return Array.from(menu.querySelectorAll('input[type=checkbox]')).map(function (input) {
+  return Array.from(menu.querySelectorAll('input[type=checkbox], input[type=radio]')).map(function (input) {
     return input.value
   })
 }
@@ -39,7 +39,10 @@ function allowedCodesFromMenu(pref) {
 function savedReadFilter() {
   const allowed = allowedCodesFromMenu('read')
   if (!allowed.length) return []
-  return codesFromPref(localStorage.getItem('readalong-read') || '', allowed)
+  const codes = codesFromPref(localStorage.getItem('readalong-read') || '', allowed)
+  const menu = homeEl('[data-pref=read]')
+  if (menu && menu.getAttribute('data-multiple') === 'false') return codes.slice(0, 1)
+  return codes
 }
 
 function savedLevelFilter() {
@@ -348,6 +351,42 @@ function titleOptionLabel(input) {
   return (text && text.textContent.trim()) || input.value
 }
 
+function levelRangeLabel(selected, all, allLabel) {
+  if (isAllFilter(selected, all)) return allLabel
+  const ordered = all.filter(function (code) { return selected.indexOf(code) !== -1 })
+  if (!ordered.length) return allLabel
+  const ranges = []
+  let start = ordered[0]
+  let prev = ordered[0]
+  for (let i = 1; i <= ordered.length; i++) {
+    const curr = ordered[i]
+    if (curr && LEVEL_SCORES[curr] === (LEVEL_SCORES[prev] || 0) + 1) {
+      prev = curr
+      continue
+    }
+    ranges.push(start === prev ? start : start + '-' + prev)
+    start = curr
+    prev = curr
+  }
+  return ranges.join(' · ')
+}
+
+function titleMenuLabel(control, menu, selected, all) {
+  const allLabel = control.getAttribute('data-i18n-all') || ''
+  if (menu.getAttribute('data-multiple') === 'false') {
+    const input = menu.querySelector('input[value="' + selected[0] + '"]')
+    return input ? titleOptionLabel(input) : (selected[0] || '')
+  }
+  if (menu.getAttribute('data-pref') === 'level') {
+    return levelRangeLabel(selected, all, allLabel)
+  }
+  if (selected.length === all.length) return allLabel
+  return selected.map(function (code) {
+    const input = menu.querySelector('input[value="' + code + '"]')
+    return input ? titleOptionLabel(input) : code
+  }).join(' · ')
+}
+
 function syncTranslateForRead(readLangs) {
   const bySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
   const sourceLangs = Object.keys(bySource)
@@ -387,18 +426,28 @@ function syncTranslateForRead(readLangs) {
   })
 }
 
-function updateTitleFilter(el) {
+function updateTitleFilter(el, event) {
   const menu = el.classList && el.classList.contains('title-menu') ? el : el.closest('.title-menu')
   const control = menu && menu.closest('.home-title-control')
   if (!menu || !control) return
 
-  const inputs = Array.from(menu.querySelectorAll('input[type=checkbox]'))
+  const inputs = Array.from(menu.querySelectorAll('input[type=checkbox], input[type=radio]'))
   const all = inputs.map(function (input) { return input.value })
-  let selected = inputs.filter(function (input) { return input.checked }).map(function (input) { return input.value })
+  const multiple = menu.getAttribute('data-multiple') !== 'false'
+  let selected
 
-  if (!selected.length) {
-    inputs.forEach(function (input) { input.checked = true })
-    selected = all.slice()
+  if (!multiple) {
+    const chosen = (event && event.target && event.target.value) || (inputs.find(function (input) { return input.checked }) || {}).value
+    if (!chosen) return
+    inputs.forEach(function (input) { input.checked = input.value === chosen })
+    selected = [chosen]
+    closeTitleMenus()
+  } else {
+    selected = inputs.filter(function (input) { return input.checked }).map(function (input) { return input.value })
+    if (!selected.length) {
+      inputs.forEach(function (input) { input.checked = true })
+      selected = all.slice()
+    }
   }
 
   inputs.forEach(function (input) {
@@ -409,22 +458,25 @@ function updateTitleFilter(el) {
   window.setLangPref(menu.getAttribute('data-pref'), selected.join(','))
 
   const labelEl = control.querySelector('[data-title-label]')
-  if (labelEl) {
-    const allLabel = control.getAttribute('data-i18n-all') || ''
-    labelEl.textContent = selected.length === all.length
-      ? allLabel
-      : selected.map(function (code) {
-        const input = menu.querySelector('input[value="' + code + '"]')
-        return input ? titleOptionLabel(input) : code
-      }).join(' · ')
-  }
+  if (labelEl) labelEl.textContent = titleMenuLabel(control, menu, selected, all)
 
   if (menu.getAttribute('data-pref') === 'read') syncTranslateForRead(selected)
   applyAllItems()
 }
 
 function initTitleMenus() {
+  const readMenu = homeEl('[data-pref=read]')
+  if (readMenu && readMenu.getAttribute('data-multiple') === 'false') {
+    const allowed = allowedCodesFromMenu('read')
+    const codes = codesFromPref(localStorage.getItem('readalong-read') || '', allowed)
+    if (codes.length > 1) window.setLangPref('read', codes[0])
+  }
   document.addEventListener('click', function (event) {
+    const singleOption = event.target.closest('[data-multiple=false] [role=option]')
+    if (singleOption) {
+      closeTitleMenus()
+      return
+    }
     if (event.target.closest('.home-title-control')) return
     closeTitleMenus()
   })
