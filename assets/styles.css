@@ -1501,7 +1501,7 @@ body.ios:not(.started.show-translation) .translation-popover{
   flex-wrap: wrap;
   min-width: 0;
   font-size: 0;
-  gap: 0.35em;
+  gap: 0.35rem;
 }
 
 .home-header h1{
