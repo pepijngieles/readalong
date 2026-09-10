@@ -1500,6 +1500,7 @@ body.ios:not(.started.show-translation) .translation-popover{
   align-items: baseline;
   flex-wrap: wrap;
   min-width: 0;
+  font-size: 0;
 }
 
 .home-header h1{
@@ -1543,9 +1544,10 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 .home-title-trigger .icon{
   position: static;
-  width: 0.875rem;
-  height: 0.875rem;
+  width: 0.75rem;
+  height: 0.75rem;
   margin: 0;
+  margin-inline-end: -0.125rem;
   color: var(--text-tertiary);
   transform: none;
 }
