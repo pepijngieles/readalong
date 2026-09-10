@@ -15,14 +15,14 @@ if (!$needsOnboarding) {
   foreach ($sourceLangs as $code) {
     $translationLangsBySource[$code] = story_translation_languages_for_source($storiesDir, $code);
   }
-  $readAlongLangs = lang_prefs_list('read', $sourceLangs, ['nl']);
-  $translateLangOptions = story_translation_languages_for_sources($translationLangsBySource, $readAlongLangs, $sourceLangs);
+  $readAlongLang = lang_prefs_list('read', $sourceLangs, ['nl'])[0] ?? 'nl';
+  $translateLangOptions = story_translation_languages_for_sources($translationLangsBySource, [$readAlongLang], $sourceLangs);
   $translateLang = lang_prefs_list('translate', $translateLangOptions, [ui_locale()])[0] ?? ($translateLangOptions[0] ?? ui_locale());
   $levelCodes = level_codes();
   $levelFilter = lang_prefs_list('level', $levelCodes, []);
   $showTranslationLang = false;
   $stories = story_list($storiesDir, [$translateLang], null, []);
-  $stories = story_apply_home_hidden($stories, $readAlongLangs, $sourceLangs, $levelFilter);
+  $stories = story_apply_home_hidden($stories, [$readAlongLang], $sourceLangs, $levelFilter);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = story_duration_filter_minutes();
   $kindTiles = story_filter_kinds();
@@ -30,9 +30,9 @@ if (!$needsOnboarding) {
   foreach ($sourceLangs as $code) {
     $readLabels[$code] = lang_label($code);
   }
-  $readSelectLabel = pref_filter_summary($readAlongLangs, $sourceLangs, $readLabels, t('home.all_languages'));
+  $readSelectLabel = $readLabels[$readAlongLang] ?? lang_label($readAlongLang);
   $levelLabels = array_combine($levelCodes, $levelCodes);
-  $levelSelectLabel = pref_filter_summary($levelFilter, $levelCodes, $levelLabels, t('home.all_levels'));
+  $levelSelectLabel = level_filter_summary($levelFilter, t('home.all_levels'));
   $weatherVisible = false;
   foreach ($weatherStories as $item) {
     if (empty($item['hidden'])) {
@@ -72,9 +72,10 @@ if (!$needsOnboarding) {
 					$readSelectLabel,
 					t('home.all_languages'),
 					$readLabels,
-					$readAlongLangs,
+					[$readAlongLang],
 					$sourceLangs,
-					true
+					true,
+					false
 				);
 				render_title_menu(
 					'level-menu',
@@ -179,7 +180,7 @@ if (!$needsOnboarding) {
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=20" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=21" defer></script>
 
 <?php endif; ?>
 

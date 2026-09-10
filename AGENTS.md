@@ -120,7 +120,7 @@ Settings is a native `<dialog>`:
 - Project CSS wins over Brio’s centered dialog on wide viewports (`#settings` stays a bottom sheet)
 - `updateThemeColor()` in `settings.js` checks `settingsDialog.open`, not `.hidden`
 
-Home read-along language and levels live in the header as custom multi-selects (`toggleTitleMenu`, `updateTitleFilter`). The trigger width follows the active label. A comma sits only between the two menus, not after “Readalong”. They apply immediately via `setLangPref` (no reload). They are not in `#settings`. Translation language in the settings sheet applies on change (`data-change=saveCatalogPrefs`) and reloads. There is no save button; the reader sheet has no title.
+Home read-along language is a single-select title menu; levels are a multi-select (`toggleTitleMenu`, `updateTitleFilter`). Consecutive levels collapse to a range (`A1-B2`). Trigger width follows the active label. No comma in the title. They apply immediately via `setLangPref` (no reload). They are not in `#settings`. Translation language in the settings sheet applies on change (`data-change=saveCatalogPrefs`) and reloads. There is no save button; the reader sheet has no title.
 
 ---
 
@@ -220,8 +220,8 @@ After UI or chrome changes, test:
 
 **Home**
 
-- [ ] Header reads as one title: Readalong language dropdown, level dropdown (comma only between the two menus)
-- [ ] Language and level menus are multi-select; trigger width follows the active label
+- [ ] Header reads as one title: Readalong language dropdown level dropdown (no commas)
+- [ ] Language is single-select; levels are multi-select with ranges like A1-B2; trigger width follows the active label
 - [ ] Language and level filters apply immediately (no reload)
 - [ ] Settings gear: translation language + theme only (not read-along/level)
 - [ ] Settings: open, Escape, backdrop, close X; translation language applies on change + reload; no save button
