@@ -325,8 +325,12 @@ function toggleHistory(el) {
   el.textContent = expanded ? historyLabel : hideHistoryLabel
 }
 
+function filterMenuTriggers() {
+  return homeAll('.home-title-trigger, .filter-trigger')
+}
+
 function closeTitleMenus(except) {
-  homeAll('.home-title-trigger').forEach(function (button) {
+  filterMenuTriggers().forEach(function (button) {
     if (except && button === except) return
     button.setAttribute('aria-expanded', 'false')
     const menu = document.getElementById(button.getAttribute('aria-controls'))
@@ -428,7 +432,7 @@ function syncTranslateForRead(readLangs) {
 
 function updateTitleFilter(el, event) {
   const menu = el.classList && el.classList.contains('title-menu') ? el : el.closest('.title-menu')
-  const control = menu && menu.closest('.home-title-control')
+  const control = menu && menu.closest('.home-title-control, .filter-dropdown')
   if (!menu || !control) return
 
   const inputs = Array.from(menu.querySelectorAll('input[type=checkbox], input[type=radio]'))
@@ -477,7 +481,7 @@ function initTitleMenus() {
       closeTitleMenus()
       return
     }
-    if (event.target.closest('.home-title-control')) return
+    if (event.target.closest('.home-title-control, .filter-dropdown')) return
     closeTitleMenus()
   })
   document.addEventListener('keydown', function (event) {

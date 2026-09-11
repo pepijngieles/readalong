@@ -2,9 +2,9 @@
 require_once __DIR__ . '/../story.php';
 
 $storiesDir = dirname(__DIR__, 2) . '/stories';
-$sourceLangs = story_source_languages($storiesDir);
+$contentLangs = story_content_languages($storiesDir);
 $translationLangsBySource = [];
-foreach ($sourceLangs as $code) {
+foreach ($contentLangs as $code) {
   $translationLangsBySource[$code] = story_translation_languages_for_source($storiesDir, $code);
 }
 $uiLang = detect_browser_locale(configured_languages());
@@ -38,7 +38,7 @@ $storyConfig = [
 					<label for=onboarding-read data-i18n=onboarding.read_along><?= e(t('onboarding.read_along')) ?></label>
 					<div class="select-wrap full-width">
 						<select id=onboarding-read class=select-medium data-onboarding-read data-change=onboardingReadChange translate=no>
-<?php foreach ($sourceLangs as $code): ?>
+<?php foreach ($contentLangs as $code): ?>
 							<option value=<?= e($code) ?> lang=<?= e($code) ?><?= $code === $defaultRead ? ' selected' : '' ?>><?= e(lang_label($code)) ?></option>
 <?php endforeach; ?>
 						</select>
