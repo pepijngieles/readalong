@@ -1996,12 +1996,13 @@ html.loading body{
   border-radius: 50%;
   background: var(--thumb-line);
   color: var(--thumb-bg);
-  border: calc(var(--thumb-size) * 0.03) solid var(--background-primary);
+  border: max(2px, calc(var(--thumb-size) * 0.045)) solid var(--background-primary);
 }
 
 .item-thumb .type-badge .thumb-icon{
-  width: 50%;
-  height: 50%;
+  width: 62%;
+  height: 62%;
+  flex-shrink: 0;
 }
 
 .item-thumb .thumb-icon{
