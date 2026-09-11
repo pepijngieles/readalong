@@ -1,6 +1,7 @@
 {
   "id": "two-frogs",
   "type": "default",
+  "topic": "fiction",
   "language": "nl",
   "order": 1,
   "published": true,
