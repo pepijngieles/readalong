@@ -1900,7 +1900,7 @@ html.loading body{
   --thumb-bg: var(--thumb-fallback-bg);
   --thumb-fill: var(--thumb-fallback-fill);
   --thumb-line: var(--thumb-fallback-line);
-  --thumb-badge-size: 38%;
+  --thumb-badge-size: 32%;
   position: relative;
   flex-shrink: 0;
   overflow: visible;
@@ -1943,7 +1943,7 @@ html.loading body{
 }
 
 .item-thumb[data-layout=compact]{
-  --thumb-badge-size: 40%;
+  --thumb-badge-size: 34%;
 }
 
 .item-thumb .canvas{
@@ -2000,8 +2000,8 @@ html.loading body{
 }
 
 .item-thumb .type-badge .thumb-icon{
-  width: calc(var(--thumb-size) * 14 / 48);
-  height: calc(var(--thumb-size) * 14 / 48);
+  width: calc(var(--thumb-size) * 12 / 64);
+  height: calc(var(--thumb-size) * 12 / 64);
   flex-shrink: 0;
 }
 
