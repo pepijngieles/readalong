@@ -72,9 +72,10 @@ ELEVEN = "https://api.elevenlabs.io/v1"
 
 # Scribe wil ISO-639-3, de site gebruikt tweeletterige codes.
 SCRIBE_LANG = {"no": "nor", "nb": "nor", "nn": "nor", "nl": "nld", "en": "eng",
-               "de": "deu", "sv": "swe", "da": "dan", "fr": "fra", "es": "spa"}
-DEEPL_LANG = {"no": "NB", "nb": "NB", "nl": "NL", "de": "DE", "sv": "SV",
-              "da": "DA", "fr": "FR", "es": "ES"}
+               "de": "deu", "hu": "hun", "sv": "swe", "da": "dan", "fr": "fra",
+               "es": "spa"}
+DEEPL_LANG = {"no": "NB", "nb": "NB", "nl": "NL", "de": "DE", "hu": "HU",
+              "sv": "SV", "da": "DA", "fr": "FR", "es": "ES"}
 
 # Zinseinde, maar niet na een afkorting.
 SENTENCE_END = re.compile(r"[.!?…]+[\"'»”’)\]]*$")
@@ -90,13 +91,16 @@ STRONG_CONJUNCTIONS = {
     "men", "eller", "maar", "want", "omdat", "fordi", "mens", "terwijl",
     "hoewel", "zodat", "dus", "although", "because", "but", "or",
     "sidan", "dersom", "medan",
+    "de", "hanem", "mert", "hogy", "bár", "míg", "tehát",
 }
 MEDIUM_CONJUNCTIONS = {
     "så", "da", "då", "for", "siden", "toen", "so", "while", "when",
     "når", "hvis", "als", "if", "then",
+    "mikor", "amikor", "ha", "mivel", "azután", "akkor",
 }
 WEAK_CONJUNCTIONS = {
     "og", "en", "and", "som", "at", "der", "òg", "samt",
+    "és", "mint", "amely", "aki", "amit",
 }
 CONJUNCTIONS = STRONG_CONJUNCTIONS | MEDIUM_CONJUNCTIONS | WEAK_CONJUNCTIONS
 LIST_CONJUNCTIONS = {"og", "en", "and", "òg"}
@@ -104,6 +108,7 @@ PRONOUNS = {
     "jeg", "du", "han", "hun", "vi", "de", "eg", "ho", "me", "dei",
     "ik", "jij", "hij", "zij", "we", "they", "i", "me", "mi", "min",
     "my", "haar", "his", "her", "dem", "oss", "ons",
+    "én", "te", "ő", "mi", "ti", "ők", "magam", "magad", "maguk",
 }
 
 # Mik op 2–3 halfzinnen, niet op kruimels en niet op 60-woordmonsters.
