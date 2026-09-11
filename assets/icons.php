@@ -88,7 +88,7 @@ function icon_definitions() {
   ];
 }
 
-function icon($name, $options = []) {
+function icon_html($name, $options = []) {
   static $icons = null;
   if ($icons === null) {
     $icons = icon_definitions();
@@ -105,9 +105,13 @@ function icon($name, $options = []) {
   $class = $options['class'] ?? 'icon';
   $style = isset($options['style']) ? ' style="' . e($options['style']) . '"' : '';
 
-  echo '<svg width=' . (int) $width . ' height=' . (int) $height
+  return '<svg width=' . (int) $width . ' height=' . (int) $height
     . ' viewBox="' . e($definition['viewBox']) . '"'
     . ' class=' . e($class) . ' data-icon aria-hidden=true' . $style . '>'
     . $definition['body']
     . '</svg>';
+}
+
+function icon($name, $options = []) {
+  echo icon_html($name, $options);
 }
