@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/thumbnail.php';
 
 function voice_label(array $voice) {
   $label = $voice['name'];
@@ -339,6 +340,7 @@ function story_list($storiesDir, $translationLangs = 'en', $readAlongLang = null
       'levelLabel' => !empty($meta['level']) ? level_label($meta['level']) : null,
       'kind' => $kind,
       'kindLabel' => story_kind_label($kind),
+      'topic' => $meta['topic'] ?? '',
       'language' => $meta['language'],
       'translationLang' => $usedTranslationLang,
       'sentenceCount' => count($defaultVoice['timestamps'] ?? []),
@@ -453,6 +455,7 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
 
   $html = "\t\t\t<li" . $attrs . ">\n";
   $html .= "\t\t\t\t<a class=story-item href=\"stories/" . e($item['slug']) . "/\">\n";
+  $html .= "\t\t\t\t\t" . render_item_thumbnail($item['id'], $item['topic'] ?? '', $item['kind'] ?? '', 64, 'story-thumb') . "\n";
   $html .= "\t\t\t\t\t<div class=body>\n";
   $html .= "\t\t\t\t\t\t" . $title . "\n";
   if ($metaHtml) {

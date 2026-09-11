@@ -2,6 +2,7 @@
   "id": "taco-pa-fredag",
   "type": "dialogue",
   "kind": "podcast",
+  "topic": "food",
   "language": "no",
   "order": 5,
   "published": true,

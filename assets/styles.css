@@ -514,9 +514,13 @@ dl dt{
 
 .list .story-item{
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--spacing-16);
+}
+
+.story-item .item-thumb{
+  flex-shrink: 0;
 }
 
 .list li:first-of-type a{
@@ -1741,11 +1745,14 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .continue-list li.featured .story-item{
-  display: block;
+  display: flex;
+  align-items: flex-start;
 }
 
 .continue-list li.featured .story-item .body{
   display: block;
+  flex: 1;
+  min-width: 0;
 }
 
 .continue-list li.featured .story-item p{

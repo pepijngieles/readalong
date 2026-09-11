@@ -2,6 +2,7 @@
   "id": "tonesette-dikt",
   "type": "dialogue",
   "kind": "podcast",
+  "topic": "music",
   "language": "no",
   "order": 9,
   "published": true,

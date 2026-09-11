@@ -1,6 +1,7 @@
 {
   "id": "favorite-food",
   "type": "dialogue",
+  "topic": "food",
   "language": "nl",
   "order": 2,
   "published": true,
