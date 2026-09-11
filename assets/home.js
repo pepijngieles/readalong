@@ -79,9 +79,18 @@ function levelMatchesCodes(level, selected) {
   })
 }
 
+function defaultKindFilter() {
+  const allSection = homeEl('[data-all-section]')
+  const fromDom = allSection && allSection.getAttribute('data-default-kind')
+  if (fromDom) return fromDom
+  const kinds = knownKinds()
+  return kinds[0] || DEFAULT_KIND
+}
+
 function knownKinds() {
   const kinds = []
   homeAll('[data-kind-filter]').forEach(function (chip) {
+    if (chip.hidden) return
     kinds.push(chip.getAttribute('data-kind-filter'))
   })
   return kinds
@@ -89,15 +98,18 @@ function knownKinds() {
 
 function readFiltersFromUrl() {
   const params = new URLSearchParams(location.search)
-  const kind = params.get('kind') || DEFAULT_KIND
+  const kind = params.get('kind') || defaultKindFilter()
   const duration = parseInt(params.get('duration'), 10)
-  kindFilter = knownKinds().indexOf(kind) !== -1 ? kind : DEFAULT_KIND
+  const kinds = knownKinds()
+  kindFilter = kinds.indexOf(kind) !== -1 ? kind : defaultKindFilter()
   durationLimit = DURATION_OPTIONS.indexOf(duration) !== -1 ? duration * 60 : 0
 }
 
 function writeFiltersToUrl() {
   const params = new URLSearchParams(location.search)
-  if (kindFilter && kindFilter !== DEFAULT_KIND) params.set('kind', kindFilter)
+  const kinds = knownKinds()
+  const defaultKind = defaultKindFilter()
+  if (kinds.length && kindFilter && kindFilter !== defaultKind) params.set('kind', kindFilter)
   else params.delete('kind')
   if (durationLimit) params.set('duration', String(durationLimit / 60))
   else params.delete('duration')
@@ -123,6 +135,38 @@ function filtersActive() {
   return !!durationLimit
 }
 
+function updateKindPills(readFilter, levelFilter, sourceLangs) {
+  const allList = homeEl('[data-all-items]')
+  const kindsRow = homeEl('[data-kind-filters]')
+  if (!allList) return
+
+  const availableKinds = {}
+  allList.querySelectorAll('li').forEach(function (item) {
+    const language = item.getAttribute('data-language') || ''
+    const level = item.getAttribute('data-level') || ''
+    const matchLang = isAllFilter(readFilter, sourceLangs) || readFilter.indexOf(language) !== -1
+    const matchLevel = levelMatchesCodes(level, levelFilter)
+    if (!matchLang || !matchLevel) return
+    const kind = item.getAttribute('data-kind') || ''
+    if (kind) availableKinds[kind] = true
+  })
+
+  let firstVisible = null
+  homeAll('[data-kind-filter]').forEach(function (chip) {
+    const kind = chip.getAttribute('data-kind-filter')
+    const show = !!availableKinds[kind]
+    chip.hidden = !show
+    if (show && !firstVisible) firstVisible = kind
+  })
+
+  if (kindsRow) kindsRow.hidden = !firstVisible
+
+  if (firstVisible && knownKinds().indexOf(kindFilter) === -1) {
+    kindFilter = firstVisible
+    syncFilterState()
+  }
+}
+
 function applyAllItems() {
   const allList = homeEl('[data-all-items]')
   const noResults = homeEl('[data-no-results]')
@@ -137,6 +181,9 @@ function applyAllItems() {
   const readFilter = savedReadFilter()
   const levelFilter = savedLevelFilter()
 
+  updateKindPills(readFilter, levelFilter, sourceLangs)
+  const activeKinds = knownKinds()
+
   function matchesHomeFilters(item, includeKindDuration) {
     const language = item.getAttribute('data-language') || ''
     const level = item.getAttribute('data-level') || ''
@@ -146,7 +193,7 @@ function applyAllItems() {
     if (!includeKindDuration) return true
     const kind = item.getAttribute('data-kind') || ''
     const seconds = parseInt(item.getAttribute('data-duration-seconds'), 10) || 0
-    const matchKind = !kind || kind === kindFilter
+    const matchKind = !activeKinds.length || !kind || kind === kindFilter
     const matchDuration = !durationLimit || (seconds > 0 && seconds <= durationLimit)
     return matchKind && matchDuration
   }
@@ -469,6 +516,7 @@ function updateTitleFilter(el, event) {
 }
 
 function initTitleMenus() {
+  closeTitleMenus()
   const readMenu = homeEl('[data-pref=read]')
   if (readMenu && readMenu.getAttribute('data-multiple') === 'false') {
     const allowed = allowedCodesFromMenu('read')

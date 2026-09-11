@@ -317,7 +317,7 @@ function render_browse_filter_menu($id, $pref, $groupLabel, $summaryLabel, $allL
   ?>
 				<div class=filter-field>
 					<span class=visually-hidden id="<?= e($id) ?>-label"><?= e($groupLabel) ?></span>
-					<div class="select-wrap filter-dropdown" data-i18n-all="<?= e($allLabel) ?>"><button type=button class="quiet select-medium filter-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls="<?= e($id) ?>" aria-labelledby="<?= e($id) ?>-label"><span data-title-label><?= e($summaryLabel) ?></span></button><?php icon('chevron-down', ['size' => 16]); ?><div id="<?= e($id) ?>" class="title-menu filter-menu hidden" role=listbox<?= $multiple ? ' aria-multiselectable=true' : '' ?> data-pref="<?= e($pref) ?>"<?= $multiple ? '' : ' data-multiple=false' ?> data-change=updateTitleFilter>
+					<div class="select-wrap filter-dropdown" data-i18n-all="<?= e($allLabel) ?>"><button type=button class="select-medium filter-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls="<?= e($id) ?>" aria-labelledby="<?= e($id) ?>-label"><span data-title-label><?= e($summaryLabel) ?></span></button><?php icon('chevron-down', ['size' => 16]); ?><div id="<?= e($id) ?>" class="title-menu filter-menu" role=listbox hidden<?= $multiple ? ' aria-multiselectable=true' : '' ?> data-pref="<?= e($pref) ?>"<?= $multiple ? '' : ' data-multiple=false' ?> data-change=updateTitleFilter>
 <?php foreach ($options as $code => $label): ?>
 <?php $checked = $allSelected || in_array($code, $selected, true); ?>
 						<label role=option aria-selected=<?= $checked ? 'true' : 'false' ?>>

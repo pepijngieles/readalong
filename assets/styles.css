@@ -812,7 +812,8 @@ select + .icon{
   pointer-events: none;
 }
 
-select.select-medium{
+select.select-medium,
+button.select-medium.filter-trigger{
   box-sizing: border-box;
   width: 100%;
   height: 2rem;
@@ -825,6 +826,21 @@ select.select-medium{
   line-height: 1rem;
   color: var(--text-secondary);
   background-color: var(--background-popover);
+}
+
+button.select-medium.filter-trigger{
+  display: inline-flex;
+  align-items: center;
+  text-align: start;
+  white-space: nowrap;
+  box-shadow: none;
+  filter: none;
+  cursor: pointer;
+}
+
+button.select-medium.filter-trigger:active{
+  filter: none;
+  box-shadow: none;
 }
 
 select.select-medium:focus-visible,
@@ -1817,25 +1833,22 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .home-browse-filters{
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
   margin-block: var(--spacing-12) 0;
 }
 
+.home-browse-kinds{
+  flex-wrap: wrap;
+}
+
+.home-browse-filters .filter-field,
+.home-browse-filters label.filter-field{
+  width: 100%;
+}
+
 .home-browse-filters .select-wrap{
-  display: inline-block;
-}
-
-.home-browse-filters select.select-medium,
-.home-browse-filters button.select-medium.filter-trigger{
-  width: auto;
-}
-
-button.select-medium.filter-trigger{
-  display: inline-flex;
-  align-items: center;
-  text-align: start;
-  cursor: pointer;
+  display: block;
+  width: 100%;
 }
 
 .filter-dropdown{
