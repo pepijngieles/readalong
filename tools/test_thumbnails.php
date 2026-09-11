@@ -97,6 +97,11 @@ try {
   $iconOnly = render_item_thumbnail('x', 'food', 'podcast', 24);
   expect_true(strpos($iconOnly, 'type-badge') === false, 'icon layout skips badge');
   expect_true(strpos($iconOnly, 'class="disc"') === false, 'icon layout skips disc');
+  $banner = render_item_thumbnail('bo-i-byen', 'cities', 'news', 96, 'story-banner', 'banner');
+  expect_true(strpos($banner, 'data-shape=banner') !== false, 'banner includes data-shape');
+  expect_true(strpos($banner, 'class="motif') !== false, 'banner includes motif');
+  expect_true(strpos($banner, 'type-badge') !== false, 'banner includes badge');
+  expect_true(strpos($banner, '--thumb-size') === false, 'banner has no fixed px size');
 } catch (Throwable $e) {
   expect_true(false, 'render_item_thumbnail threw: ' . $e->getMessage());
 }

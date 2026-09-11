@@ -1946,6 +1946,19 @@ html.loading body{
   --thumb-badge-size: 34%;
 }
 
+.item-thumb.banner{
+  container-type: size;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  --thumb-size: 100cqh;
+  margin-block-end: var(--spacing-16);
+}
+
+.item-thumb.banner .canvas{
+  border-radius: var(--border-radius-medium);
+}
+
 .item-thumb .canvas{
   position: relative;
   width: 100%;
@@ -2232,6 +2245,10 @@ html.loading body{
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
   gap: var(--spacing-16);
+}
+
+.thumb-demo-page .thumb-banner-demo{
+  max-width: 34rem;
 }
 
 .thumb-demo-page .thumb-library{

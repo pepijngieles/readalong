@@ -29,9 +29,9 @@ $library = [
   ['id' => 'two-frogs', 'topic' => 'fiction', 'contentType' => '', 'title' => 'The story of two frogs'],
 ];
 
-function thumb_demo_cell($id, $topic, $contentType, $size, $caption) {
+function thumb_demo_cell($id, $topic, $contentType, $size, $caption, $shape = 'square') {
   echo '<div class=thumb-cell>';
-  echo render_item_thumbnail($id, $topic, $contentType, $size);
+  echo render_item_thumbnail($id, $topic, $contentType, $size, '', $shape);
   echo '<small>' . e($caption) . '</small>';
   echo '</div>';
 }
@@ -97,6 +97,12 @@ endfor; ?>
   }
   thumb_demo_cell($item['id'], $item['topic'], $item['contentType'], 96, $caption);
 endforeach; ?>
+		</div>
+
+		<h2>Banner (16:9)</h2>
+		<p class="text-color-tertiary font-size-small">Full-width detail page banner. Same topic, type, and id as the square thumbnail.</p>
+		<div class=thumb-banner-demo>
+<?php thumb_demo_cell('bo-i-byen', 'cities', 'news', 96, 'bo-i-byen · cities · news', 'banner'); ?>
 		</div>
 
 		<h2>Size</h2>
