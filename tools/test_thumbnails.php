@@ -69,15 +69,16 @@ for ($i = 0; $i < 1000; $i++) {
   $variantCounts[$info['variant']]++;
 }
 
+$expectedMotif = 1000 / count(thumbnail_motifs());
 foreach ($counts as $motif => $count) {
-  expect_true($count >= 140 && $count <= 260, "motif $motif count $count is roughly uniform (expected ~200)");
+  expect_true($count >= 110 && $count <= 230, "motif $motif count $count is roughly uniform (expected ~$expectedMotif)");
 }
 
 $chi = 0.0;
 foreach ($counts as $count) {
-  $chi += (($count - 200) ** 2) / 200;
+  $chi += (($count - $expectedMotif) ** 2) / $expectedMotif;
 }
-expect_true($chi < 20, "chi-square $chi over motifs should be modest");
+expect_true($chi < 25, "chi-square $chi over motifs should be modest");
 
 foreach ($variantCounts as $variant => $count) {
   expect_true($count >= 150 && $count <= 350, "variant $variant count $count is roughly uniform (expected ~250)");

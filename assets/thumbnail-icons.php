@@ -38,6 +38,15 @@ function thumb_icon_definitions() {
   ];
 }
 
+function thumb_badge_adjustments() {
+  return [
+    'Microphone' => 'translate(0, -7%)',
+    'BookBookmark' => 'translate(0, -5%)',
+    'Newspaper' => 'translate(0, -4%)',
+    'EnvelopeSimple' => 'translate(0, -3%)',
+  ];
+}
+
 function thumb_icon_html($name, $options = []) {
   static $icons = null;
   if ($icons === null) {
@@ -50,7 +59,14 @@ function thumb_icon_html($name, $options = []) {
 
   $definition = $icons[$name];
   $class = $options['class'] ?? 'thumb-icon';
-  return '<svg viewBox="0 0 256 256" class="' . e($class) . '" focusable="false">'
+  $style = '';
+  if (!empty($options['badge'])) {
+    $adjustments = thumb_badge_adjustments();
+    if (isset($adjustments[$name])) {
+      $style = ' style="transform:' . e($adjustments[$name]) . '"';
+    }
+  }
+  return '<svg viewBox="0 0 256 256" class="' . e($class) . '" focusable="false"' . $style . '>'
     . $definition
     . '</svg>';
 }

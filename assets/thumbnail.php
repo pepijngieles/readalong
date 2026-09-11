@@ -54,7 +54,7 @@ function render_item_thumbnail($id, $topic, $contentType, $size = 96, $className
   $html .= '</div>';
 
   if ($layout !== 'icon') {
-    $html .= '<div class="type-badge">' . thumb_icon_html($badgeName) . '</div>';
+    $html .= '<div class="type-badge">' . thumb_icon_html($badgeName, ['badge' => true]) . '</div>';
   }
 
   $html .= '</div>';
