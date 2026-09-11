@@ -55,6 +55,11 @@ function serve_audio($path) {
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+if (preg_match('#^/thumbnails/?$#', $uri)) {
+  require __DIR__ . '/thumbnails.php';
+  return true;
+}
+
 if (preg_match('#^/stories/([a-z0-9-]+)/?$#', $uri, $m)) {
   $_GET['slug'] = $m[1];
   require __DIR__ . '/stories/view.php';
