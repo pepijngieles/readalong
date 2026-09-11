@@ -156,7 +156,8 @@
   --thumb-fallback-line: #2C2C2A;
 
   --thumb-motif-opacity: 0.5;
-  --thumb-motif-grid-opacity: 0.8;
+  --thumb-motif-grid-opacity: 0.38;
+  --thumb-motif-lines-opacity: 0.32;
   --thumb-motif-echo-opacity: 0.13;
 }
 
@@ -214,7 +215,8 @@ body.theme-black{
   --thumb-fallback-line: #D3D1C7;
 
   --thumb-motif-opacity: 0.4;
-  --thumb-motif-grid-opacity: 0.55;
+  --thumb-motif-grid-opacity: 0.28;
+  --thumb-motif-lines-opacity: 0.24;
   --thumb-motif-echo-opacity: 0.2;
 }
 
@@ -2096,21 +2098,54 @@ html.loading body{
 .item-thumb .motif.grid{
   inset: 0;
   opacity: var(--thumb-motif-grid-opacity);
-  background-image: radial-gradient(circle, var(--thumb-fill) 2px, transparent 2.5px);
-  background-size: 15% 15%;
-  background-position: 0 0;
+  background-image: radial-gradient(circle, var(--thumb-fill) 1px, transparent 1px);
+  background-size: 33.333333% 33.333333%;
+  background-position: center center;
 }
 
 .item-thumb .motif.grid[data-variant="1"]{
-  background-position: 7.5% 0;
+  background-size: 50% 50%;
 }
 
 .item-thumb .motif.grid[data-variant="2"]{
-  background-position: 0 7.5%;
+  background-size: 33.333333% 33.333333%;
+  background-position: calc(50% + 16.666667%) center;
 }
 
 .item-thumb .motif.grid[data-variant="3"]{
-  background-position: 7.5% 7.5%;
+  background-size: 50% 50%;
+  background-position: calc(50% + 25%) center;
+}
+
+.item-thumb .motif.lines{
+  width: 150%;
+  height: 150%;
+  top: 50%;
+  left: 50%;
+  opacity: var(--thumb-motif-lines-opacity);
+  --line-step: 14%;
+  --line-width: 1px;
+  background-image: repeating-linear-gradient(
+    var(--line-angle, 45deg),
+    transparent,
+    transparent calc(var(--line-step) - var(--line-width)),
+    var(--thumb-fill) calc(var(--line-step) - var(--line-width)),
+    var(--thumb-fill) var(--line-step)
+  );
+  transform: translate(-50%, -50%);
+}
+
+.item-thumb .motif.lines[data-variant="1"]{
+  --line-angle: -45deg;
+}
+
+.item-thumb .motif.lines[data-variant="2"]{
+  --line-step: 20%;
+}
+
+.item-thumb .motif.lines[data-variant="3"]{
+  --line-angle: -45deg;
+  --line-step: 20%;
 }
 
 .item-thumb .motif.horizon{

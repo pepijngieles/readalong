@@ -77,7 +77,7 @@ endforeach; ?>
 		</div>
 
 		<h2>Motif grid</h2>
-		<p class="text-color-tertiary font-size-small">Same topic and type; id varies. Five motifs × four variants.</p>
+		<p class="text-color-tertiary font-size-small">Same topic and type; id varies. Six motifs × four variants.</p>
 		<div class=thumb-motif-grid>
 <?php for ($i = 0; $i < 24; $i++):
   $id = sprintf('grid-%02d', $i);

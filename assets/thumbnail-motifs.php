@@ -1,7 +1,7 @@
 <?php
 
 function thumbnail_motifs() {
-  return ['band', 'arc', 'echo', 'grid', 'horizon'];
+  return ['band', 'arc', 'echo', 'grid', 'lines', 'horizon'];
 }
 
 function thumbnail_hash_id($id) {
