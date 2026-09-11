@@ -32,7 +32,7 @@ function read_json($path) {
 }
 
 function configured_languages() {
-  return ['de', 'en', 'es', 'fr', 'nl', 'no'];
+  return ['de', 'en', 'es', 'fr', 'hu', 'nl', 'no'];
 }
 
 function lang_endonyms() {
@@ -41,6 +41,7 @@ function lang_endonyms() {
     'en' => 'English',
     'es' => 'Español',
     'fr' => 'Français',
+    'hu' => 'Magyar',
     'nl' => 'Nederlands',
     'no' => 'Norsk',
   ];
@@ -76,6 +77,10 @@ function onboarding_demo_segments() {
     'fr' => [
       'Quand le train est enfin entré en gare,',
       'j\'avais déjà lu la moitié du livre.',
+    ],
+    'hu' => [
+      'Amikor a vonat végre beállt az állomásra,',
+      'már a könyv felét elolvastam.',
     ],
     'nl' => [
       'Toen de trein eindelijk het station binnenreed,',

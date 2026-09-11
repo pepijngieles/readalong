@@ -1,0 +1,91 @@
+{
+  "id": "magyar-dolgozat",
+  "type": "default",
+  "language": "hu",
+  "order": 10,
+  "published": true,
+  "voices": [
+    {
+      "id": "bakonyi-orsolya",
+      "name": "Bakonyi Orsolya",
+      "duration": 292,
+      "timestamps": [
+        0.0,
+        6.0,
+        8.1,
+        11.0,
+        14.4,
+        23.8,
+        32.7,
+        41.3,
+        48.1,
+        57.6,
+        64.1,
+        69.7,
+        79.2,
+        84.7,
+        92.2,
+        95.9,
+        106.4,
+        113.0,
+        116.7,
+        125.2,
+        131.5,
+        138.8,
+        146.1,
+        154.6,
+        159.0,
+        162.1,
+        172.0,
+        172.0,
+        174.7,
+        179.1,
+        179.1,
+        179.1,
+        179.1,
+        180.5,
+        183.3,
+        186.9,
+        189.7,
+        197.2,
+        199.5,
+        208.2,
+        218.9,
+        220.9,
+        228.4,
+        229.8,
+        235.0,
+        243.8,
+        249.3,
+        256.5,
+        260.6,
+        262.9,
+        273.7,
+        281.3,
+        287.6,
+        290.2,
+        290.2,
+        290.2
+      ]
+    }
+  ],
+  "level": "B1-B2",
+  "attribution": {
+    "title": "Tanár úr kérem — Karinthy Frigyes",
+    "url": "https://mek.oszk.hu/19100/19144/"
+  },
+  "rights": {
+    "text": {
+      "source": "MEK / Karinthy Frigyes (public domain)",
+      "license": "Public domain",
+      "url": "https://mek.oszk.hu/19100/19144/"
+    },
+    "audio": {
+      "reader": "Bakonyi Orsolya",
+      "recorded": "2019",
+      "license": "Public domain",
+      "url": "https://mek.oszk.hu/19100/19144/"
+    }
+  },
+  "kind": "book"
+}
