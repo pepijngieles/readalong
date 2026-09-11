@@ -38,12 +38,12 @@ function thumb_icon_definitions() {
   ];
 }
 
-function thumb_badge_adjustments() {
+function thumb_badge_view_boxes() {
   return [
-    'Microphone' => 'translate(0, -7%)',
-    'BookBookmark' => 'translate(0, -5%)',
-    'Newspaper' => 'translate(0, -4%)',
-    'EnvelopeSimple' => 'translate(0, -3%)',
+    'Microphone' => '48 16 160 232',
+    'BookBookmark' => '40 24 176 208',
+    'Newspaper' => '16 40 224 176',
+    'EnvelopeSimple' => '24 48 208 152',
   ];
 }
 
@@ -59,14 +59,14 @@ function thumb_icon_html($name, $options = []) {
 
   $definition = $icons[$name];
   $class = $options['class'] ?? 'thumb-icon';
-  $style = '';
+  $viewBox = '0 0 256 256';
   if (!empty($options['badge'])) {
-    $adjustments = thumb_badge_adjustments();
-    if (isset($adjustments[$name])) {
-      $style = ' style="transform:' . e($adjustments[$name]) . '"';
+    $boxes = thumb_badge_view_boxes();
+    if (isset($boxes[$name])) {
+      $viewBox = $boxes[$name];
     }
   }
-  return '<svg viewBox="0 0 256 256" class="' . e($class) . '" focusable="false"' . $style . '>'
+  return '<svg viewBox="' . e($viewBox) . '" class="' . e($class) . '" focusable="false">'
     . $definition
     . '</svg>';
 }
