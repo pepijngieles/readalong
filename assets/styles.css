@@ -1952,11 +1952,22 @@ html.loading body{
   aspect-ratio: 16 / 9;
   height: auto;
   --thumb-size: 100cqh;
+  --thumb-badge-size: 32cqh;
   margin-block-end: var(--spacing-16);
 }
 
 .item-thumb.banner .canvas{
   border-radius: var(--border-radius-medium);
+}
+
+.item-thumb.banner .disc{
+  width: 62cqh;
+  height: 62cqh;
+}
+
+.item-thumb.banner .topic-icon{
+  width: 38cqh;
+  height: 38cqh;
 }
 
 .item-thumb .canvas{
