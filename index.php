@@ -10,24 +10,25 @@ $partials = __DIR__ . '/assets/partials';
 
 if (!$needsOnboarding) {
   $storiesDir = __DIR__ . '/stories';
-  $sourceLangs = story_source_languages($storiesDir);
+  $contentLangs = story_content_languages($storiesDir);
+  $defaultReadLang = in_array('nl', $contentLangs, true) ? 'nl' : ($contentLangs[0] ?? 'nl');
   $translationLangsBySource = [];
-  foreach ($sourceLangs as $code) {
+  foreach ($contentLangs as $code) {
     $translationLangsBySource[$code] = story_translation_languages_for_source($storiesDir, $code);
   }
-  $readAlongLang = lang_prefs_list('read', $sourceLangs, ['nl'])[0] ?? 'nl';
-  $translateLangOptions = story_translation_languages_for_sources($translationLangsBySource, [$readAlongLang], $sourceLangs);
+  $readAlongLang = lang_prefs_list('read', $contentLangs, [$defaultReadLang])[0] ?? $defaultReadLang;
+  $translateLangOptions = story_translation_languages_for_sources($translationLangsBySource, [$readAlongLang], $contentLangs);
   $translateLang = lang_prefs_list('translate', $translateLangOptions, [ui_locale()])[0] ?? ($translateLangOptions[0] ?? ui_locale());
   $levelCodes = level_codes();
   $levelFilter = lang_prefs_list('level', $levelCodes, []);
   $showTranslationLang = false;
   $stories = story_list($storiesDir, [$translateLang], null, []);
-  $stories = story_apply_home_hidden($stories, [$readAlongLang], $sourceLangs, $levelFilter);
+  $stories = story_apply_home_hidden($stories, [$readAlongLang], $contentLangs, $levelFilter);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $durationPills = story_duration_filter_minutes();
   $kindTiles = story_filter_kinds();
   $readLabels = [];
-  foreach ($sourceLangs as $code) {
+  foreach ($contentLangs as $code) {
     $readLabels[$code] = lang_label($code);
   }
   $readSelectLabel = $readLabels[$readAlongLang] ?? lang_label($readAlongLang);
@@ -73,19 +74,9 @@ if (!$needsOnboarding) {
 					t('home.all_languages'),
 					$readLabels,
 					[$readAlongLang],
-					$sourceLangs,
+					$contentLangs,
 					true,
 					false
-				);
-				render_title_menu(
-					'level-menu',
-					'level',
-					t('home.level'),
-					$levelSelectLabel,
-					t('home.all_levels'),
-					$levelLabels,
-					$levelFilter,
-					$levelCodes
 				);
 ?>
 			</div>
@@ -123,6 +114,18 @@ if (!$needsOnboarding) {
 					<?= e(t('home.kind.' . $kind)) ?>
 				</button>
 <?php endforeach; ?>
+<?php
+				render_browse_filter_menu(
+					'level-menu',
+					'level',
+					t('home.level'),
+					$levelSelectLabel,
+					t('home.all_levels'),
+					$levelLabels,
+					$levelFilter,
+					$levelCodes
+				);
+?>
 				<label>
 					<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
 					<div class=select-wrap>
@@ -180,7 +183,7 @@ if (!$needsOnboarding) {
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=21" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=22" defer></script>
 
 <?php endif; ?>
 

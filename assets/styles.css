@@ -827,7 +827,8 @@ select.select-medium{
   background-color: var(--background-popover);
 }
 
-select.select-medium:focus-visible{
+select.select-medium:focus-visible,
+button.select-medium.filter-trigger:focus-visible{
   outline: 2px solid var(--focus-outline);
   outline-offset: 2px;
 }
@@ -837,7 +838,8 @@ select.select-medium:focus-visible{
     background-color: var(--background-primary);
   }
 
-  select.select-medium:hover{
+  select.select-medium:hover,
+  button.select-medium.filter-trigger:hover{
     background-color: var(--background-primary);
   }
 }
@@ -1824,8 +1826,24 @@ body.ios:not(.started.show-translation) .translation-popover{
   display: inline-block;
 }
 
-.home-browse-filters select.select-medium{
+.home-browse-filters select.select-medium,
+.home-browse-filters button.select-medium.filter-trigger{
   width: auto;
+}
+
+button.select-medium.filter-trigger{
+  display: inline-flex;
+  align-items: center;
+  text-align: start;
+  cursor: pointer;
+}
+
+.filter-dropdown{
+  position: relative;
+}
+
+.filter-dropdown .filter-menu{
+  min-width: 100%;
 }
 
 .home-results-bar{

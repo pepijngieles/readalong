@@ -216,6 +216,22 @@ function story_published_dirs($storiesDir) {
   return $dirs;
 }
 
+function story_content_languages($storiesDir) {
+  $languages = [];
+
+  foreach (story_published_dirs($storiesDir) as $storyDir) {
+    $meta = read_json($storyDir . '/story.json');
+    $code = $meta['language'] ?? '';
+    if ($code !== '') {
+      $languages[$code] = true;
+    }
+  }
+
+  $codes = array_keys($languages);
+  sort($codes);
+  return $codes;
+}
+
 function story_source_languages($storiesDir) {
   $languages = array_fill_keys(configured_languages(), true);
 
