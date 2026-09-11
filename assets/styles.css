@@ -1900,7 +1900,7 @@ html.loading body{
   --thumb-bg: var(--thumb-fallback-bg);
   --thumb-fill: var(--thumb-fallback-fill);
   --thumb-line: var(--thumb-fallback-line);
-  --thumb-badge-size: 30%;
+  --thumb-badge-size: 32%;
   position: relative;
   flex-shrink: 0;
   overflow: visible;
@@ -1947,18 +1947,16 @@ html.loading body{
 }
 
 .item-thumb.banner{
+  container-type: size;
   width: 100%;
   aspect-ratio: 16 / 9;
   height: auto;
+  --thumb-size: 100cqh;
   margin-block-end: var(--spacing-16);
 }
 
 .item-thumb.banner .canvas{
   border-radius: var(--border-radius-medium);
-}
-
-.item-thumb.banner .type-badge{
-  border-width: max(2px, 0.35em);
 }
 
 .item-thumb .canvas{
@@ -2011,12 +2009,13 @@ html.loading body{
   border-radius: 50%;
   background: var(--thumb-line);
   color: var(--thumb-bg);
-  border: calc(var(--thumb-size) * 0.03) solid var(--background-primary);
+  border: max(2px, calc(var(--thumb-size) * 0.045)) solid var(--background-primary);
 }
 
 .item-thumb .type-badge .thumb-icon{
-  width: 50%;
-  height: 50%;
+  width: calc(var(--thumb-size) * 12 / 64);
+  height: calc(var(--thumb-size) * 12 / 64);
+  flex-shrink: 0;
 }
 
 .item-thumb .thumb-icon{
