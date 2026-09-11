@@ -25,8 +25,16 @@ if (!$needsOnboarding) {
   $stories = story_list($storiesDir, [$translateLang], null, []);
   $stories = story_apply_home_hidden($stories, [$readAlongLang], $contentLangs, $levelFilter);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
+  $kindStories = story_apply_home_hidden(
+    story_list($storiesDir, [$translateLang], null, []),
+    [$readAlongLang],
+    $contentLangs,
+    []
+  );
+  [, $kindStories] = story_partition_by_kind($kindStories, 'weather');
   $durationPills = story_duration_filter_minutes();
-  $kindTiles = story_filter_kinds();
+  $kindTiles = story_catalog_kinds($kindStories);
+  $defaultKind = $kindTiles[0] ?? '';
   $readLabels = [];
   foreach ($contentLangs as $code) {
     $readLabels[$code] = lang_label($code);
@@ -104,16 +112,20 @@ if (!$needsOnboarding) {
 		</section>
 <?php endif; ?>
 
-		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
+		<section class=home-section id=alle-items data-all-section data-i18n-remaining="<?= e(t('home.remaining')) ?>" data-i18n-results="<?= e(t('home.results_count')) ?>" data-default-kind="<?= e($defaultKind) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
 			<div class=section-header>
 				<h2><?= e(t('home.browse_content')) ?></h2>
 			</div>
-			<div class="home-browse-filters flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>">
+			<div class="home-browse-filters flex columns gap-2xs">
+<?php if ($kindTiles): ?>
+				<div class="home-browse-kinds flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>" data-kind-filters>
 <?php foreach ($kindTiles as $kind): ?>
-				<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === 'podcast' ? 'true' : 'false' ?>>
-					<?= e(t('home.kind.' . $kind)) ?>
-				</button>
+					<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === $defaultKind ? 'true' : 'false' ?>>
+						<?= e(t('home.kind.' . $kind)) ?>
+					</button>
 <?php endforeach; ?>
+				</div>
+<?php endif; ?>
 <?php
 				render_browse_filter_menu(
 					'level-menu',
@@ -126,7 +138,7 @@ if (!$needsOnboarding) {
 					$levelCodes
 				);
 ?>
-				<label>
+				<label class=filter-field>
 					<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
 					<div class=select-wrap>
 						<select class=select-medium data-duration-filter data-change=filterDuration>
@@ -183,7 +195,7 @@ if (!$needsOnboarding) {
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=22" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=23" defer></script>
 
 <?php endif; ?>
 

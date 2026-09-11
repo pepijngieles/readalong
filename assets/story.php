@@ -507,3 +507,22 @@ function story_partition_by_kind(array $items, $kind) {
 
   return [$matched, $rest];
 }
+
+function story_catalog_kinds(array $stories) {
+  $allowed = story_filter_kinds();
+  $present = [];
+
+  foreach ($stories as $item) {
+    if (!empty($item['hidden'])) {
+      continue;
+    }
+    $kind = $item['kind'] ?? '';
+    if ($kind !== '' && in_array($kind, $allowed, true)) {
+      $present[$kind] = true;
+    }
+  }
+
+  return array_values(array_filter($allowed, function ($kind) use ($present) {
+    return !empty($present[$kind]);
+  }));
+}
