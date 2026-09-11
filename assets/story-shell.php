@@ -12,6 +12,8 @@ $storyClass = 'story';
 
 		<article class="<?= e($storyClass) ?>" lang=<?= e($story['languageCode']) ?> translate=no>
 
+<?= render_item_thumbnail($meta['id'], $meta['topic'] ?? '', $meta['kind'] ?? '', 96, 'story-banner', 'banner') ?>
+
 			<h1><?= e($story['heading']) ?></h1>
 
 <?php include $partials . '/selection-row.php'; ?>
