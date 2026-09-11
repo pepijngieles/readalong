@@ -2118,7 +2118,6 @@ html.loading body{
 }
 
 .item-thumb .motif.lines{
-  inset: -25%;
   width: 150%;
   height: 150%;
   top: 50%;
