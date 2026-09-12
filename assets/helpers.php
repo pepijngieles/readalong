@@ -158,6 +158,49 @@ function lang_label($code) {
   return $labels[$code] ?? strtoupper($code);
 }
 
+function lang_flag_codes() {
+  return [
+    'de' => 'de',
+    'en' => 'gb',
+    'es' => 'es',
+    'fr' => 'fr',
+    'hu' => 'hu',
+    'nl' => 'nl',
+    'no' => 'no',
+  ];
+}
+
+function lang_flag_path($code) {
+  $codes = lang_flag_codes();
+  $flag = $codes[$code] ?? null;
+  return $flag ? 'assets/flags/' . $flag . '.svg' : null;
+}
+
+function lang_flag($code, array $attrs = []) {
+  $path = lang_flag_path($code);
+  if ($path === null) {
+    return '';
+  }
+
+  $classes = ['lang-flag'];
+  if (!empty($attrs['class'])) {
+    $classes[] = $attrs['class'];
+  }
+
+  $alt = $attrs['alt'] ?? lang_endonym($code);
+  $hidden = !empty($attrs['decorative']);
+  $attrsHtml = ' class="' . e(implode(' ', $classes)) . '"'
+    . ' src="' . e($path) . '"'
+    . ' alt="' . e($hidden ? '' : $alt) . '"'
+    . ' width="24" height="16" decoding="async"'
+    . ' data-lang-flag="' . e($code) . '"';
+  if ($hidden) {
+    $attrsHtml .= ' aria-hidden=true';
+  }
+
+  return '<img' . $attrsHtml . '>';
+}
+
 function lang_pref($key, array $allowed, $default) {
   $value = $_GET[$key] ?? $_COOKIE['readalong-' . $key] ?? $default;
   return in_array($value, $allowed, true) ? $value : $default;
@@ -294,16 +337,20 @@ function level_filter_summary(array $selected, $allLabel) {
   return implode(' · ', $ranges);
 }
 
-function render_title_menu($id, $pref, $groupLabel, $summaryLabel, $allLabel, array $options, array $selected, array $allowed, $optionLang = false, $multiple = true) {
+function render_title_menu($id, $pref, $groupLabel, $summaryLabel, $allLabel, array $options, array $selected, array $allowed, $optionLang = false, $multiple = true, $showFlags = false) {
   $allSelected = $multiple && language_filter_is_all($selected, $allowed);
   $inputType = $multiple ? 'checkbox' : 'radio';
+  $selectedCode = (!$allSelected && $selected !== []) ? $selected[0] : null;
   ?>
-				<div class="home-title-control" data-i18n-all="<?= e($allLabel) ?>"><button type=button class="quiet home-title-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls="<?= e($id) ?>"><span class=visually-hidden><?= e($groupLabel) ?></span><span data-title-label><?= e($summaryLabel) ?></span><?php icon('chevron-down', ['size' => 16]); ?></button><div id="<?= e($id) ?>" class=title-menu hidden role=listbox<?= $multiple ? ' aria-multiselectable=true' : '' ?> data-pref="<?= e($pref) ?>"<?= $multiple ? '' : ' data-multiple=false' ?> data-change=updateTitleFilter>
+				<div class="home-title-control" data-i18n-all="<?= e($allLabel) ?>"><button type=button class="quiet home-title-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls="<?= e($id) ?>"><span class=visually-hidden><?= e($groupLabel) ?></span><?php if ($showFlags && $selectedCode !== null && lang_flag_path($selectedCode) !== null): ?><span data-title-flag><?= lang_flag($selectedCode, ['decorative' => true]) ?></span><?php endif; ?><span data-title-label><?= e($summaryLabel) ?></span><?php icon('chevron-down', ['size' => 16]); ?></button><div id="<?= e($id) ?>" class=title-menu hidden role=listbox<?= $multiple ? ' aria-multiselectable=true' : '' ?> data-pref="<?= e($pref) ?>"<?= $multiple ? '' : ' data-multiple=false' ?> data-change=updateTitleFilter>
 <?php foreach ($options as $code => $label): ?>
 <?php $checked = $allSelected || in_array($code, $selected, true); ?>
 						<label role=option aria-selected=<?= $checked ? 'true' : 'false' ?><?= $optionLang ? ' translate=no lang=' . e($code) : '' ?>>
 							<input type=<?= e($inputType) ?><?= $multiple ? '' : ' name="title-' . e($id) . '"' ?> value="<?= e($code) ?>"<?= $checked ? ' checked' : '' ?>>
 							<?php icon('check', ['size' => 16]); ?>
+<?php if ($showFlags && lang_flag_path($code) !== null): ?>
+							<?= lang_flag($code, ['decorative' => true]) ?>
+<?php endif; ?>
 							<span><?= e($label) ?></span>
 						</label>
 <?php endforeach; ?>

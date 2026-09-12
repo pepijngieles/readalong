@@ -414,6 +414,36 @@ function toggleTitleMenu(el) {
   }
 }
 
+function langFlagSrc(code) {
+  const codes = window.LANG_FLAG_CODES || {}
+  const file = codes[code]
+  return file ? 'assets/flags/' + file + '.svg' : ''
+}
+
+function updateTitleFlag(control, code) {
+  const wrap = control.querySelector('[data-title-flag]')
+  if (!wrap) return
+  const src = langFlagSrc(code)
+  if (!src) {
+    wrap.hidden = true
+    return
+  }
+  let img = wrap.querySelector('img')
+  if (!img) {
+    img = document.createElement('img')
+    img.className = 'lang-flag'
+    img.width = 24
+    img.height = 16
+    img.decoding = 'async'
+    img.setAttribute('aria-hidden', 'true')
+    wrap.appendChild(img)
+  }
+  img.src = src
+  img.alt = ''
+  img.dataset.langFlag = code
+  wrap.hidden = false
+}
+
 function titleOptionLabel(input) {
   const label = input.closest('label')
   const text = label ? label.querySelector('span') : null
@@ -528,6 +558,10 @@ function updateTitleFilter(el, event) {
 
   const labelEl = control.querySelector('[data-title-label]')
   if (labelEl) labelEl.textContent = titleMenuLabel(control, menu, selected, all)
+
+  if (menu.getAttribute('data-multiple') === 'false' && selected.length === 1) {
+    updateTitleFlag(control, selected[0])
+  }
 
   if (menu.getAttribute('data-pref') === 'read') syncTranslateForRead(selected)
   applyAllItems()

@@ -130,7 +130,7 @@ Home read-along language is a single-select title menu; levels are a multi-selec
 |------|-------|
 | `assets/scripts.js` | Story player: audio, sentences, settings, translation, progress |
 | `assets/home.js` | Home: filters, continue reading, header language/level dropdowns |
-| `assets/onboarding.js` | First-run flow; exposes `onboardingReadChange`, `completeOnboarding`, etc. |
+| `assets/onboarding.js` | First-run flow; two steps — language tiles + translate menu, then demo with speed/pause |
 
 New **chrome** actions → global function + `data-click`/`data-change` in HTML.
 
@@ -231,9 +231,10 @@ After UI or chrome changes, test:
 
 **Onboarding**
 
-- [ ] Language selects update demo text
-- [ ] Demo play/pause
-- [ ] Continue → home with saved prefs
+- [ ] Step 1: subtle translate/UI dropdown with flags; read-along language tiles with flags
+- [ ] Step 1 → step 2 via Next; no demo on step 1
+- [ ] Step 2: demo play/pause, speed and sentence-pause sliders, Back to step 1
+- [ ] Continue → home with saved prefs and reader settings
 
 **Story**
 

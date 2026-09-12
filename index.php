@@ -59,7 +59,7 @@ if (!$needsOnboarding) {
 }
 ?>
 <?php include $partials . '/head.php'; ?>
-<body<?= $needsOnboarding ? ' class="onboarding-page show-translation started paused"' : '' ?>>
+<body<?= $needsOnboarding ? ' class="onboarding-page"' : '' ?>>
 <?php include $partials . '/theme-bootstrap.php'; ?>
 
 <?php if ($needsOnboarding): ?>
@@ -84,7 +84,8 @@ if (!$needsOnboarding) {
 					[$readAlongLang],
 					$contentLangs,
 					true,
-					false
+					false,
+					true
 				);
 ?>
 			</div>
@@ -172,6 +173,7 @@ if (!$needsOnboarding) {
 		window.COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 		window.TRANSLATION_LANGS_BY_SOURCE = <?= json_encode($translationLangsBySource, JSON_UNESCAPED_UNICODE) ?>;
 		window.LANG_ENDONYMS = <?= json_encode(lang_endonyms(), JSON_UNESCAPED_UNICODE) ?>;
+		window.LANG_FLAG_CODES = <?= json_encode(lang_flag_codes(), JSON_UNESCAPED_UNICODE) ?>;
 
 		window.setLangPref = function (key, value) {
 			localStorage.setItem('readalong-' + key, value);
@@ -197,7 +199,7 @@ if (!$needsOnboarding) {
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=24" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=25" defer></script>
 
 <?php endif; ?>
 
