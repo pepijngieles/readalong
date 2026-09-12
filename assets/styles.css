@@ -734,6 +734,12 @@ dl dt{
     color: var(--icon-accent);
   }
 
+  nav .audio-controls .play,
+  nav .audio-controls .pause{
+    width: 4rem;
+    height: 4rem;
+  }
+
   body.started:not(.paused) .play,
   body:not(.started.paused) .pause,
   body.paused .pause{
