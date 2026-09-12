@@ -57,6 +57,7 @@ foreach ($ids as $id) {
   $b = motif_for($id);
   expect_equal($a, $b, 'motif_for stable for ' . var_export($id, true));
   expect_true(in_array($a['motif'], thumbnail_motifs(), true), 'known motif for ' . $id);
+  expect_true($a['motif'] !== 'band', 'band is remapped for ' . $id);
   expect_true($a['variant'] >= 0 && $a['variant'] <= 3, 'variant 0-3 for ' . $id);
 }
 
@@ -71,12 +72,23 @@ for ($i = 0; $i < 1000; $i++) {
 
 $expectedMotif = 1000 / count(thumbnail_motifs());
 foreach ($counts as $motif => $count) {
-  expect_true($count >= 110 && $count <= 230, "motif $motif count $count is roughly uniform (expected ~$expectedMotif)");
+  // lines absorbs former band assignments (~1/6 of ids)
+  $min = $motif === 'lines' ? 280 : 110;
+  $max = $motif === 'lines' ? 520 : 230;
+  expect_true($count >= $min && $count <= $max, "motif $motif count $count is roughly uniform (expected ~$expectedMotif)");
 }
 
 $chi = 0.0;
-foreach ($counts as $count) {
-  $chi += (($count - $expectedMotif) ** 2) / $expectedMotif;
+$expectedCounts = [
+  'arc' => 1000 / 6,
+  'echo' => 1000 / 6,
+  'grid' => 1000 / 6,
+  'lines' => 2000 / 6,
+  'horizon' => 1000 / 6,
+];
+foreach ($counts as $motif => $count) {
+  $expected = $expectedCounts[$motif];
+  $chi += (($count - $expected) ** 2) / $expected;
 }
 expect_true($chi < 25, "chi-square $chi over motifs should be modest");
 

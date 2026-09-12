@@ -1,6 +1,7 @@
 {
   "id": "az-ezermester-es-a-kozak",
   "type": "dialogue",
+  "topic": "history",
   "language": "hu",
   "order": 16,
   "published": true,

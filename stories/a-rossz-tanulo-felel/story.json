@@ -1,6 +1,7 @@
 {
   "id": "a-rossz-tanulo-felel",
   "type": "dialogue",
+  "topic": "fiction",
   "language": "hu",
   "order": 17,
   "published": true,
