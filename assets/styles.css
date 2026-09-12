@@ -1721,6 +1721,16 @@ body.ios:not(.started.show-translation) .translation-popover{
   cursor: pointer;
 }
 
+.home-title-trigger [data-title-flag]{
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.home-title-trigger .lang-flag{
+  display: block;
+  transform: translateY(2px);
+}
+
 .home-title-trigger .icon{
   position: static;
   width: 0.75rem;
