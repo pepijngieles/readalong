@@ -741,7 +741,7 @@ dl dt{
   }
 
   body.started:not(.paused) .pause{
-    display: inline-block;
+    display: inline-flex;
   }
 
 
@@ -889,6 +889,11 @@ input[type=range]::-ms-track{
 
 /* 10. Navigation
 ---------------------------------------------------------------------------- */
+nav .audio-controls{
+  display: flex;
+  align-items: center;
+}
+
 nav{
   z-index: 3;
   position: fixed;
