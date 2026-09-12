@@ -33,20 +33,23 @@ $storyConfig = [
 
 		<div class="onboarding-card flex columns gap-medium">
 			<div class="onboarding-step flex columns gap-medium" data-onboarding-step=1>
-				<div class="onboarding-read-list flex columns gap-2xs" role=radiogroup aria-label="<?= e(t('onboarding.read_along')) ?>" data-onboarding-read-list data-change=onboardingReadChange>
+				<div class="flex columns gap-3xs onboarding-ui-field">
+					<span id=onboarding-read-label class=onboarding-field-label data-i18n=onboarding.read_along><?= e(t('onboarding.read_along')) ?></span>
+					<div class="onboarding-read-list flex columns gap-2xs" role=radiogroup aria-labelledby=onboarding-read-label data-onboarding-read-list data-change=onboardingReadChange>
 <?php foreach ($contentLangs as $code): ?>
-					<label class=onboarding-lang-option role=option aria-selected=<?= $code === $defaultRead ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
-						<input type=radio name=onboarding-read value="<?= e($code) ?>"<?= $code === $defaultRead ? ' checked' : '' ?>>
+						<label class=onboarding-lang-option role=option aria-selected=<?= $code === $defaultRead ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
 <?php if (lang_flag_path($code) !== null): ?>
-						<?= lang_flag($code, ['decorative' => true]) ?>
+							<?= lang_flag($code, ['decorative' => true]) ?>
 <?php endif; ?>
-						<span><?= e(lang_endonym($code)) ?></span>
-					</label>
+							<span data-lang-label="<?= e($code) ?>"><?= e(lang_label($code)) ?></span>
+							<input type=radio name=onboarding-read value="<?= e($code) ?>"<?= $code === $defaultRead ? ' checked' : '' ?>>
+						</label>
 <?php endforeach; ?>
+					</div>
 				</div>
 
 				<div class="flex columns gap-3xs onboarding-ui-field">
-					<label for=onboarding-translate-trigger data-i18n=onboarding.app_language_label><?= e(t('onboarding.app_language_label')) ?></label>
+					<label for=onboarding-translate-trigger class=onboarding-field-label data-i18n=onboarding.app_language_label><?= e(t('onboarding.app_language_label')) ?></label>
 					<div class="home-title-control onboarding-ui-control full-width">
 						<button type=button id=onboarding-translate-trigger class="quiet home-title-trigger onboarding-ui-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls=onboarding-translate-menu>
 							<span data-title-label translate=no lang=<?= e($defaultTranslate) ?>><?= e($translateSelectLabel) ?></span>
@@ -72,10 +75,10 @@ $storyConfig = [
 				</div>
 			</div>
 
-			<div class=onboarding-step data-onboarding-step=2 hidden>
+			<div class="onboarding-step flex columns gap-medium" data-onboarding-step=2 hidden>
 				<button type=button class="quiet onboarding-back" data-click=onboardingBack><?php icon('back', ['size' => 16]); ?><span data-i18n=onboarding.back><?= e(t('onboarding.back')) ?></span></button>
 
-				<div class=onboarding-demo>
+				<div class="onboarding-demo flex columns gap-medium">
 					<article class=story lang=<?= e($defaultRead) ?> translate=no data-onboarding-demo-story>
 						<p>
 							<span tabindex=0 data-sentence=0 lang=<?= e($defaultRead) ?> data-translation="<?= e($demoTranslation[0]) ?>" aria-current=true><?= e($demoSource[0]) ?></span>
@@ -138,4 +141,4 @@ $storyConfig = [
 <script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 <script type="text/javascript" src="assets/settings.js?v=5" defer></script>
 <script type="text/javascript" src="assets/scripts.js?v=25" defer></script>
-<script type="text/javascript" src="assets/onboarding.js?v=13" defer></script>
+<script type="text/javascript" src="assets/onboarding.js?v=14" defer></script>

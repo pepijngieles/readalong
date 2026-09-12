@@ -34,11 +34,19 @@
     return (strings[locale] && strings[locale][key]) || (strings.en && strings.en[key]) || key;
   }
 
+  function langLabel(code, locale) {
+    return translate('lang.' + code, locale);
+  }
+
   function applyLocale(locale) {
     document.documentElement.lang = locale;
     document.querySelectorAll('[data-i18n]').forEach(function (element) {
       const key = element.getAttribute('data-i18n');
       if (key) element.textContent = translate(key, locale);
+    });
+    document.querySelectorAll('[data-lang-label]').forEach(function (element) {
+      const code = element.getAttribute('data-lang-label');
+      if (code) element.textContent = langLabel(code, locale);
     });
   }
 
