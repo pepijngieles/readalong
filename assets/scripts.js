@@ -467,15 +467,15 @@ function updateAllRangeProgress() {
 
 window.applyReaderSettings = function () {
   const form = document.forms.settings
-  if (!form || !form.fontFamily) return
+  if (!form) return
   if (audioFile && form.playbackRate) audioFile.playbackRate = form.playbackRate.value
   if (form.sentencePause) sentencePause = form.sentencePause.value
   if (form.fontSize) document.documentElement.style.setProperty('--font-size', form.fontSize.value + '%')
   const story = document.querySelector('.story')
   if (story && form.lineHeight) story.style.setProperty('--line-height', form.lineHeight.value)
-  applyFontFamily(form.fontFamily.value)
-  if (form.playbackRateOut) form.playbackRateOut.value = formatSpeed(form.playbackRate.value)
-  if (form.sentencePauseOut) form.sentencePauseOut.value = formatPause(form.sentencePause.value)
+  if (form.fontFamily) applyFontFamily(form.fontFamily.value)
+  if (form.playbackRate && form.playbackRateOut) form.playbackRateOut.value = formatSpeed(form.playbackRate.value)
+  if (form.sentencePause && form.sentencePauseOut) form.sentencePauseOut.value = formatPause(form.sentencePause.value)
   updateAllRangeProgress()
   if (typeof updateTranslation === 'function') updateTranslation()
 }

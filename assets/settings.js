@@ -175,3 +175,6 @@ initSettingsControls()
 
 window.saveCatalogPrefs = saveCatalogPrefs
 window.openSettings = openSettings
+window.saveSettings = saveSettings
+window.updateSettings = updateSettings
+window.loadSettings = loadSettings

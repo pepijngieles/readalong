@@ -85,6 +85,10 @@ function icon_definitions() {
       'viewBox' => '0 0 23 29',
       'body' => '<path d="M0.5 0.5H22.5" class="no-fill round"/><path d="M0.5 4.5H22.5" class="no-fill round"/><path d="M0.5 8.5H22.5" class="no-fill round"/><path d="M0.5 12.5H22.5" class="no-fill round"/><path d="M0.5 16.5H22.5" class="no-fill round"/><path d="M0.5 20.5H22.5" class="no-fill round"/><path d="M0.5 24.5H22.5" class="no-fill round"/><path d="M0.5 28.5H9.5" class="no-fill round"/>',
     ],
+    'translate' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M4.5 5.5H11.5" class="no-fill round"/><path d="M8 5.5V18.5" class="no-fill round"/><path d="M5 18.5H11" class="no-fill round"/><path d="M14.5 7.5H19.5" class="no-fill round"/><path d="M17 7.5V16.5" class="no-fill round"/><path d="M14.5 11.5H19.5" class="no-fill round"/><path d="M14.5 15.5H19.5" class="no-fill round"/>',
+    ],
   ];
 }
 
