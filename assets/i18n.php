@@ -4,7 +4,7 @@ function ui_strings() {
   return [
     'de' => [
       'onboarding.read_along' => 'Mitlesen in',
-      'onboarding.read_question' => 'In welcher Sprache möchtest du mitlesen?',
+      'onboarding.app_language_label' => 'Sprache der App und Übersetzungen',
       'onboarding.translations_label' => 'Übersetzung anzeigen in',
       'onboarding.ui_language' => 'Oberfläche in',
       'onboarding.next' => 'Weiter',
@@ -90,7 +90,7 @@ function ui_strings() {
     ],
     'en' => [
       'onboarding.read_along' => 'Read along in',
-      'onboarding.read_question' => 'Which language do you want to read along in?',
+      'onboarding.app_language_label' => 'Language of the app and translations',
       'onboarding.translations_label' => 'Show translation in',
       'onboarding.ui_language' => 'Interface in',
       'onboarding.next' => 'Continue',
@@ -176,7 +176,7 @@ function ui_strings() {
     ],
     'es' => [
       'onboarding.read_along' => 'Leer en',
-      'onboarding.read_question' => '¿En qué idioma quieres leer en voz alta?',
+      'onboarding.app_language_label' => 'Idioma de la app y traducciones',
       'onboarding.translations_label' => 'Mostrar traducción en',
       'onboarding.ui_language' => 'Interfaz en',
       'onboarding.next' => 'Continuar',
@@ -262,7 +262,7 @@ function ui_strings() {
     ],
     'fr' => [
       'onboarding.read_along' => 'Lire en',
-      'onboarding.read_question' => 'Dans quelle langue veux-tu lire en même temps ?',
+      'onboarding.app_language_label' => 'Langue de l’app et des traductions',
       'onboarding.translations_label' => 'Afficher la traduction en',
       'onboarding.ui_language' => 'Interface en',
       'onboarding.next' => 'Continuer',
@@ -348,7 +348,7 @@ function ui_strings() {
     ],
     'nl' => [
       'onboarding.read_along' => 'Meelezen in',
-      'onboarding.read_question' => 'In welke taal wil je meelezen?',
+      'onboarding.app_language_label' => 'Taal van de app en vertalingen',
       'onboarding.translations_label' => 'Toon vertaling in',
       'onboarding.ui_language' => 'Interface in',
       'onboarding.next' => 'Volgende',
@@ -434,7 +434,7 @@ function ui_strings() {
     ],
     'no' => [
       'onboarding.read_along' => 'Lese med på',
-      'onboarding.read_question' => 'Hvilket språk vil du lese med på?',
+      'onboarding.app_language_label' => 'Språk for appen og oversettelser',
       'onboarding.translations_label' => 'Vis oversettelse på',
       'onboarding.ui_language' => 'Grensesnitt på',
       'onboarding.next' => 'Fortsett',

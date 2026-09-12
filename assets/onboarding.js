@@ -48,30 +48,6 @@
     return file ? 'assets/flags/' + file + '.svg' : '';
   }
 
-  function updateTitleFlag(control, code) {
-    const wrap = control.querySelector('[data-title-flag]');
-    if (!wrap) return;
-    const src = langFlagSrc(code);
-    if (!src) {
-      wrap.hidden = true;
-      return;
-    }
-    let img = wrap.querySelector('img');
-    if (!img) {
-      img = document.createElement('img');
-      img.className = 'lang-flag';
-      img.width = 24;
-      img.height = 16;
-      img.decoding = 'async';
-      img.setAttribute('aria-hidden', 'true');
-      wrap.appendChild(img);
-    }
-    img.src = src;
-    img.alt = '';
-    img.dataset.langFlag = code;
-    wrap.hidden = false;
-  }
-
   function closeTitleMenus(exceptButton) {
     document.querySelectorAll('.home-title-trigger[aria-expanded=true]').forEach(function (button) {
       if (exceptButton && button === exceptButton) return;
@@ -156,16 +132,16 @@
     if (labelEl && chosen) {
       labelEl.textContent = endonyms[chosen] || chosen.toUpperCase();
       labelEl.lang = chosen;
-      updateTitleFlag(control, chosen);
     }
     updateNextButton();
   }
 
-  function updateReadTiles() {
-    document.querySelectorAll('[data-onboarding-read-tiles] [data-lang]').forEach(function (tile) {
-      const active = tile.getAttribute('data-lang') === selectedRead;
-      tile.setAttribute('aria-pressed', active ? 'true' : 'false');
-      tile.setAttribute('aria-selected', active ? 'true' : 'false');
+  function updateReadOptions() {
+    document.querySelectorAll('[data-onboarding-read-list] .onboarding-lang-option').forEach(function (option) {
+      const input = option.querySelector('input[type=radio]');
+      const active = input && input.value === selectedRead;
+      if (input) input.checked = active;
+      option.setAttribute('aria-selected', active ? 'true' : 'false');
     });
   }
 
@@ -248,11 +224,11 @@
     }
   }
 
-  window.onboardingReadTile = function (el) {
-    const code = el.getAttribute('data-lang');
-    if (!code) return;
-    selectedRead = code;
-    updateReadTiles();
+  window.onboardingReadChange = function () {
+    const input = document.querySelector('[data-onboarding-read-list] input[type=radio]:checked');
+    if (!input) return;
+    selectedRead = input.value;
+    updateReadOptions();
     syncTranslateMenuForReadAlong();
     applyLocale(uiLocaleFromTranslate(selectedTranslate()));
     updateNextButton();
@@ -278,7 +254,6 @@
       labelEl.textContent = endonyms[chosen] || chosen.toUpperCase();
       labelEl.lang = chosen;
     }
-    updateTitleFlag(control, chosen);
     closeTitleMenus();
     applyLocale(uiLocaleFromTranslate(chosen));
     updateNextButton();
@@ -328,7 +303,7 @@
 
   const systemLang = detectSystemLanguage();
   applyLocale(systemLang);
-  updateReadTiles();
+  updateReadOptions();
   syncTranslateMenuForReadAlong();
   updateNextButton();
   showStep(1);
