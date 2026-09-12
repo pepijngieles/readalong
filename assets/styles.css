@@ -1708,6 +1708,12 @@ body.ios:not(.started.show-translation) .translation-popover{
   flex-shrink: 0;
 }
 
+.home-title-trigger [data-title-flag]{
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
 .home-title-trigger{
   display: inline-flex;
   align-items: center;
