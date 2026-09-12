@@ -112,7 +112,6 @@
   --line-height: 1.5;
 
   --settings-label-muted: #7a6f58;
-  --settings-grabber: var(--border-default);
 
   --font-family-story: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif;
 
@@ -189,7 +188,6 @@ body.theme-black{
   --shade-default: rgba(255,255,255,.06);
   --shade-strong: rgba(255,255,255,.12);
   --settings-label-muted: rgba(255,255,255,.55);
-  --settings-grabber: rgba(255,255,255,.24);
   --slider-thumb: var(--color-white);
 
   --thumb-history-bg: #412402;
@@ -979,7 +977,9 @@ dialog.dialog-sheet::backdrop{
   display: flex;
   flex-direction: column;
   gap: var(--spacing-32);
-  padding: var(--spacing-32) var(--spacing-24);
+  padding-inline: var(--spacing-24);
+  /* Close button is 3rem, offset by --spacing-12; keep a gap below it. */
+  padding-block-start: calc(var(--spacing-12) + 3rem + var(--spacing-16));
   padding-block-end: calc(var(--spacing-32) + env(safe-area-inset-bottom, 0px));
   min-width: 0;
   user-select: none;
@@ -994,7 +994,8 @@ dialog.dialog-sheet::backdrop{
 
 #settings .content{
   min-width: 0;
-  overflow-x: hidden;
+  /* Room for 2px outline + 2px offset inside overflow-y: auto. */
+  padding: var(--spacing-8);
 }
 
 #settings h2{
@@ -1155,17 +1156,6 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 /* 17. Settings
 ---------------------------------------------------------------------------- */
-.settings-grabber{
-  position: absolute;
-  top: .5625rem;
-  left: 50%;
-  width: 2.375rem;
-  height: var(--spacing-4);
-  border-radius: var(--spacing-2);
-  background-color: var(--settings-grabber);
-  transform: translateX(-50%);
-}
-
 #settings fieldset{
   min-width: 0;
   border: none;
@@ -1322,12 +1312,14 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 .settings-slider output{
   flex-shrink: 0;
-  width: var(--spacing-24);
+  min-width: 2.75rem;
+  width: auto;
   font-size: .875rem;
   font-weight: 600;
   line-height: var(--spacing-16);
-  text-align: center;
+  text-align: end;
   color: var(--settings-label-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .settings-row{
