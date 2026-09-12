@@ -1,6 +1,7 @@
 {
   "id": "magyar-dolgozat",
   "type": "default",
+  "topic": "fiction",
   "language": "hu",
   "order": 10,
   "published": true,

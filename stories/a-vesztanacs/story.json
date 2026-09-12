@@ -1,6 +1,7 @@
 {
   "id": "a-vesztanacs",
   "type": "default",
+  "topic": "fiction",
   "language": "hu",
   "order": 18,
   "published": true,

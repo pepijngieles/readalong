@@ -2193,30 +2193,6 @@ html.loading body{
   pointer-events: none;
 }
 
-.item-thumb .motif.band{
-  width: 160%;
-  height: 22%;
-  top: 38%;
-  left: 50%;
-  background: var(--thumb-fill);
-  opacity: var(--thumb-motif-opacity);
-  transform: translate(-50%, -50%) rotate(-20deg);
-}
-
-.item-thumb .motif.band[data-variant="1"]{
-  transform: translate(-50%, -50%) rotate(20deg);
-}
-
-.item-thumb .motif.band[data-variant="2"]{
-  top: 62%;
-  transform: translate(-50%, -50%) rotate(-20deg);
-}
-
-.item-thumb .motif.band[data-variant="3"]{
-  top: 62%;
-  transform: translate(-50%, -50%) rotate(20deg);
-}
-
 .item-thumb .motif.arc{
   width: 140%;
   height: 140%;
@@ -2299,7 +2275,7 @@ html.loading body{
   top: 50%;
   left: 50%;
   opacity: var(--thumb-motif-lines-opacity);
-  --line-step: 14%;
+  --line-step: 7%;
   --line-width: 1px;
   background-image: repeating-linear-gradient(
     var(--line-angle, 45deg),
@@ -2316,12 +2292,12 @@ html.loading body{
 }
 
 .item-thumb .motif.lines[data-variant="2"]{
-  --line-step: 20%;
+  --line-step: 10%;
 }
 
 .item-thumb .motif.lines[data-variant="3"]{
   --line-angle: -45deg;
-  --line-step: 20%;
+  --line-step: 10%;
 }
 
 .item-thumb .motif.horizon{

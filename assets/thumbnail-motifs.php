@@ -1,7 +1,7 @@
 <?php
 
 function thumbnail_motifs() {
-  return ['band', 'arc', 'echo', 'grid', 'lines', 'horizon'];
+  return ['arc', 'echo', 'grid', 'lines', 'horizon'];
 }
 
 function thumbnail_hash_id($id) {
@@ -16,11 +16,16 @@ function thumbnail_hash_id($id) {
 }
 
 function motif_for($id) {
-  $motifs = thumbnail_motifs();
   $h = thumbnail_hash_id($id);
+  $variant = ($h >> 8) % 4;
+  $legacy = ['band', 'arc', 'echo', 'grid', 'lines', 'horizon'];
+  $motif = $legacy[$h % count($legacy)];
+  if ($motif === 'band') {
+    $motif = 'lines';
+  }
   return [
-    'motif' => $motifs[$h % count($motifs)],
-    'variant' => ($h >> 8) % 4,
+    'motif' => $motif,
+    'variant' => $variant,
   ];
 }
 
@@ -38,7 +43,7 @@ function thumbnail_render_motif($motif, $variant, $iconName) {
 
   $known = thumbnail_motifs();
   if (!in_array($motif, $known, true)) {
-    $motif = 'band';
+    $motif = 'lines';
   }
 
   return '<div class="motif ' . e($motif) . '" data-variant="' . $variant . '"></div>';

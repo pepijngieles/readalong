@@ -1,6 +1,7 @@
 {
   "id": "egy-bal",
   "type": "default",
+  "topic": "history",
   "language": "hu",
   "order": 15,
   "published": true,
