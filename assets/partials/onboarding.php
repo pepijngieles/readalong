@@ -101,5 +101,5 @@ $storyConfig = [
 </script>
 <script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 <script type="text/javascript" src="assets/settings.js?v=4" defer></script>
-<script type="text/javascript" src="assets/scripts.js?v=23" defer></script>
+<script type="text/javascript" src="assets/scripts.js?v=24" defer></script>
 <script type="text/javascript" src="assets/onboarding.js?v=11" defer></script>

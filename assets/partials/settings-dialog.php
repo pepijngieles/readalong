@@ -4,7 +4,6 @@ $settingsReader = !empty($settingsReader);
 ?>
 	<dialog id=settings class="dialog-sheet settings"<?php if ($settingsCatalog): ?> aria-labelledby=settings-title<?php else: ?> aria-label="<?= e(t('nav.settings')) ?>"<?php endif; ?>>
 		<div class=panel>
-			<div class=settings-grabber aria-hidden=true></div>
 			<button type=button class="close-button quiet icon-only" data-el=close-button data-click="closeDialog(settings)">
 				<span class=visually-hidden><?= e(t('common.close')) ?></span>
 				<?php icon('close-small'); ?>

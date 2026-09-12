@@ -58,6 +58,7 @@ const timestamps = Object.fromEntries(
 let voice = storyConfig.voice
 
 const PROGRESS_KEY = 'readalong-progress'
+const PREVIOUS_RESTART_SECONDS = 1.5
 
 function loadProgressMap() {
   try {
@@ -240,6 +241,7 @@ function autoPlay() {
     }
   }
   updateProgressBar()
+  disableButtons()
 }
 
 
@@ -320,8 +322,20 @@ function changeSentence() {
   }
 
   /* 5.5 Disable rewind/forward button if needed --------------------------- */
+  function sentenceElapsed() {
+    const start = sentenceStart(currentSentence)
+    if (!Number.isFinite(start)) return 0
+    const now = audioFile && Number.isFinite(audioFile.currentTime)
+      ? audioFile.currentTime
+      : time
+    return now - start
+  }
+
   function disableButtons(button){
-    if (rewindButton) rewindButton.disabled = currentSentence == 0
+    if (rewindButton) {
+      rewindButton.disabled = currentSentence == 0 &&
+        sentenceElapsed() < PREVIOUS_RESTART_SECONDS
+    }
     if (fastForwardButton) fastForwardButton.disabled = currentSentence == sentences.length - 1
   }
 
@@ -351,7 +365,11 @@ function playSentence(number) {
 
 
 function playPrevious() {
-  playSentence(currentSentence - 1)
+  if (currentSentence > 0 && sentenceElapsed() < PREVIOUS_RESTART_SECONDS) {
+    playSentence(currentSentence - 1)
+    return
+  }
+  playSentence(currentSentence)
 }
 
 function playNext() {
