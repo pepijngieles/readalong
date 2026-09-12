@@ -152,14 +152,18 @@ function updateKindPills(readFilter, levelFilter, sourceLangs) {
   })
 
   let firstVisible = null
+  let visibleCount = 0
   homeAll('[data-kind-filter]').forEach(function (chip) {
     const kind = chip.getAttribute('data-kind-filter')
     const show = !!availableKinds[kind]
     chip.hidden = !show
-    if (show && !firstVisible) firstVisible = kind
+    if (show) {
+      visibleCount++
+      if (!firstVisible) firstVisible = kind
+    }
   })
 
-  if (kindsRow) kindsRow.hidden = !firstVisible
+  if (kindsRow) kindsRow.hidden = visibleCount <= 1
 
   if (firstVisible && knownKinds().indexOf(kindFilter) === -1) {
     kindFilter = firstVisible
@@ -286,12 +290,26 @@ function decorateContinueItem(item, progress) {
   }
 }
 
+function findContinueSource(entry) {
+  const id = entry.id.replace(/"/g, '')
+  const slug = (entry.progress && entry.progress.slug) ? entry.progress.slug.replace(/"/g, '') : ''
+  const lists = homeAll('[data-all-items], [data-weather-items]')
+  for (let i = 0; i < lists.length; i++) {
+    const list = lists[i]
+    let source = list.querySelector('li[data-id="' + id + '"]')
+    if (!source && slug) {
+      source = list.querySelector('li[data-slug="' + slug + '"]')
+    }
+    if (source) return source
+  }
+  return null
+}
+
 function cloneContinueItem(entry, featured) {
-  const allList = homeEl('[data-all-items]')
-  if (!allList) return null
-  const source = allList.querySelector('li[data-id="' + entry.id.replace(/"/g, '') + '"]')
+  const source = findContinueSource(entry)
   if (!source) return null
   const clone = source.cloneNode(true)
+  clone.removeAttribute('hidden')
   if (featured) clone.classList.add('featured')
   decorateContinueItem(clone, entry.progress)
   return clone
@@ -337,7 +355,7 @@ function fillContinueReading() {
     if (continueHistory) continueHistory.hidden = true
   }
 
-  continueSection.hidden = false
+  continueSection.hidden = continueFeatured.children.length === 0
 }
 
 function clearFilters() {
@@ -513,6 +531,7 @@ function updateTitleFilter(el, event) {
 
   if (menu.getAttribute('data-pref') === 'read') syncTranslateForRead(selected)
   applyAllItems()
+  fillContinueReading()
 }
 
 function initTitleMenus() {

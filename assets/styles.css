@@ -1841,14 +1841,23 @@ body.ios:not(.started.show-translation) .translation-popover{
   flex-wrap: wrap;
 }
 
-.home-browse-filters .filter-field,
-.home-browse-filters label.filter-field{
-  width: 100%;
+.home-browse-selects{
+  flex-wrap: wrap;
+  align-items: center;
 }
 
-.home-browse-filters .select-wrap{
-  display: block;
-  width: 100%;
+.home-browse-selects .filter-field,
+.home-browse-selects label.filter-field{
+  width: auto;
+}
+
+.home-browse-selects .select-wrap{
+  display: inline-block;
+}
+
+.home-browse-selects select.select-medium,
+.home-browse-selects button.select-medium.filter-trigger{
+  width: auto;
 }
 
 .filter-dropdown{

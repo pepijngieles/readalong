@@ -28,21 +28,6 @@ $settingsReader = !empty($settingsReader);
 						</div>
 					</div>
 				</div>
-<?php elseif ($settingsReader && !empty($storyTranslationLangOptions)): ?>
-
-				<div class="settings-catalog flex columns gap-small">
-					<div>
-						<label for=story-translate-into><?= e(t('home.translate_into')) ?></label>
-						<div class=select-wrap>
-							<select id=story-translate-into class=select-medium data-translate-along data-change=saveCatalogPrefs>
-<?php foreach ($storyTranslationLangOptions as $code): ?>
-								<option value="<?= e($code) ?>"<?= $code === $storyTranslateLang ? ' selected' : '' ?> translate=no lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
-<?php endforeach; ?>
-							</select>
-							<?php icon('chevron-down', ['size' => 16]); ?>
-						</div>
-					</div>
-				</div>
 <?php endif; ?>
 <?php if ($settingsReader): ?>
 
