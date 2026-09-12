@@ -444,9 +444,17 @@ function updateTitleFlag(control, code) {
   wrap.hidden = false
 }
 
-function titleOptionLabel(input) {
+function readLangLabel(code) {
+  const labels = window.LANG_LABELS || {}
+  return labels[code] || code.toUpperCase()
+}
+
+function titleOptionLabel(input, menu) {
+  if (menu && menu.getAttribute('data-pref') === 'read') {
+    return readLangLabel(input.value)
+  }
   const label = input.closest('label')
-  const text = label ? label.querySelector('span') : null
+  const text = label ? label.querySelector('span:last-of-type') : null
   return (text && text.textContent.trim()) || input.value
 }
 
@@ -473,8 +481,11 @@ function levelRangeLabel(selected, all, allLabel) {
 function titleMenuLabel(control, menu, selected, all) {
   const allLabel = control.getAttribute('data-i18n-all') || ''
   if (menu.getAttribute('data-multiple') === 'false') {
+    if (menu.getAttribute('data-pref') === 'read') {
+      return readLangLabel(selected[0])
+    }
     const input = menu.querySelector('input[value="' + selected[0] + '"]')
-    return input ? titleOptionLabel(input) : (selected[0] || '')
+    return input ? titleOptionLabel(input, menu) : (selected[0] || '')
   }
   if (menu.getAttribute('data-pref') === 'level') {
     return levelRangeLabel(selected, all, allLabel)
@@ -482,7 +493,7 @@ function titleMenuLabel(control, menu, selected, all) {
   if (selected.length === all.length) return allLabel
   return selected.map(function (code) {
     const input = menu.querySelector('input[value="' + code + '"]')
-    return input ? titleOptionLabel(input) : code
+    return input ? titleOptionLabel(input, menu) : code
   }).join(' · ')
 }
 
@@ -568,6 +579,19 @@ function updateTitleFilter(el, event) {
   fillContinueReading()
 }
 
+function syncReadMenuLabel() {
+  const readMenu = homeEl('[data-pref=read]')
+  if (!readMenu || readMenu.getAttribute('data-multiple') !== 'false') return
+  const control = readMenu.closest('.home-title-control')
+  if (!control) return
+  const allowed = allowedCodesFromMenu('read')
+  const codes = codesFromPref(localStorage.getItem('readalong-read') || '', allowed)
+  if (!codes.length) return
+  const labelEl = control.querySelector('[data-title-label]')
+  if (labelEl) labelEl.textContent = readLangLabel(codes[0])
+  updateTitleFlag(control, codes[0])
+}
+
 function initTitleMenus() {
   closeTitleMenus()
   const readMenu = homeEl('[data-pref=read]')
@@ -575,6 +599,7 @@ function initTitleMenus() {
     const allowed = allowedCodesFromMenu('read')
     const codes = codesFromPref(localStorage.getItem('readalong-read') || '', allowed)
     if (codes.length > 1) window.setLangPref('read', codes[0])
+    syncReadMenuLabel()
   }
   document.addEventListener('click', function (event) {
     const singleOption = event.target.closest('[data-multiple=false] [role=option]')
