@@ -32,44 +32,39 @@ $storyConfig = [
 		<h1 class=onboarding-brand>Readalong</h1>
 
 		<div class="onboarding-card flex columns gap-medium">
-			<div class="onboarding-ui-bar flex">
-				<div class="home-title-control onboarding-ui-control" data-i18n-all="">
-					<button type=button class="quiet home-title-trigger onboarding-ui-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls=onboarding-translate-menu>
-						<?php icon('translate', ['size' => 16]); ?>
-						<span class=visually-hidden data-i18n=onboarding.translations_label><?= e(t('onboarding.translations_label')) ?></span>
-<?php if (lang_flag_path($defaultTranslate) !== null): ?>
-						<span data-title-flag><?= lang_flag($defaultTranslate, ['decorative' => true]) ?></span>
-<?php endif; ?>
-						<span data-title-label translate=no lang=<?= e($defaultTranslate) ?>><?= e($translateSelectLabel) ?></span>
-						<?php icon('chevron-down', ['size' => 16]); ?>
-					</button>
-					<div id=onboarding-translate-menu class=title-menu hidden role=listbox data-multiple=false data-pref=translate data-change=onboardingTranslateMenu>
-<?php foreach ($translateLangOptions as $code): ?>
-						<label role=option aria-selected=<?= $code === $defaultTranslate ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
-							<input type=radio name=onboarding-translate value="<?= e($code) ?>"<?= $code === $defaultTranslate ? ' checked' : '' ?>>
-							<?php icon('check', ['size' => 16]); ?>
-<?php if (lang_flag_path($code) !== null): ?>
-							<?= lang_flag($code, ['decorative' => true]) ?>
-<?php endif; ?>
-							<span><?= e(lang_endonym($code)) ?></span>
-						</label>
-<?php endforeach; ?>
-					</div>
-				</div>
-			</div>
-
-			<div class=onboarding-step data-onboarding-step=1>
-				<h2 class="onboarding-question font-size-medium" data-i18n=onboarding.read_question><?= e(t('onboarding.read_question')) ?></h2>
-
-				<div class="onboarding-lang-tiles flex gap-xs" role=listbox aria-label="<?= e(t('onboarding.read_along')) ?>" data-onboarding-read-tiles>
+			<div class="onboarding-step flex columns gap-medium" data-onboarding-step=1>
+				<div class="onboarding-read-list flex columns gap-2xs" role=radiogroup aria-label="<?= e(t('onboarding.read_along')) ?>" data-onboarding-read-list data-change=onboardingReadChange>
 <?php foreach ($contentLangs as $code): ?>
-					<button type=button class="onboarding-lang-tile pill choice" data-click=onboardingReadTile data-lang="<?= e($code) ?>" role=option aria-selected=<?= $code === $defaultRead ? 'true' : 'false' ?> aria-pressed=<?= $code === $defaultRead ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
+					<label class=onboarding-lang-option role=option aria-selected=<?= $code === $defaultRead ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
+						<input type=radio name=onboarding-read value="<?= e($code) ?>"<?= $code === $defaultRead ? ' checked' : '' ?>>
 <?php if (lang_flag_path($code) !== null): ?>
-						<?= lang_flag($code, ['decorative' => true, 'class' => 'onboarding-lang-tile-flag']) ?>
+						<?= lang_flag($code, ['decorative' => true]) ?>
 <?php endif; ?>
 						<span><?= e(lang_endonym($code)) ?></span>
-					</button>
+					</label>
 <?php endforeach; ?>
+				</div>
+
+				<div class="flex columns gap-3xs onboarding-ui-field">
+					<label for=onboarding-translate-trigger data-i18n=onboarding.app_language_label><?= e(t('onboarding.app_language_label')) ?></label>
+					<div class="home-title-control onboarding-ui-control full-width">
+						<button type=button id=onboarding-translate-trigger class="quiet home-title-trigger onboarding-ui-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls=onboarding-translate-menu>
+							<span data-title-label translate=no lang=<?= e($defaultTranslate) ?>><?= e($translateSelectLabel) ?></span>
+							<?php icon('chevron-down', ['size' => 16]); ?>
+						</button>
+						<div id=onboarding-translate-menu class=title-menu hidden role=listbox data-multiple=false data-pref=translate data-change=onboardingTranslateMenu>
+<?php foreach ($translateLangOptions as $code): ?>
+							<label role=option aria-selected=<?= $code === $defaultTranslate ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
+								<input type=radio name=onboarding-translate value="<?= e($code) ?>"<?= $code === $defaultTranslate ? ' checked' : '' ?>>
+								<?php icon('check', ['size' => 16]); ?>
+<?php if (lang_flag_path($code) !== null): ?>
+								<?= lang_flag($code, ['decorative' => true]) ?>
+<?php endif; ?>
+								<span><?= e(lang_endonym($code)) ?></span>
+							</label>
+<?php endforeach; ?>
+						</div>
+					</div>
 				</div>
 
 				<div class="flex columns gap-xs onboarding-step-actions">
@@ -143,4 +138,4 @@ $storyConfig = [
 <script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 <script type="text/javascript" src="assets/settings.js?v=5" defer></script>
 <script type="text/javascript" src="assets/scripts.js?v=25" defer></script>
-<script type="text/javascript" src="assets/onboarding.js?v=12" defer></script>
+<script type="text/javascript" src="assets/onboarding.js?v=13" defer></script>
