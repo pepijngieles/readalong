@@ -117,7 +117,7 @@ if (!$needsOnboarding) {
 				<h2><?= e(t('home.browse_content')) ?></h2>
 			</div>
 			<div class="home-browse-filters flex columns gap-2xs">
-<?php if ($kindTiles): ?>
+<?php if (count($kindTiles) > 1): ?>
 				<div class="home-browse-kinds flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>" data-kind-filters>
 <?php foreach ($kindTiles as $kind): ?>
 					<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === $defaultKind ? 'true' : 'false' ?>>
@@ -126,6 +126,7 @@ if (!$needsOnboarding) {
 <?php endforeach; ?>
 				</div>
 <?php endif; ?>
+				<div class="home-browse-selects flex gap-2xs">
 <?php
 				render_browse_filter_menu(
 					'level-menu',
@@ -138,18 +139,19 @@ if (!$needsOnboarding) {
 					$levelCodes
 				);
 ?>
-				<label class=filter-field>
-					<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
-					<div class=select-wrap>
-						<select class=select-medium data-duration-filter data-change=filterDuration>
-							<option value=""><?= e(t('home.all_lengths')) ?></option>
+					<label class=filter-field>
+						<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
+						<div class=select-wrap>
+							<select class=select-medium data-duration-filter data-change=filterDuration>
+								<option value=""><?= e(t('home.all_lengths')) ?></option>
 <?php foreach ($durationPills as $minutes): ?>
-							<option value="<?= e((string) $minutes) ?>"><?= e(t('home.up_to_minutes', ['n' => (string) $minutes])) ?></option>
+								<option value="<?= e((string) $minutes) ?>"><?= e(t('home.up_to_minutes', ['n' => (string) $minutes])) ?></option>
 <?php endforeach; ?>
-						</select>
-						<?php icon('chevron-down', ['size' => 16]); ?>
-					</div>
-				</label>
+							</select>
+							<?php icon('chevron-down', ['size' => 16]); ?>
+						</div>
+					</label>
+				</div>
 			</div>
 			<div class="home-results-bar flex gap-small">
 				<p class="home-results-count text-color-tertiary" data-results-count></p>
@@ -195,7 +197,7 @@ if (!$needsOnboarding) {
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=23" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=24" defer></script>
 
 <?php endif; ?>
 
