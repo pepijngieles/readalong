@@ -37,9 +37,9 @@ if (!$needsOnboarding) {
   $defaultKind = $kindTiles[0] ?? '';
   $readLabels = [];
   foreach ($contentLangs as $code) {
-    $readLabels[$code] = lang_label($code);
+    $readLabels[$code] = lang_endonym($code);
   }
-  $readSelectLabel = $readLabels[$readAlongLang] ?? lang_label($readAlongLang);
+  $readSelectLabel = $readLabels[$readAlongLang] ?? lang_endonym($readAlongLang);
   $levelLabels = array_combine($levelCodes, $levelCodes);
   $levelSelectLabel = level_filter_summary($levelFilter, t('home.all_levels'));
   $weatherVisible = false;

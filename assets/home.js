@@ -561,6 +561,10 @@ function updateTitleFilter(el, event) {
 
   if (menu.getAttribute('data-multiple') === 'false' && selected.length === 1) {
     updateTitleFlag(control, selected[0])
+    if (labelEl) {
+      labelEl.setAttribute('translate', 'no')
+      labelEl.lang = selected[0]
+    }
   }
 
   if (menu.getAttribute('data-pref') === 'read') syncTranslateForRead(selected)
