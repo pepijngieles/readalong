@@ -149,7 +149,6 @@ function lang_labels() {
   foreach (configured_languages() as $code) {
     $labels[$code] = t('lang.' . $code);
   }
-  $labels['hu'] = 'Magyar';
   return $labels;
 }
 
