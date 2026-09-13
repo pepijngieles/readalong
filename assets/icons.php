@@ -89,6 +89,22 @@ function icon_definitions() {
       'viewBox' => '0 0 24 24',
       'body' => '<path d="M4.5 5.5H11.5" class="no-fill round"/><path d="M8 5.5V18.5" class="no-fill round"/><path d="M5 18.5H11" class="no-fill round"/><path d="M14.5 7.5H19.5" class="no-fill round"/><path d="M17 7.5V16.5" class="no-fill round"/><path d="M14.5 11.5H19.5" class="no-fill round"/><path d="M14.5 15.5H19.5" class="no-fill round"/>',
     ],
+    'heart' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M12 20.5 10.8 19.4C5.4 14.6 2 11.7 2 7.7 2 5.2 4 3.2 6.5 3.2c1.5 0 3 .8 3.8 2 .8-1.2 2.3-2 3.8-2C16 3.2 18 5.2 18 7.7c0 4-3.4 6.9-8.8 12.8L12 20.5Z" class="no-fill round"/>',
+    ],
+    'heart-filled' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M12 20.5 10.8 19.4C5.4 14.6 2 11.7 2 7.7 2 5.2 4 3.2 6.5 3.2c1.5 0 3 .8 3.8 2 .8-1.2 2.3-2 3.8-2C16 3.2 18 5.2 18 7.7c0 4-3.4 6.9-8.8 12.8L12 20.5Z" class="fill"/>',
+    ],
+    'more' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<circle cx="6" cy="12" r="1.5" class="fill"/><circle cx="12" cy="12" r="1.5" class="fill"/><circle cx="18" cy="12" r="1.5" class="fill"/>',
+    ],
+    'share' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M12 3.5V14.5" class="no-fill round"/><path d="M8.5 7 12 3.5 15.5 7" class="no-fill round"/><path d="M5.5 10.5V18.5C5.5 19.6 6.4 20.5 7.5 20.5H16.5C17.6 20.5 18.5 19.6 18.5 18.5V10.5" class="no-fill round"/>',
+    ],
   ];
 }
 

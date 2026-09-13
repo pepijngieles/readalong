@@ -66,6 +66,12 @@ if (preg_match('#^/stories/([a-z0-9-]+)/?$#', $uri, $m)) {
   return true;
 }
 
+if (preg_match('#^/library/(hidden|completed)/?$#', $uri, $m)) {
+  $_GET['view'] = $m[1];
+  require __DIR__ . '/library.php';
+  return true;
+}
+
 if (preg_match('#^/audio/[a-z0-9/_-]+\.mp3$#', $uri)) {
   serve_audio(__DIR__ . $uri);
   return true;

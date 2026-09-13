@@ -132,6 +132,9 @@ function saveCatalogPrefs(el) {
 
 function openSettings(el, event) {
   openDialog(el, event, 'settings')
+  if (typeof window.updateLibrarySettingsCounts === 'function') {
+    window.updateLibrarySettingsCounts()
+  }
 }
 
 function initSettingsControls() {

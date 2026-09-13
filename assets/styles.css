@@ -506,8 +506,35 @@ dl dt{
   margin-block: 0 var(--spacing-24);
 }
 
-.list a{
-  display: block;
+.list .story-row{
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  padding-block: var(--spacing-8);
+}
+
+.list li:first-of-type .story-row,
+.list li:first-of-type > a.story-item{
+  padding-block-start: var(--spacing-16);
+}
+
+.list li:last-of-type .story-row,
+.list li:last-of-type > a.story-item{
+  padding-block-end: var(--spacing-16);
+}
+
+.list a.story-item{
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: var(--spacing-16);
+  padding-block: 0;
+  text-decoration: none;
+}
+
+.list > li > a.story-item{
+  display: flex;
   padding-block: var(--spacing-8);
   text-decoration: none;
 }
@@ -521,14 +548,6 @@ dl dt{
 
 .story-item .item-thumb{
   flex-shrink: 0;
-}
-
-.list li:first-of-type a{
-  padding-block-start: var(--spacing-16);
-}
-
-.list li:last-of-type a{
-  padding-block-end: var(--spacing-16);
 }
 
 .list a p{
@@ -567,6 +586,144 @@ dl dt{
   height: var(--spacing-4);
   margin-block-start: var(--spacing-8);
   z-index: auto;
+}
+
+.story-actions{
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.story-action-favorite .heart-filled{
+  display: none;
+}
+
+.story-action-favorite.active .heart-outline,
+.story-action-favorite[aria-pressed=true] .heart-outline{
+  display: none;
+}
+
+.story-action-favorite.active .heart-filled,
+.story-action-favorite[aria-pressed=true] .heart-filled{
+  display: block;
+}
+
+.story-action-favorite.active,
+.story-action-favorite[aria-pressed=true]{
+  color: var(--text-primary);
+}
+
+.item-menu{
+  position: fixed;
+  z-index: 20;
+  left: auto;
+  min-width: 14rem;
+}
+
+.item-menu-action{
+  display: block;
+  width: 100%;
+  padding: var(--spacing-8) var(--spacing-12);
+  border: 0;
+  border-radius: var(--border-radius-small);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .item-menu-action:hover{
+    background-color: var(--shade-default);
+  }
+}
+
+.item-snackbar{
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  bottom: var(--spacing-16);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-12);
+  max-width: calc(100% - var(--spacing-32));
+  padding: var(--spacing-12) var(--spacing-16);
+  border-radius: var(--border-radius-medium);
+  background-color: var(--background-popover);
+  box-shadow:
+    0 .25rem .5rem var(--shadow-ambient),
+    0 0 3px var(--shadow-outline);
+  transform: translate(-50%, 120%);
+  transition: transform .2s ease;
+}
+
+.item-snackbar.visible{
+  transform: translate(-50%, 0);
+}
+
+.item-snackbar[hidden]{
+  display: none;
+}
+
+.item-snackbar p{
+  margin: 0;
+  font-size: .875rem;
+  line-height: var(--spacing-20);
+}
+
+.item-snackbar-undo{
+  flex-shrink: 0;
+  font-size: .875rem;
+  text-decoration: underline;
+}
+
+.settings-library-label{
+  margin: 0;
+  font-size: .875rem;
+  line-height: var(--spacing-20);
+}
+
+.settings-library-link{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-12);
+  width: 100%;
+  padding: var(--spacing-12) var(--spacing-16);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--border-radius-medium);
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 1rem;
+  line-height: var(--spacing-24);
+  text-align: start;
+  cursor: pointer;
+}
+
+.settings-library-link[hidden]{
+  display: none;
+}
+
+.settings-library-count{
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.library-header{
+  align-items: center;
+  margin-block-end: var(--spacing-16);
+}
+
+.library-header h1{
+  margin: 0;
+}
+
+.library-back{
+  flex-shrink: 0;
 }
 
 
@@ -1880,9 +2037,15 @@ body.ios:not(.started.show-translation) .translation-popover{
   padding: var(--spacing-16);
 }
 
+.continue-list li.featured .story-row{
+  padding: 0;
+  align-items: flex-start;
+}
+
 .continue-list li.featured a.story-item{
   padding: 0;
   gap: var(--spacing-12);
+  align-items: flex-start;
 }
 
 .continue-list li.featured .story-item{
