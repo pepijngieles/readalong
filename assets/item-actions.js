@@ -82,14 +82,35 @@
     share: 'share'
   }
 
-  function menuIcon(action) {
+  function menuIconHtml(action) {
     const icons = window.ITEM_MENU_ICONS || {}
     const name = MENU_ACTION_ICONS[action]
     return name && icons[name] ? icons[name] : ''
   }
 
-  function menuButton(action, label) {
-    return '<button type=button class="item-menu-action flex gap-small" role=menuitem data-click=runItemAction data-item-action="' + action + '">' + menuIcon(action) + '<span>' + label + '</span></button>'
+  function parseIconHtml(html) {
+    if (!html) return null
+    const template = document.createElement('template')
+    template.innerHTML = html.trim()
+    return template.content.firstChild
+  }
+
+  function createMenuButton(action, label) {
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = 'item-menu-action flex gap-small'
+    button.setAttribute('role', 'menuitem')
+    button.setAttribute('data-click', 'runItemAction')
+    button.setAttribute('data-item-action', action)
+
+    const icon = parseIconHtml(menuIconHtml(action))
+    if (icon) button.appendChild(icon)
+
+    const text = document.createElement('span')
+    text.textContent = label
+    button.appendChild(text)
+
+    return button
   }
 
   function buildItemMenu(itemEl, inContinue) {
@@ -97,38 +118,38 @@
     const completed = state.isCompleted(meta.id)
     const hidden = state.isHidden(meta.id)
     const started = state.isStarted(meta.id)
-    const parts = []
+    const menu = document.createDocumentFragment()
     const favorite = state.isFavorite(meta.id)
 
     if (favorite) {
-      parts.push(menuButton('unfavorite', i18n('unfavorite', 'Remove from favorites')))
+      menu.appendChild(createMenuButton('unfavorite', i18n('unfavorite', 'Remove from favorites')))
     } else {
-      parts.push(menuButton('favorite', i18n('favorite', 'Add to favorites')))
+      menu.appendChild(createMenuButton('favorite', i18n('favorite', 'Add to favorites')))
     }
 
     if (!completed) {
-      parts.push(menuButton('complete', completeLabel(meta.kind)))
+      menu.appendChild(createMenuButton('complete', completeLabel(meta.kind)))
     } else {
-      parts.push(menuButton('uncomplete', i18n('mark_incomplete', 'Mark as not completed')))
+      menu.appendChild(createMenuButton('uncomplete', i18n('mark_incomplete', 'Mark as not completed')))
     }
 
     if (started && !completed) {
-      parts.push(menuButton('reset', i18n('reset_progress', 'Start over')))
+      menu.appendChild(createMenuButton('reset', i18n('reset_progress', 'Start over')))
     }
 
     if (inContinue) {
-      parts.push(menuButton('dismiss-continue', i18n('dismiss_continue', 'Remove from continue reading')))
+      menu.appendChild(createMenuButton('dismiss-continue', i18n('dismiss_continue', 'Remove from continue reading')))
     }
 
     if (!hidden) {
-      parts.push(menuButton('hide', i18n('hide', 'Hide item')))
+      menu.appendChild(createMenuButton('hide', i18n('hide', 'Hide item')))
     } else {
-      parts.push(menuButton('unhide', i18n('unhide', 'Show item again')))
+      menu.appendChild(createMenuButton('unhide', i18n('unhide', 'Show item again')))
     }
 
-    parts.push(menuButton('share', i18n('share', 'Share link')))
+    menu.appendChild(createMenuButton('share', i18n('share', 'Share link')))
 
-    return parts.join('')
+    return menu
   }
 
   function openItemMenu(el) {
@@ -142,7 +163,8 @@
 
     activeItemEl = itemEl
     const inContinue = !!itemEl.closest('[data-continue-section]')
-    menu.innerHTML = buildItemMenu(itemEl, inContinue)
+    menu.replaceChildren()
+    menu.appendChild(buildItemMenu(itemEl, inContinue))
     positionItemMenu(el, menu)
     menu.hidden = false
     el.setAttribute('aria-expanded', 'true')
