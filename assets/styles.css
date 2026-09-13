@@ -1943,11 +1943,6 @@ body.ios:not(.started.show-translation) .translation-popover{
   display: none;
 }
 
-.title-menu.is-fixed{
-  position: fixed;
-  z-index: 20;
-}
-
 .title-menu label{
   display: flex;
   align-items: center;
