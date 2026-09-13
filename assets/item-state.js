@@ -51,11 +51,6 @@ window.ReadalongItemState = (function () {
     return !!(progress && (progress.started || progress.sentence > 0))
   }
 
-  function isDismissedFromContinue(id) {
-    const progress = loadProgressMap()[id]
-    return !!(progress && progress.dismissedFromContinue)
-  }
-
   function setFavorite(id, value) {
     const map = loadFavorites()
     if (value) map[id] = true
@@ -86,29 +81,8 @@ window.ReadalongItemState = (function () {
       slug: slug || existing.slug || '',
       completed: complete === true,
       started: true,
-      sentence: complete ? (existing.sentence || 0) : (existing.sentence || 0),
-      dismissedFromContinue: complete ? false : existing.dismissedFromContinue
+      sentence: complete ? (existing.sentence || 0) : (existing.sentence || 0)
     })
-  }
-
-  function resetProgress(id) {
-    const map = loadProgressMap()
-    delete map[id]
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify(map))
-  }
-
-  function dismissFromContinue(id, slug) {
-    const existing = getProgress(id) || {}
-    saveProgressEntry(id, {
-      slug: slug || existing.slug || '',
-      dismissedFromContinue: true
-    })
-  }
-
-  function clearDismissedFromContinue(id) {
-    const progress = getProgress(id)
-    if (!progress || !progress.dismissedFromContinue) return
-    saveProgressEntry(id, { dismissedFromContinue: false })
   }
 
   function favoriteCount() {
@@ -162,15 +136,11 @@ window.ReadalongItemState = (function () {
     isHidden: isHidden,
     isCompleted: isCompleted,
     isStarted: isStarted,
-    isDismissedFromContinue: isDismissedFromContinue,
     setFavorite: setFavorite,
     setHidden: setHidden,
     getProgress: getProgress,
     saveProgressEntry: saveProgressEntry,
     markComplete: markComplete,
-    resetProgress: resetProgress,
-    dismissFromContinue: dismissFromContinue,
-    clearDismissedFromContinue: clearDismissedFromContinue,
     favoriteCount: favoriteCount,
     hiddenCount: hiddenCount,
     completedCount: completedCount,

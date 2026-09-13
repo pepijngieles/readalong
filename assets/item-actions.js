@@ -75,8 +75,6 @@
     unfavorite: 'heart-filled',
     complete: 'circle-check',
     uncomplete: 'circle',
-    reset: 'rotate-ccw',
-    'dismiss-continue': 'list-x',
     hide: 'eye-off',
     unhide: 'eye',
     share: 'share'
@@ -113,11 +111,10 @@
     return button
   }
 
-  function buildItemMenu(itemEl, inContinue) {
+  function buildItemMenu(itemEl) {
     const meta = itemMeta(itemEl)
     const completed = state.isCompleted(meta.id)
     const hidden = state.isHidden(meta.id)
-    const started = state.isStarted(meta.id)
     const menu = document.createDocumentFragment()
     const favorite = state.isFavorite(meta.id)
 
@@ -131,14 +128,6 @@
       menu.appendChild(createMenuButton('complete', completeLabel(meta.kind)))
     } else {
       menu.appendChild(createMenuButton('uncomplete', i18n('mark_incomplete', 'Mark as not completed')))
-    }
-
-    if (started && !completed) {
-      menu.appendChild(createMenuButton('reset', i18n('reset_progress', 'Start over')))
-    }
-
-    if (inContinue) {
-      menu.appendChild(createMenuButton('dismiss-continue', i18n('dismiss_continue', 'Remove from continue reading')))
     }
 
     if (!hidden) {
@@ -162,9 +151,8 @@
     if (open) return
 
     activeItemEl = itemEl
-    const inContinue = !!itemEl.closest('[data-continue-section]')
     menu.replaceChildren()
-    menu.appendChild(buildItemMenu(itemEl, inContinue))
+    menu.appendChild(buildItemMenu(itemEl))
     positionItemMenu(el, menu)
     menu.hidden = false
     el.setAttribute('aria-expanded', 'true')
@@ -243,10 +231,6 @@
       })
     } else if (action === 'unhide') {
       state.setHidden(meta.id, false)
-    } else if (action === 'reset') {
-      state.resetProgress(meta.id)
-    } else if (action === 'dismiss-continue') {
-      state.dismissFromContinue(meta.id, meta.slug)
     } else if (action === 'favorite' || action === 'unfavorite') {
       const next = action === 'favorite'
       state.setFavorite(meta.id, next)
