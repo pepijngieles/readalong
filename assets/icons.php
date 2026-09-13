@@ -127,7 +127,7 @@ function icon_html($name, $options = []) {
 
   return '<svg width=' . (int) $width . ' height=' . (int) $height
     . ' viewBox="' . e($definition['viewBox']) . '"'
-    . ' class=' . e($class) . ' data-icon aria-hidden=true' . $style . '>'
+    . ' class="' . e($class) . '" data-icon aria-hidden=true' . $style . '>'
     . $definition['body']
     . '</svg>';
 }

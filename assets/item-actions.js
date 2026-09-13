@@ -246,7 +246,7 @@
     if (settingsDialog && settingsDialog.open && typeof closeDialog === 'function') {
       closeDialog(settingsDialog, null, 'settings')
     }
-    location.href = 'library/' + view
+    location.href = '/library/' + view
   }
 
   function openHiddenLibrary() {
