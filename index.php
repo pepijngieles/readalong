@@ -141,6 +141,29 @@ if (!$needsOnboarding) {
 				);
 ?>
 					<label class=filter-field>
+						<span class=visually-hidden><?= e(t('home.filter.progress')) ?></span>
+						<div class=select-wrap>
+							<select class=select-medium data-progress-filter data-change=filterProgress>
+								<option value=todo><?= e(t('home.filter.progress.todo')) ?></option>
+								<option value=in-progress><?= e(t('home.filter.progress.in_progress')) ?></option>
+								<option value=done><?= e(t('home.filter.progress.done')) ?></option>
+								<option value=all><?= e(t('home.filter.progress.all')) ?></option>
+							</select>
+							<?php icon('chevron-down', ['size' => 16]); ?>
+						</div>
+					</label>
+					<label class=filter-field>
+						<span class=visually-hidden><?= e(t('home.filter.visibility')) ?></span>
+						<div class=select-wrap>
+							<select class=select-medium data-visibility-filter data-change=filterVisibility>
+								<option value=default><?= e(t('home.filter.visibility.default')) ?></option>
+								<option value=hidden-only><?= e(t('home.filter.visibility.hidden')) ?></option>
+								<option value=all><?= e(t('home.filter.visibility.all')) ?></option>
+							</select>
+							<?php icon('chevron-down', ['size' => 16]); ?>
+						</div>
+					</label>
+					<label class=filter-field>
 						<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
 						<div class=select-wrap>
 							<select class=select-medium data-duration-filter data-change=filterDuration>
@@ -153,12 +176,18 @@ if (!$needsOnboarding) {
 						</div>
 					</label>
 				</div>
+				<div class="home-browse-kinds flex gap-2xs" role=group aria-label="<?= e(t('home.favorites')) ?>" data-favorites-filter-row hidden>
+					<button type=button class="pill choice" data-favorites-filter data-click=toggleFavoritesFilter aria-pressed=false>
+						<?php icon('heart-filled', ['size' => 16]); ?>
+						<?= e(t('home.favorites')) ?>
+					</button>
+				</div>
 			</div>
 			<div class="home-results-bar flex gap-small">
 				<p class="home-results-count text-color-tertiary" data-results-count></p>
 				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
-<?php render_story_list($stories, 'data-all-items', $showTranslationLang, false); ?>
+<?php render_story_list($stories, 'data-all-items', $showTranslationLang, false, true); ?>
 			<div class="home-empty" data-no-results<?= $visibleStories ? ' hidden' : '' ?> data-i18n-empty="<?= e(t('home.no_results')) ?>" data-i18n-empty-filters="<?= e(t('home.no_results_filters')) ?>">
 				<p data-empty-message><?= e(t('home.no_results')) ?></p>
 				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
@@ -167,7 +196,12 @@ if (!$needsOnboarding) {
 
 	</main>
 
-<?php $settingsCatalog = true; include $partials . '/settings-dialog.php'; ?>
+<?php
+$settingsCatalog = true;
+include $partials . '/settings-dialog.php';
+include $partials . '/item-chrome.php';
+include $partials . '/item-actions-i18n.php';
+?>
 
 	<script type="text/javascript">
 		window.COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
@@ -199,7 +233,9 @@ if (!$needsOnboarding) {
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
+	<script type="text/javascript" src="assets/item-state.js?v=1" defer></script>
+	<script type="text/javascript" src="assets/item-actions.js?v=1" defer></script>
+	<script type="text/javascript" src="assets/settings.js?v=5" defer></script>
 	<script type="text/javascript" src="assets/home.js?v=27" defer></script>
 
 <?php endif; ?>

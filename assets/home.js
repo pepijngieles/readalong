@@ -3,9 +3,13 @@ const DEFAULT_KIND = 'podcast'
 const DURATION_OPTIONS = [2, 5, 10, 20]
 const LEVEL_CODES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 const LEVEL_SCORES = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 }
+const itemState = window.ReadalongItemState
 
 let kindFilter = DEFAULT_KIND
 let durationLimit = 0
+let progressFilter = 'todo'
+let visibilityFilter = 'default'
+let favoritesFilter = false
 
 function homeEl(selector) {
   return document.querySelector(selector)
@@ -121,6 +125,23 @@ function writeFiltersToUrl() {
   }
 }
 
+function loadBrowseFiltersFromStorage() {
+  if (!itemState) return
+  const stored = itemState.loadBrowseFilters()
+  progressFilter = stored.progress || 'todo'
+  visibilityFilter = stored.visibility || 'default'
+  favoritesFilter = !!stored.favorites
+}
+
+function saveBrowseFiltersToStorage() {
+  if (!itemState) return
+  itemState.saveBrowseFilters({
+    progress: progressFilter,
+    visibility: visibilityFilter,
+    favorites: favoritesFilter
+  })
+}
+
 function syncFilterState() {
   homeAll('[data-kind-filter]').forEach(function (chip) {
     chip.setAttribute('aria-pressed', chip.getAttribute('data-kind-filter') === kindFilter ? 'true' : 'false')
@@ -129,10 +150,36 @@ function syncFilterState() {
   if (durationSelect) {
     durationSelect.value = durationLimit ? String(durationLimit / 60) : ''
   }
+  const progressSelect = homeEl('[data-progress-filter]')
+  if (progressSelect) progressSelect.value = progressFilter
+  const visibilitySelect = homeEl('[data-visibility-filter]')
+  if (visibilitySelect) visibilitySelect.value = visibilityFilter
+  const favoritesChip = homeEl('[data-favorites-filter]')
+  if (favoritesChip) {
+    favoritesChip.setAttribute('aria-pressed', favoritesFilter ? 'true' : 'false')
+  }
+}
+
+function browseFiltersAtDefault() {
+  return progressFilter === 'todo' &&
+    visibilityFilter === 'default' &&
+    !favoritesFilter
+}
+
+function updateFavoritesFilterRow() {
+  const row = homeEl('[data-favorites-filter-row]')
+  if (!row || !itemState) return
+  const showFavorites = itemState.favoriteCount() > 1
+  row.hidden = !showFavorites
+  if (!showFavorites && favoritesFilter) {
+    favoritesFilter = false
+    saveBrowseFiltersToStorage()
+    syncFilterState()
+  }
 }
 
 function filtersActive() {
-  return !!durationLimit
+  return !!durationLimit || !browseFiltersAtDefault()
 }
 
 function updateKindPills(readFilter, levelFilter, sourceLangs) {
@@ -203,7 +250,11 @@ function applyAllItems() {
   }
 
   allList.querySelectorAll('li').forEach(function (item) {
-    const show = matchesHomeFilters(item, true)
+    const id = item.getAttribute('data-id') || ''
+    const matchStatus = itemState
+      ? itemState.matchesBrowseStatus(id, progressFilter, visibilityFilter, favoritesFilter)
+      : true
+    const show = matchesHomeFilters(item, true) && matchStatus
     item.hidden = !show
     if (show) visible++
   })
@@ -233,6 +284,7 @@ function applyAllItems() {
   homeAll('[data-clear-filters]').forEach(function (button) {
     button.hidden = !filtersActive()
   })
+  updateFavoritesFilterRow()
   writeFiltersToUrl()
 }
 
@@ -247,7 +299,10 @@ function loadProgressEntries() {
   return Object.keys(map).map(function (id) {
     return { id: id, progress: map[id] }
   }).filter(function (entry) {
-    return entry.progress && !entry.progress.completed && (entry.progress.sentence > 0 || entry.progress.started)
+    return entry.progress &&
+      !entry.progress.completed &&
+      !entry.progress.dismissedFromContinue &&
+      (entry.progress.sentence > 0 || entry.progress.started)
   }).sort(function (a, b) {
     return (b.progress.updatedAt || 0) - (a.progress.updatedAt || 0)
   })
@@ -372,6 +427,29 @@ function fillContinueReading() {
 
 function clearFilters() {
   durationLimit = 0
+  progressFilter = 'todo'
+  visibilityFilter = 'default'
+  favoritesFilter = false
+  saveBrowseFiltersToStorage()
+  syncFilterState()
+  applyAllItems()
+}
+
+function filterProgress(el) {
+  progressFilter = el.value || 'todo'
+  saveBrowseFiltersToStorage()
+  applyAllItems()
+}
+
+function filterVisibility(el) {
+  visibilityFilter = el.value || 'default'
+  saveBrowseFiltersToStorage()
+  applyAllItems()
+}
+
+function toggleFavoritesFilter(el) {
+  favoritesFilter = el.getAttribute('aria-pressed') !== 'true'
+  saveBrowseFiltersToStorage()
   syncFilterState()
   applyAllItems()
 }
@@ -627,19 +705,34 @@ function initTitleMenus() {
   })
 }
 
+function refreshHomeLists() {
+  applyAllItems()
+  fillContinueReading()
+  if (typeof window.syncAllFavoriteButtons === 'function') {
+    window.syncAllFavoriteButtons(document)
+  }
+  updateFavoritesFilterRow()
+}
+
 function initHome() {
   if (!homeEl('[data-all-items]')) return
 
+  loadBrowseFiltersFromStorage()
   readFiltersFromUrl()
   syncFilterState()
   fillContinueReading()
   applyAllItems()
+  updateFavoritesFilterRow()
   initTitleMenus()
+  document.addEventListener('readalong:items-changed', refreshHomeLists)
 }
 
 window.clearFilters = clearFilters
 window.filterKind = filterKind
 window.filterDuration = filterDuration
+window.filterProgress = filterProgress
+window.filterVisibility = filterVisibility
+window.toggleFavoritesFilter = toggleFavoritesFilter
 window.toggleHistory = toggleHistory
 window.toggleTitleMenu = toggleTitleMenu
 window.updateTitleFilter = updateTitleFilter

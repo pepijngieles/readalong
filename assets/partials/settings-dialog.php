@@ -26,6 +26,17 @@ $settingsReader = !empty($settingsReader);
 							<?php icon('chevron-down', ['size' => 16]); ?>
 						</div>
 					</div>
+					<div class="settings-library flex columns gap-2xs">
+						<p class="settings-library-label text-color-tertiary"><?= e(t('settings.library')) ?></p>
+						<button type=button class="settings-library-link" data-library-link=hidden data-click=openHiddenLibrary hidden>
+							<span><?= e(t('settings.hidden_items')) ?></span>
+							<span class="settings-library-count" data-hidden-count>0</span>
+						</button>
+						<button type=button class="settings-library-link" data-library-link=completed data-click=openCompletedLibrary hidden>
+							<span><?= e(t('settings.completed_items')) ?></span>
+							<span class="settings-library-count" data-completed-count>0</span>
+						</button>
+					</div>
 				</div>
 <?php endif; ?>
 <?php if ($settingsReader): ?>

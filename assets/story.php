@@ -439,7 +439,7 @@ function story_item_meta(array $item, $showTranslationLang = false, $includeKind
   return implode(' · ', $parts);
 }
 
-function story_list_item(array $item, $showTranslationLang = false, $includeKind = true) {
+function story_list_item(array $item, $showTranslationLang = false, $includeKind = true, $withActions = false) {
   $search = trim($item['title'] . ' ' . ($item['sourceTitle'] ?? '') . ' ' . ($item['kindLabel'] ?? ''));
   $attrs = ' data-id="' . e($item['id']) . '"';
   $attrs .= ' data-kind="' . e($item['kind'] ?? '') . '"';
@@ -470,6 +470,9 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
   $metaHtml = $meta !== '' ? '<small class=meta>' . e($meta) . '</small>' : '';
 
   $html = "\t\t\t<li" . $attrs . ">\n";
+  if ($withActions) {
+    $html .= "\t\t\t\t<div class=\"story-row flex gap-small\">\n";
+  }
   $html .= "\t\t\t\t<a class=story-item href=\"stories/" . e($item['slug']) . "/\">\n";
   $html .= "\t\t\t\t\t" . render_item_thumbnail($item['id'], $item['topic'] ?? '', $item['kind'] ?? '', 64, 'story-thumb') . "\n";
   $html .= "\t\t\t\t\t<div class=body>\n";
@@ -481,14 +484,21 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
   $html .= "\t\t\t\t\t\t<progress data-item-progress hidden value=0 max=100></progress>\n";
   $html .= "\t\t\t\t\t</div>\n";
   $html .= "\t\t\t\t</a>\n";
+  if ($withActions) {
+    $html .= "\t\t\t\t\t<div class=\"story-actions flex gap-2xs\">\n";
+    $html .= "\t\t\t\t\t\t<button type=button class=\"quiet icon-only small rounded story-action-favorite\" data-click=toggleFavorite aria-pressed=false aria-label=\"" . e(t('item.favorite')) . "\">" . icon_html('heart', ['class' => 'icon heart-outline']) . icon_html('heart-filled', ['class' => 'icon heart-filled']) . "</button>\n";
+    $html .= "\t\t\t\t\t\t<button type=button class=\"quiet icon-only small rounded\" data-click=openItemMenu aria-haspopup=menu aria-expanded=false aria-controls=item-menu aria-label=\"" . e(t('item.more_actions')) . "\">" . icon_html('more', ['size' => 20]) . "</button>\n";
+    $html .= "\t\t\t\t\t</div>\n";
+    $html .= "\t\t\t\t</div>\n";
+  }
   $html .= "\t\t\t</li>\n";
   return $html;
 }
 
-function render_story_list(array $items, $extraAttrs = '', $showTranslationLang = false, $includeKind = true) {
+function render_story_list(array $items, $extraAttrs = '', $showTranslationLang = false, $includeKind = true, $withActions = false) {
   echo "\t\t<ul class=list" . ($extraAttrs !== '' ? ' ' . $extraAttrs : '') . ">\n";
   foreach ($items as $item) {
-    echo story_list_item($item, $showTranslationLang, $includeKind);
+    echo story_list_item($item, $showTranslationLang, $includeKind, $withActions);
   }
   echo "\t\t</ul>\n";
 }
