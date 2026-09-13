@@ -691,46 +691,70 @@ dl dt{
   text-decoration: underline;
 }
 
-.settings-library-label{
-  margin: 0;
-  font-size: .875rem;
-  line-height: var(--spacing-20);
-}
-
-.settings-library-link{
-  display: flex;
+.home-header-actions{
+  flex-shrink: 0;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-12);
-  width: 100%;
-  padding: var(--spacing-12) var(--spacing-16);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--border-radius-medium);
-  background-color: var(--background-secondary);
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 1rem;
-  line-height: var(--spacing-24);
-  text-align: start;
-  cursor: pointer;
-}
-
-.settings-library-link[hidden]{
-  display: none;
-}
-
-.settings-library-count{
-  color: var(--text-tertiary);
-  font-variant-numeric: tabular-nums;
 }
 
 .library-header{
-  align-items: center;
   margin-block-end: var(--spacing-16);
+}
+
+.library-header-row{
+  align-items: center;
 }
 
 .library-header h1{
   margin: 0;
+}
+
+.library-segment{
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.library-segment label{
+  flex: 1 1 0;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.library-segment label input{
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.library-segment label > .button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: var(--spacing-8) var(--spacing-12);
+  border-radius: var(--border-radius-medium);
+  background-color: var(--background-popover);
+  box-shadow: none;
+  color: var(--text-tertiary);
+  font-size: .875rem;
+  line-height: var(--spacing-20);
+  text-align: center;
+}
+
+.library-segment label input:checked + .button{
+  background-color: var(--background-yellow);
+  box-shadow: inset 2px 4px 8px var(--shadow-inset-soft);
+  color: var(--text-yellow);
+}
+
+.library-segment label input:focus-visible + .button{
+  outline: 2px solid var(--focus-outline);
+  outline-offset: 2px;
+}
+
+#settings .title-menu.is-fixed{
+  z-index: 30;
 }
 
 .library-back{
@@ -2004,7 +2028,8 @@ body.ios:not(.started.show-translation) .translation-popover{
   }
 }
 
-.home-settings-toggle{
+.home-settings-toggle,
+.home-library-toggle{
   flex-shrink: 0;
 }
 

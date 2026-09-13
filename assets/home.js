@@ -7,7 +7,6 @@ const itemState = window.ReadalongItemState
 
 let kindFilter = DEFAULT_KIND
 let durationLimit = 0
-let progressFilter = 'todo'
 let visibilityFilter = 'default'
 let favoritesFilter = false
 
@@ -128,7 +127,6 @@ function writeFiltersToUrl() {
 function loadBrowseFiltersFromStorage() {
   if (!itemState) return
   const stored = itemState.loadBrowseFilters()
-  progressFilter = stored.progress || 'todo'
   visibilityFilter = stored.visibility || 'default'
   favoritesFilter = !!stored.favorites
 }
@@ -136,7 +134,6 @@ function loadBrowseFiltersFromStorage() {
 function saveBrowseFiltersToStorage() {
   if (!itemState) return
   itemState.saveBrowseFilters({
-    progress: progressFilter,
     visibility: visibilityFilter,
     favorites: favoritesFilter
   })
@@ -150,8 +147,6 @@ function syncFilterState() {
   if (durationSelect) {
     durationSelect.value = durationLimit ? String(durationLimit / 60) : ''
   }
-  const progressSelect = homeEl('[data-progress-filter]')
-  if (progressSelect) progressSelect.value = progressFilter
   const visibilitySelect = homeEl('[data-visibility-filter]')
   if (visibilitySelect) visibilitySelect.value = visibilityFilter
   const favoritesChip = homeEl('[data-favorites-filter]')
@@ -161,8 +156,7 @@ function syncFilterState() {
 }
 
 function browseFiltersAtDefault() {
-  return progressFilter === 'todo' &&
-    visibilityFilter === 'default' &&
+  return visibilityFilter === 'default' &&
     !favoritesFilter
 }
 
@@ -252,7 +246,7 @@ function applyAllItems() {
   allList.querySelectorAll('li').forEach(function (item) {
     const id = item.getAttribute('data-id') || ''
     const matchStatus = itemState
-      ? itemState.matchesBrowseStatus(id, progressFilter, visibilityFilter, favoritesFilter)
+      ? itemState.matchesBrowseStatus(id, visibilityFilter, favoritesFilter)
       : true
     const show = matchesHomeFilters(item, true) && matchStatus
     item.hidden = !show
@@ -427,17 +421,10 @@ function fillContinueReading() {
 
 function clearFilters() {
   durationLimit = 0
-  progressFilter = 'todo'
   visibilityFilter = 'default'
   favoritesFilter = false
   saveBrowseFiltersToStorage()
   syncFilterState()
-  applyAllItems()
-}
-
-function filterProgress(el) {
-  progressFilter = el.value || 'todo'
-  saveBrowseFiltersToStorage()
   applyAllItems()
 }
 
@@ -484,12 +471,32 @@ function filterMenuTriggers() {
   return homeAll('.home-title-trigger, .filter-trigger')
 }
 
+function positionOnboardingUiMenu(button, menu) {
+  const rect = button.getBoundingClientRect()
+  menu.classList.add('is-fixed')
+  menu.style.top = Math.round(rect.bottom + 8) + 'px'
+  menu.style.left = Math.round(rect.left) + 'px'
+  menu.style.right = 'auto'
+  menu.style.width = Math.round(rect.width) + 'px'
+}
+
+function resetOnboardingUiMenu(menu) {
+  menu.classList.remove('is-fixed')
+  menu.style.top = ''
+  menu.style.left = ''
+  menu.style.right = ''
+  menu.style.width = ''
+}
+
 function closeTitleMenus(except) {
   filterMenuTriggers().forEach(function (button) {
     if (except && button === except) return
     button.setAttribute('aria-expanded', 'false')
     const menu = document.getElementById(button.getAttribute('aria-controls'))
-    if (menu) menu.hidden = true
+    if (menu) {
+      menu.hidden = true
+      resetOnboardingUiMenu(menu)
+    }
   })
 }
 
@@ -501,6 +508,9 @@ function toggleTitleMenu(el) {
   if (!open) {
     el.setAttribute('aria-expanded', 'true')
     menu.hidden = false
+    if (menu.closest('.onboarding-ui-control')) {
+      positionOnboardingUiMenu(el, menu)
+    }
   }
 }
 
@@ -587,6 +597,67 @@ function titleMenuLabel(control, menu, selected, all) {
   }).join(' · ')
 }
 
+let settingsTranslateCheckIcon = null
+
+function rebuildSettingsTranslateMenu(options, current) {
+  const menu = homeEl('#settings-translate-menu')
+  const control = menu && menu.closest('.home-title-control')
+  if (!menu || !control) return
+
+  const endonyms = window.LANG_ENDONYMS || {}
+  if (!settingsTranslateCheckIcon) {
+    settingsTranslateCheckIcon = menu.querySelector('label .icon')
+  }
+  menu.innerHTML = ''
+
+  const nextTranslate = options.indexOf(current) !== -1 ? current : (options[0] || '')
+
+  options.forEach(function (code) {
+    const checked = code === nextTranslate
+    const label = document.createElement('label')
+    label.setAttribute('role', 'option')
+    label.setAttribute('aria-selected', checked ? 'true' : 'false')
+    label.setAttribute('translate', 'no')
+    label.lang = code
+
+    const input = document.createElement('input')
+    input.type = 'radio'
+    input.name = 'settings-translate'
+    input.value = code
+    input.checked = checked
+    label.appendChild(input)
+
+    if (settingsTranslateCheckIcon) {
+      label.appendChild(settingsTranslateCheckIcon.cloneNode(true))
+    }
+
+    const src = langFlagSrc(code)
+    if (src) {
+      const img = document.createElement('img')
+      img.className = 'lang-flag'
+      img.src = src
+      img.width = 24
+      img.height = 16
+      img.decoding = 'async'
+      img.alt = ''
+      img.setAttribute('aria-hidden', 'true')
+      img.dataset.langFlag = code
+      label.appendChild(img)
+    }
+
+    const text = document.createElement('span')
+    text.textContent = endonyms[code] || code
+    label.appendChild(text)
+    menu.appendChild(label)
+  })
+
+  const labelEl = control.querySelector('[data-title-label]')
+  if (labelEl && nextTranslate) {
+    labelEl.textContent = endonyms[nextTranslate] || nextTranslate
+    labelEl.lang = nextTranslate
+  }
+}
+
 function syncTranslateForRead(readLangs) {
   const bySource = window.TRANSLATION_LANGS_BY_SOURCE || {}
   const sourceLangs = Object.keys(bySource)
@@ -597,33 +668,23 @@ function syncTranslateForRead(readLangs) {
       seen[lang] = true
     })
   })
-  const options = Object.keys(seen)
-  const translateSelect = homeEl('[data-translate-along]')
-  const current = translateSelect
-    ? translateSelect.value
+  const endonyms = window.LANG_ENDONYMS || {}
+  const options = Object.keys(seen).sort(function (a, b) {
+    return String(endonyms[a] || a).localeCompare(endonyms[b] || b)
+  })
+  const menu = homeEl('#settings-translate-menu')
+  const current = menu
+    ? ((menu.querySelector('input[type=radio]:checked') || {}).value || '')
     : (localStorage.getItem('readalong-translate') || '').split(',')[0]
   if (options.length && options.indexOf(current) === -1) {
     window.setLangPref('translate', options[0])
-    const allowed = Object.keys(window.LANG_ENDONYMS || {})
+    const allowed = Object.keys(endonyms)
     window.setLangPref('ui', allowed.indexOf(options[0]) !== -1 ? options[0] : 'en')
     location.reload()
     return
   }
-  if (!translateSelect) return
-  const endonyms = window.LANG_ENDONYMS || {}
-  const keep = translateSelect.value
-  translateSelect.innerHTML = ''
-  options.sort(function (a, b) {
-    return String(endonyms[a] || a).localeCompare(endonyms[b] || b)
-  }).forEach(function (code) {
-    const option = document.createElement('option')
-    option.value = code
-    option.lang = code
-    option.setAttribute('translate', 'no')
-    option.textContent = endonyms[code] || code
-    if (code === keep) option.selected = true
-    translateSelect.appendChild(option)
-  })
+  if (!menu) return
+  rebuildSettingsTranslateMenu(options, current)
 }
 
 function updateTitleFilter(el, event) {
@@ -730,7 +791,6 @@ function initHome() {
 window.clearFilters = clearFilters
 window.filterKind = filterKind
 window.filterDuration = filterDuration
-window.filterProgress = filterProgress
 window.filterVisibility = filterVisibility
 window.toggleFavoritesFilter = toggleFavoritesFilter
 window.toggleHistory = toggleHistory

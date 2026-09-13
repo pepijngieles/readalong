@@ -89,10 +89,15 @@ if (!$needsOnboarding) {
 				);
 ?>
 			</div>
-			<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
-				<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
-				<?php icon('gear', ['size' => 20]); ?>
-			</button>
+			<div class="home-header-actions flex gap-2xs">
+				<a class="quiet icon-only small rounded home-library-toggle" href="/library/completed" aria-label="<?= e(t('library.completed_title')) ?>">
+					<?php icon('clock', ['size' => 20]); ?>
+				</a>
+				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
+					<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
+					<?php icon('gear', ['size' => 20]); ?>
+				</button>
+			</div>
 		</header>
 
 		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
@@ -140,18 +145,6 @@ if (!$needsOnboarding) {
 					$levelCodes
 				);
 ?>
-					<label class=filter-field>
-						<span class=visually-hidden><?= e(t('home.filter.progress')) ?></span>
-						<div class=select-wrap>
-							<select class=select-medium data-progress-filter data-change=filterProgress>
-								<option value=todo><?= e(t('home.filter.progress.todo')) ?></option>
-								<option value=in-progress><?= e(t('home.filter.progress.in_progress')) ?></option>
-								<option value=done><?= e(t('home.filter.progress.done')) ?></option>
-								<option value=all><?= e(t('home.filter.progress.all')) ?></option>
-							</select>
-							<?php icon('chevron-down', ['size' => 16]); ?>
-						</div>
-					</label>
 					<label class=filter-field>
 						<span class=visually-hidden><?= e(t('home.filter.visibility')) ?></span>
 						<div class=select-wrap>
@@ -233,10 +226,10 @@ include $partials . '/item-actions-i18n.php';
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/item-state.js?v=2" defer></script>
-	<script type="text/javascript" src="assets/item-actions.js?v=4" defer></script>
-	<script type="text/javascript" src="assets/settings.js?v=5" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=28" defer></script>
+	<script type="text/javascript" src="assets/item-state.js?v=3" defer></script>
+	<script type="text/javascript" src="assets/item-actions.js?v=5" defer></script>
+	<script type="text/javascript" src="assets/settings.js?v=6" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=30" defer></script>
 
 <?php endif; ?>
 
