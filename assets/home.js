@@ -318,23 +318,24 @@ function decorateContinueItem(item, progress) {
   const remainingMinutes = Math.round(remainingSeconds / 60)
   const remainingEl = item.querySelector('[data-remaining]')
   const progressEl = item.querySelector('[data-item-progress]')
-  const metaEl = item.querySelector('.story-item .meta')
   const showTranslationLang = continueSection?.hasAttribute('data-show-translation-lang')
   const durationDisplay = item.getAttribute('data-duration-display') || ''
   const kindLabel = item.getAttribute('data-kind-label') || ''
+  const level = item.getAttribute('data-level') || ''
   const translationEndonym = item.getAttribute('data-translation-endonym') || ''
   const parts = []
   const remainingTemplate = (homeEl('[data-all-section]')?.getAttribute('data-i18n-remaining')) || '{n} min'
 
   if (durationDisplay) parts.push(durationDisplay)
+  if (level) parts.push(level)
   if (remainingMinutes >= 1) {
     parts.push(remainingTemplate.replace('{n}', String(remainingMinutes)))
   }
   if (showTranslationLang && translationEndonym) parts.push(translationEndonym)
   if (kindLabel) parts.push(kindLabel)
 
-  if (metaEl && parts.length) {
-    metaEl.textContent = parts.join(' · ')
+  if (parts.length && typeof window.setItemMetaText === 'function') {
+    window.setItemMetaText(item, parts.join(' · '))
   }
   if (remainingEl) {
     remainingEl.hidden = true
@@ -708,8 +709,8 @@ function initTitleMenus() {
 function refreshHomeLists() {
   applyAllItems()
   fillContinueReading()
-  if (typeof window.syncAllFavoriteButtons === 'function') {
-    window.syncAllFavoriteButtons(document)
+  if (typeof window.syncAllFavoriteIndicators === 'function') {
+    window.syncAllFavoriteIndicators(document)
   }
   updateFavoritesFilterRow()
 }
