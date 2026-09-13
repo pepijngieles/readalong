@@ -64,7 +64,7 @@ include $partials . '/item-actions-i18n.php';
 		window.COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 	</script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=1" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=2" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=4" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=5" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=2" defer></script>

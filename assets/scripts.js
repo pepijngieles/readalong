@@ -140,9 +140,6 @@ function seekAudio(seconds) {
 ---------------------------------------------------------------------------- */
 function start() {
   started = true
-  if (window.ReadalongItemState && storyConfig.id) {
-    window.ReadalongItemState.clearDismissedFromContinue(storyConfig.id)
-  }
   document.body.classList.add('started','paused')
   updateThemeColor()
   currentSentenceEl.setAttribute('aria-current', 'true')

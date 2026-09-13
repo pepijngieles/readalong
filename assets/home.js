@@ -301,7 +301,6 @@ function loadProgressEntries() {
   }).filter(function (entry) {
     return entry.progress &&
       !entry.progress.completed &&
-      !entry.progress.dismissedFromContinue &&
       (entry.progress.sentence > 0 || entry.progress.started)
   }).sort(function (a, b) {
     return (b.progress.updatedAt || 0) - (a.progress.updatedAt || 0)
