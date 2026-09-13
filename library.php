@@ -7,7 +7,7 @@ if (!in_array($view, ['hidden', 'completed'], true)) {
   $view = 'hidden';
 }
 
-$base = '';
+$base = '../../';
 $story = ['title' => t('library.' . $view . '_title')];
 $uiLocale = ui_locale();
 $partials = __DIR__ . '/assets/partials';
@@ -38,7 +38,7 @@ $stories = story_apply_home_hidden($stories, [$readAlongLang], $contentLangs, $l
 	<main class="library-main padding-page">
 
 		<header class="library-header flex gap-small">
-			<a class="quiet icon-only small rounded library-back" href="./" aria-label="<?= e(t('library.back')) ?>">
+			<a class="quiet icon-only small rounded library-back" href="<?= e($base) ?>" aria-label="<?= e(t('library.back')) ?>">
 				<?php icon('back', ['size' => 20]); ?>
 			</a>
 			<h1 class=font-size-large><?= e(t('library.' . $view . '_title')) ?></h1>
@@ -63,11 +63,11 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript">
 		window.COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 	</script>
-	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/item-state.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/item-actions.js?v=3" defer></script>
-	<script type="text/javascript" src="assets/settings.js?v=5" defer></script>
-	<script type="text/javascript" src="assets/library.js?v=1" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/brio/brio.js?v=1" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=1" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=4" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=5" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=2" defer></script>
 
 </body>
 </html>
