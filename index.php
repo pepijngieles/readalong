@@ -200,7 +200,7 @@ if (!$needsOnboarding) {
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=4" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=26" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=27" defer></script>
 
 <?php endif; ?>
 
