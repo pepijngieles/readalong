@@ -439,6 +439,14 @@ function story_item_meta(array $item, $showTranslationLang = false, $includeKind
   return implode(' · ', $parts);
 }
 
+function story_item_meta_html(array $item, $showTranslationLang = false, $includeKind = true) {
+  $meta = story_item_meta($item, $showTranslationLang, $includeKind);
+  if ($meta === '') {
+    return '';
+  }
+  return '<small class=meta><span data-meta-base>' . e($meta) . '</span></small>';
+}
+
 function story_list_item(array $item, $showTranslationLang = false, $includeKind = true, $withActions = false) {
   $search = trim($item['title'] . ' ' . ($item['sourceTitle'] ?? '') . ' ' . ($item['kindLabel'] ?? ''));
   $attrs = ' data-id="' . e($item['id']) . '"';
@@ -463,17 +471,17 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
     $attrs .= ' hidden';
   }
 
-  $meta = story_item_meta($item, $showTranslationLang, $includeKind);
+  $metaHtml = story_item_meta_html($item, $showTranslationLang, $includeKind);
   $lang = $item['language'] ?? '';
   $langAttr = $lang !== '' ? ' lang="' . e($lang) . '"' : '';
   $title = '<p' . $langAttr . '>' . e($item['title']) . '</p>';
-  $metaHtml = $meta !== '' ? '<small class=meta>' . e($meta) . '</small>' : '';
+  global $base;
 
   $html = "\t\t\t<li" . $attrs . ">\n";
   if ($withActions) {
     $html .= "\t\t\t\t<div class=\"story-row flex gap-small\">\n";
   }
-  $html .= "\t\t\t\t<a class=story-item href=\"stories/" . e($item['slug']) . "/\">\n";
+  $html .= "\t\t\t\t<a class=story-item href=\"" . e($base . 'stories/' . $item['slug'] . '/') . "\">\n";
   $html .= "\t\t\t\t\t" . render_item_thumbnail($item['id'], $item['topic'] ?? '', $item['kind'] ?? '', 64, 'story-thumb') . "\n";
   $html .= "\t\t\t\t\t<div class=body>\n";
   $html .= "\t\t\t\t\t\t" . $title . "\n";
@@ -486,7 +494,6 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
   $html .= "\t\t\t\t</a>\n";
   if ($withActions) {
     $html .= "\t\t\t\t\t<div class=\"story-actions flex gap-2xs\">\n";
-    $html .= "\t\t\t\t\t\t<button type=button class=\"quiet icon-only small rounded story-action-favorite\" data-click=toggleFavorite aria-pressed=false aria-label=\"" . e(t('item.favorite')) . "\">" . icon_html('heart', ['class' => 'icon heart-outline']) . icon_html('heart-filled', ['class' => 'icon heart-filled']) . "</button>\n";
     $html .= "\t\t\t\t\t\t<button type=button class=\"quiet icon-only small rounded\" data-click=openItemMenu aria-haspopup=menu aria-expanded=false aria-controls=item-menu aria-label=\"" . e(t('item.more_actions')) . "\">" . icon_html('more', ['size' => 20]) . "</button>\n";
     $html .= "\t\t\t\t\t</div>\n";
     $html .= "\t\t\t\t</div>\n";

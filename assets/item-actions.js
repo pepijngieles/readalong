@@ -37,20 +37,112 @@
     document.dispatchEvent(new CustomEvent('readalong:items-changed'))
   }
 
-  function syncFavoriteButton(button) {
-    const itemEl = itemFromElement(button)
-    if (!itemEl) return
-    const id = itemEl.getAttribute('data-id')
-    const active = state.isFavorite(id)
-    button.setAttribute('aria-pressed', active ? 'true' : 'false')
-    button.classList.toggle('active', active)
-    const label = active ? i18n('unfavorite', 'Remove from favorites') : i18n('favorite', 'Add to favorites')
-    button.setAttribute('aria-label', label)
+  function favoriteIndicatorHtml() {
+    const icons = window.ITEM_MENU_ICONS || {}
+    const icon = icons['heart-filled'] || ''
+    return '<span class="meta-sep"> · </span><span class="meta-favorite-icon" aria-hidden=true>' + icon + '</span>'
   }
 
-  function syncAllFavoriteButtons(root) {
+  function mergeMetaTail(metaEl) {
+    const baseEl = metaEl.querySelector('[data-meta-base]')
+    const tailEl = metaEl.querySelector('[data-meta-tail]')
+    if (!baseEl || !tailEl) return
+    baseEl.textContent = baseEl.textContent + tailEl.textContent
+    tailEl.remove()
+  }
+
+  function ensureMetaBase(metaEl) {
+    let baseEl = metaEl.querySelector('[data-meta-base]')
+    if (baseEl) return baseEl
+    const text = metaEl.textContent || ''
+    metaEl.textContent = ''
+    baseEl = document.createElement('span')
+    baseEl.setAttribute('data-meta-base', '')
+    baseEl.textContent = text
+    metaEl.appendChild(baseEl)
+    return baseEl
+  }
+
+  function syncFavoriteIndicator(itemEl) {
+    const metaEl = itemEl.querySelector('.story-item .meta')
+    if (!metaEl) return
+
+    const id = itemEl.getAttribute('data-id') || ''
+    const active = state.isFavorite(id)
+    const level = itemEl.getAttribute('data-level') || ''
+    const indicator = metaEl.querySelector('[data-favorite-indicator]')
+
+    if (!active) {
+      if (indicator) indicator.remove()
+      mergeMetaTail(metaEl)
+      return
+    }
+
+    const baseEl = ensureMetaBase(metaEl)
+    if (indicator) return
+
+    const indicatorEl = document.createElement('span')
+    indicatorEl.className = 'meta-favorite'
+    indicatorEl.setAttribute('data-favorite-indicator', '')
+    indicatorEl.setAttribute('aria-label', i18n('favorite', 'Add to favorites'))
+    indicatorEl.innerHTML = favoriteIndicatorHtml()
+
+    const tailEl = metaEl.querySelector('[data-meta-tail]')
+    if (tailEl) {
+      baseEl.after(indicatorEl)
+      return
+    }
+
+    const text = baseEl.textContent || ''
+    if (level && text.includes(level)) {
+      const idx = text.indexOf(level) + level.length
+      baseEl.textContent = text.slice(0, idx)
+      const tail = document.createElement('span')
+      tail.setAttribute('data-meta-tail', '')
+      tail.textContent = text.slice(idx)
+      baseEl.after(indicatorEl)
+      indicatorEl.after(tail)
+      return
+    }
+
+    baseEl.after(indicatorEl)
+  }
+
+  function syncAllFavoriteIndicators(root) {
     const scope = root || document
-    scope.querySelectorAll('[data-click=toggleFavorite]').forEach(syncFavoriteButton)
+    scope.querySelectorAll('li[data-id]').forEach(syncFavoriteIndicator)
+  }
+
+  function setItemMetaText(itemEl, text) {
+    let metaEl = itemEl.querySelector('.story-item .meta')
+    if (!metaEl) {
+      const body = itemEl.querySelector('.story-item .body')
+      if (!body || !text) return
+      metaEl = document.createElement('small')
+      metaEl.className = 'meta'
+      const titleEl = body.querySelector('p')
+      if (titleEl && titleEl.nextElementSibling) {
+        body.insertBefore(metaEl, titleEl.nextElementSibling)
+      } else {
+        body.appendChild(metaEl)
+      }
+    }
+    if (!text) {
+      metaEl.remove()
+      return
+    }
+
+    metaEl.querySelector('[data-favorite-indicator]')?.remove()
+    metaEl.querySelector('[data-meta-tail]')?.remove()
+    let baseEl = metaEl.querySelector('[data-meta-base]')
+    if (!baseEl) {
+      metaEl.textContent = ''
+      baseEl = document.createElement('span')
+      baseEl.setAttribute('data-meta-base', '')
+      metaEl.appendChild(baseEl)
+    }
+    baseEl.textContent = text
+    syncFavoriteIndicator(itemEl)
   }
 
   function closeItemMenu() {
@@ -187,20 +279,6 @@
     undoTimer = setTimeout(hideSnackbar, 5000)
   }
 
-  function toggleFavorite(el, event) {
-    if (event) {
-      event.preventDefault()
-      event.stopPropagation()
-    }
-    const itemEl = itemFromElement(el)
-    if (!itemEl) return
-    const meta = itemMeta(itemEl)
-    const next = !state.isFavorite(meta.id)
-    state.setFavorite(meta.id, next)
-    syncAllFavoriteButtons(document)
-    dispatchItemChange()
-  }
-
   function runItemAction(el, event) {
     if (event) {
       event.preventDefault()
@@ -234,7 +312,7 @@
     } else if (action === 'favorite' || action === 'unfavorite') {
       const next = action === 'favorite'
       state.setFavorite(meta.id, next)
-      syncAllFavoriteButtons(document)
+      syncAllFavoriteIndicators(document)
     } else if (action === 'share') {
       const href = activeItemEl.querySelector('.story-item')?.getAttribute('href') || ('stories/' + meta.slug + '/')
       const url = new URL(href, location.href).href
@@ -293,7 +371,7 @@
   }
 
   function initItemActions() {
-    syncAllFavoriteButtons(document)
+    syncAllFavoriteIndicators(document)
     updateLibrarySettingsCounts()
 
     document.addEventListener('click', function (event) {
@@ -304,7 +382,7 @@
       if (event.key === 'Escape') closeItemMenu()
     })
     document.addEventListener('readalong:items-changed', function () {
-      syncAllFavoriteButtons(document)
+      syncAllFavoriteIndicators(document)
       updateLibrarySettingsCounts()
     })
 
@@ -314,13 +392,13 @@
     }
   }
 
-  window.toggleFavorite = toggleFavorite
   window.openItemMenu = openItemMenu
   window.runItemAction = runItemAction
   window.undoItemAction = undoItemAction
   window.openHiddenLibrary = openHiddenLibrary
   window.openCompletedLibrary = openCompletedLibrary
-  window.syncAllFavoriteButtons = syncAllFavoriteButtons
+  window.syncAllFavoriteIndicators = syncAllFavoriteIndicators
+  window.setItemMetaText = setItemMetaText
   window.updateLibrarySettingsCounts = updateLibrarySettingsCounts
 
   document.addEventListener('DOMContentLoaded', initItemActions)
