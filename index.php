@@ -236,7 +236,7 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript" src="assets/item-state.js?v=2" defer></script>
 	<script type="text/javascript" src="assets/item-actions.js?v=4" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=5" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=29" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=28" defer></script>
 
 <?php endif; ?>
 

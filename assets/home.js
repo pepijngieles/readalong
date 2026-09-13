@@ -484,43 +484,12 @@ function filterMenuTriggers() {
   return homeAll('.home-title-trigger, .filter-trigger')
 }
 
-function positionTitleMenu(button, menu) {
-  const rect = button.getBoundingClientRect()
-  menu.classList.add('is-fixed')
-  menu.style.top = Math.round(rect.bottom + 8) + 'px'
-  const control = menu.closest('.home-title-control')
-  const isLastTitleControl = control &&
-    control.parentElement &&
-    control.parentElement.querySelector('.home-title-control:last-child') === control
-  if (isLastTitleControl) {
-    menu.style.left = 'auto'
-    menu.style.right = Math.round(window.innerWidth - rect.right) + 'px'
-  } else {
-    menu.style.left = Math.round(rect.left) + 'px'
-    menu.style.right = 'auto'
-  }
-  if (menu.classList.contains('filter-menu')) {
-    menu.style.minWidth = Math.round(rect.width) + 'px'
-  }
-}
-
-function resetTitleMenuPosition(menu) {
-  menu.classList.remove('is-fixed')
-  menu.style.top = ''
-  menu.style.left = ''
-  menu.style.right = ''
-  menu.style.minWidth = ''
-}
-
 function closeTitleMenus(except) {
   filterMenuTriggers().forEach(function (button) {
     if (except && button === except) return
     button.setAttribute('aria-expanded', 'false')
     const menu = document.getElementById(button.getAttribute('aria-controls'))
-    if (menu) {
-      menu.hidden = true
-      resetTitleMenuPosition(menu)
-    }
+    if (menu) menu.hidden = true
   })
 }
 
@@ -532,25 +501,7 @@ function toggleTitleMenu(el) {
   if (!open) {
     el.setAttribute('aria-expanded', 'true')
     menu.hidden = false
-    positionTitleMenu(el, menu)
   }
-}
-
-function repositionOpenTitleMenus() {
-  filterMenuTriggers().forEach(function (button) {
-    if (button.getAttribute('aria-expanded') !== 'true') return
-    const menu = document.getElementById(button.getAttribute('aria-controls'))
-    if (menu && !menu.hidden) positionTitleMenu(button, menu)
-  })
-}
-
-let titleMenuScrollBound = false
-
-function bindTitleMenuReposition() {
-  if (titleMenuScrollBound) return
-  titleMenuScrollBound = true
-  window.addEventListener('scroll', repositionOpenTitleMenus, true)
-  window.addEventListener('resize', repositionOpenTitleMenus)
 }
 
 function langFlagSrc(code) {
@@ -733,7 +684,6 @@ function syncReadMenuLabel() {
 
 function initTitleMenus() {
   closeTitleMenus()
-  bindTitleMenuReposition()
   const readMenu = homeEl('[data-pref=read]')
   if (readMenu && readMenu.getAttribute('data-multiple') === 'false') {
     const allowed = allowedCodesFromMenu('read')
