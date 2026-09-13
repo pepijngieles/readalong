@@ -360,6 +360,18 @@ function findContinueSource(entry) {
   return null
 }
 
+function continueEntriesForReadLanguage(entries) {
+  const sourceLangs = allowedCodesFromMenu('read')
+  const readFilter = savedReadFilter()
+  if (isAllFilter(readFilter, sourceLangs)) return entries
+  return entries.filter(function (entry) {
+    const source = findContinueSource(entry)
+    if (!source) return false
+    const language = source.getAttribute('data-language') || ''
+    return readFilter.indexOf(language) !== -1
+  })
+}
+
 function cloneContinueItem(entry, featured) {
   const source = findContinueSource(entry)
   if (!source) return null
@@ -378,7 +390,7 @@ function fillContinueReading() {
   if (!continueSection || !continueFeatured) return
 
   const historyLabel = continueSection.getAttribute('data-i18n-history') || 'All history'
-  const entries = loadProgressEntries()
+  const entries = continueEntriesForReadLanguage(loadProgressEntries())
   continueFeatured.innerHTML = ''
   if (continueHistory) continueHistory.innerHTML = ''
 
