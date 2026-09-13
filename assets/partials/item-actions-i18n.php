@@ -15,4 +15,15 @@
 			'snackbar_hidden' => t('item.snackbar.hidden'),
 			'snackbar_completed' => t('item.snackbar.completed'),
 		], JSON_UNESCAPED_UNICODE) ?>;
+		window.ITEM_MENU_ICONS = <?= json_encode([
+			'heart' => icon_html('heart', ['size' => 16]),
+			'heart-filled' => icon_html('heart-filled', ['size' => 16]),
+			'circle-check' => icon_html('circle-check', ['size' => 16]),
+			'circle' => icon_html('circle', ['size' => 16]),
+			'rotate-ccw' => icon_html('rotate-ccw', ['size' => 16]),
+			'list-x' => icon_html('list-x', ['size' => 16]),
+			'eye-off' => icon_html('eye-off', ['size' => 16]),
+			'eye' => icon_html('eye', ['size' => 16]),
+			'share' => icon_html('share', ['size' => 16]),
+		], JSON_UNESCAPED_UNICODE) ?>;
 	</script>

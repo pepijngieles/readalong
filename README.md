@@ -13,6 +13,8 @@ Story URLs work via `.htaccess` on Hostinger (LiteSpeed), or via the thin `index
 
 See [AGENTS.md](AGENTS.md) for architecture, Brio/CSS conventions, file map, and verification checklist. Cursor rules in `.cursor/rules/` mirror the same guidelines for AI agents.
 
+**Icons:** UI chrome uses [Lucide](https://lucide.dev) icons vendored into `assets/icons.php`. To add one, run `python3 tools/lucide_icon.py <lucide-name>` and paste the PHP snippet — details in AGENTS.md § Icons.
+
 ## How to contribute
 Your feedback is much appreciated! When trying out the Readalong bèta version you probably have some questions and suggestions. If you're familiar with GitHub you can create a new issue or upvote an existing one. Not sure how this works? You can always send an email to <a href="mailto:support@readalong.io?subject=I got some feedback for Readalong&body=Hi Pepijn,%0D%0A %0D%0A">support@readalong.io</a>.
 
