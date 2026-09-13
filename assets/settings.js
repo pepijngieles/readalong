@@ -117,24 +117,123 @@ function uiLocaleFromTranslate(code) {
   return allowed.indexOf(code) !== -1 ? code : 'en'
 }
 
-function saveCatalogPrefs(el) {
-  const translateSelect = (el && el.matches && el.matches('[data-translate-along]'))
+function settingsTranslateMenu() {
+  return settingsEl('#settings-translate-menu')
+}
+
+function closeSettingsTitleMenus(exceptButton) {
+  document.querySelectorAll('#settings .home-title-trigger[aria-expanded=true]').forEach(function (button) {
+    if (exceptButton && button === exceptButton) return
+    button.setAttribute('aria-expanded', 'false')
+    const menu = document.getElementById(button.getAttribute('aria-controls'))
+    if (menu) {
+      menu.hidden = true
+      menu.classList.remove('is-fixed')
+      menu.style.top = ''
+      menu.style.left = ''
+      menu.style.right = ''
+      menu.style.width = ''
+    }
+  })
+}
+
+function positionSettingsTitleMenu(button, menu) {
+  const rect = button.getBoundingClientRect()
+  menu.classList.add('is-fixed')
+  menu.style.top = Math.round(rect.bottom + 8) + 'px'
+  menu.style.left = Math.round(rect.left) + 'px'
+  menu.style.right = 'auto'
+  menu.style.width = Math.round(rect.width) + 'px'
+}
+
+function updateSettingsTranslateLabel(chosen) {
+  const menu = settingsTranslateMenu()
+  const control = settingsEl('#settings-translate-control')
+  if (!menu || !control || !chosen) return
+  const endonyms = window.LANG_ENDONYMS || {}
+  const labelEl = control.querySelector('[data-title-label]')
+  if (labelEl) {
+    labelEl.textContent = endonyms[chosen] || chosen
+    labelEl.lang = chosen
+  }
+  menu.querySelectorAll('label[role=option]').forEach(function (option) {
+    const input = option.querySelector('input')
+    const selected = input && input.value === chosen
+    if (input) input.checked = selected
+    option.setAttribute('aria-selected', selected ? 'true' : 'false')
+  })
+}
+
+function saveCatalogPrefs(el, event) {
+  const menu = el && el.classList && el.classList.contains('title-menu')
     ? el
-    : settingsEl('[data-translate-along]')
-  const next = translateSelect ? translateSelect.value : ''
-  if (!next) return
+    : settingsTranslateMenu()
+  if (!menu) return
+
+  const inputs = Array.from(menu.querySelectorAll('input[type=radio]'))
+  const chosen = (event && event.target && event.target.value)
+    || (inputs.find(function (input) { return input.checked }) || {}).value
+  if (!chosen) return
+
+  updateSettingsTranslateLabel(chosen)
+  closeSettingsTitleMenus()
+
   const current = (localStorage.getItem('readalong-translate') || '').split(',')[0]
-  if (next === current) return
-  window.setLangPref('translate', next)
-  window.setLangPref('ui', uiLocaleFromTranslate(next))
+  if (chosen === current) return
+  window.setLangPref('translate', chosen)
+  window.setLangPref('ui', uiLocaleFromTranslate(chosen))
   location.reload()
+}
+
+function initSettingsTitleMenu() {
+  const trigger = settingsEl('#settings-translate-trigger')
+  const menu = settingsTranslateMenu()
+  if (!trigger || !menu) return
+
+  if (!window.toggleTitleMenu) {
+    window.toggleTitleMenu = function (el) {
+      const targetMenu = document.getElementById(el.getAttribute('aria-controls'))
+      if (!targetMenu) return
+      const open = el.getAttribute('aria-expanded') === 'true'
+      closeSettingsTitleMenus(open ? null : el)
+      if (!open) {
+        el.setAttribute('aria-expanded', 'true')
+        targetMenu.hidden = false
+        positionSettingsTitleMenu(el, targetMenu)
+      }
+    }
+
+    window.addEventListener('scroll', function () {
+      document.querySelectorAll('#settings .home-title-trigger[aria-expanded=true]').forEach(function (button) {
+        const openMenu = document.getElementById(button.getAttribute('aria-controls'))
+        if (openMenu && !openMenu.hidden) positionSettingsTitleMenu(button, openMenu)
+      })
+    }, true)
+    window.addEventListener('resize', function () {
+      document.querySelectorAll('#settings .home-title-trigger[aria-expanded=true]').forEach(function (button) {
+        const openMenu = document.getElementById(button.getAttribute('aria-controls'))
+        if (openMenu && !openMenu.hidden) positionSettingsTitleMenu(button, openMenu)
+      })
+    })
+
+    document.addEventListener('click', function (event) {
+      if (event.target.closest('#settings .home-title-control')) return
+      closeSettingsTitleMenus()
+    })
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeSettingsTitleMenus()
+    })
+  }
+
+  menu.querySelectorAll('[role=option]').forEach(function (option) {
+    option.addEventListener('click', function () {
+      closeSettingsTitleMenus()
+    })
+  })
 }
 
 function openSettings(el, event) {
   openDialog(el, event, 'settings')
-  if (typeof window.updateLibrarySettingsCounts === 'function') {
-    window.updateLibrarySettingsCounts()
-  }
 }
 
 function initSettingsControls() {
@@ -162,8 +261,10 @@ function initSettingsControls() {
     })
   })
   settingsDialog.addEventListener('close', function () {
+    closeSettingsTitleMenus()
     updateThemeColor()
   })
+  initSettingsTitleMenu()
   loadSettings()
 }
 

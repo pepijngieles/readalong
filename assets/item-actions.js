@@ -339,40 +339,8 @@
     dispatchItemChange()
   }
 
-  function updateLibrarySettingsCounts() {
-    document.querySelectorAll('[data-hidden-count]').forEach(function (el) {
-      const count = state.hiddenCount()
-      el.textContent = String(count)
-      const row = el.closest('[data-library-link=hidden]')
-      if (row) row.hidden = count === 0
-    })
-    document.querySelectorAll('[data-completed-count]').forEach(function (el) {
-      const count = state.completedCount()
-      el.textContent = String(count)
-      const row = el.closest('[data-library-link=completed]')
-      if (row) row.hidden = count === 0
-    })
-  }
-
-  function openLibrary(view) {
-    const settingsDialog = document.getElementById('settings')
-    if (settingsDialog && settingsDialog.open && typeof closeDialog === 'function') {
-      closeDialog(settingsDialog, null, 'settings')
-    }
-    location.href = '/library/' + view
-  }
-
-  function openHiddenLibrary() {
-    openLibrary('hidden')
-  }
-
-  function openCompletedLibrary() {
-    openLibrary('completed')
-  }
-
   function initItemActions() {
     syncAllFavoriteIndicators(document)
-    updateLibrarySettingsCounts()
 
     document.addEventListener('click', function (event) {
       if (event.target.closest('#item-menu, [data-click=openItemMenu]')) return
@@ -383,23 +351,14 @@
     })
     document.addEventListener('readalong:items-changed', function () {
       syncAllFavoriteIndicators(document)
-      updateLibrarySettingsCounts()
     })
-
-    const settingsDialog = document.getElementById('settings')
-    if (settingsDialog) {
-      settingsDialog.addEventListener('toggle', updateLibrarySettingsCounts)
-    }
   }
 
   window.openItemMenu = openItemMenu
   window.runItemAction = runItemAction
   window.undoItemAction = undoItemAction
-  window.openHiddenLibrary = openHiddenLibrary
-  window.openCompletedLibrary = openCompletedLibrary
   window.syncAllFavoriteIndicators = syncAllFavoriteIndicators
   window.setItemMetaText = setItemMetaText
-  window.updateLibrarySettingsCounts = updateLibrarySettingsCounts
 
   document.addEventListener('DOMContentLoaded', initItemActions)
 })()

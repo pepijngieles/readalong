@@ -6,13 +6,25 @@
     return document.querySelector(selector)
   }
 
+  function currentLibraryView() {
+    const section = libraryEl('[data-library-section]')
+    return section ? (section.getAttribute('data-library-view') || 'completed') : 'completed'
+  }
+
+  function syncLibraryViewUrl(view) {
+    const next = '/library/' + view
+    if (location.pathname + location.search !== next) {
+      history.replaceState(null, '', next)
+    }
+  }
+
   function applyLibraryFilters() {
     const section = libraryEl('[data-library-section]')
     const list = libraryEl('[data-library-items]')
     const empty = libraryEl('[data-library-empty]')
     if (!section || !list) return
 
-    const view = section.getAttribute('data-library-view') || 'hidden'
+    const view = currentLibraryView()
     let visible = 0
 
     list.querySelectorAll('li[data-id]').forEach(function (item) {
@@ -31,11 +43,45 @@
     }
   }
 
+  function switchLibraryView(el, event) {
+    const input = event && event.target
+    if (!input || input.type !== 'radio' || !input.checked) return
+    const section = libraryEl('[data-library-section]')
+    if (!section) return
+    section.setAttribute('data-library-view', input.value)
+    syncLibraryViewUrl(input.value)
+    applyLibraryFilters()
+  }
+
+  function initLibrarySegmentKeyboard() {
+    const fieldset = libraryEl('.library-segment')
+    if (!fieldset) return
+    const inputs = Array.from(fieldset.querySelectorAll('input[type=radio]'))
+    inputs.forEach(function (input, index) {
+      input.addEventListener('keydown', function (event) {
+        let nextIndex = index
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          nextIndex = (index + 1) % inputs.length
+          event.preventDefault()
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          nextIndex = (index - 1 + inputs.length) % inputs.length
+          event.preventDefault()
+        } else return
+        inputs[nextIndex].checked = true
+        inputs[nextIndex].focus()
+        inputs[nextIndex].dispatchEvent(new Event('change', { bubbles: true }))
+      })
+    })
+  }
+
   function initLibrary() {
     if (!libraryEl('[data-library-items]')) return
     applyLibraryFilters()
+    initLibrarySegmentKeyboard()
     document.addEventListener('readalong:items-changed', applyLibraryFilters)
   }
+
+  window.switchLibraryView = switchLibraryView
 
   document.addEventListener('DOMContentLoaded', initLibrary)
 })()

@@ -5,7 +5,6 @@ window.ReadalongItemState = (function () {
   const BROWSE_FILTERS_KEY = 'readalong-browse-filters'
 
   const DEFAULT_BROWSE_FILTERS = {
-    progress: 'todo',
     visibility: 'default',
     favorites: false
   }
@@ -110,20 +109,16 @@ window.ReadalongItemState = (function () {
     localStorage.setItem(BROWSE_FILTERS_KEY, JSON.stringify(filters))
   }
 
-  function matchesBrowseStatus(id, progressFilter, visibilityFilter, favoritesOnly) {
+  function matchesBrowseStatus(id, visibilityFilter, favoritesOnly) {
     const hidden = isHidden(id)
     const completed = isCompleted(id)
-    const started = isStarted(id)
     const favorite = isFavorite(id)
 
     if (favoritesOnly && !favorite) return false
+    if (completed) return false
 
     if (visibilityFilter === 'default' && hidden) return false
     if (visibilityFilter === 'hidden-only' && !hidden) return false
-
-    if (progressFilter === 'todo' && completed) return false
-    if (progressFilter === 'in-progress' && !(started && !completed)) return false
-    if (progressFilter === 'done' && !completed) return false
 
     return true
   }

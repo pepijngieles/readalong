@@ -1,6 +1,7 @@
 <?php
 $settingsCatalog = !empty($settingsCatalog);
 $settingsReader = !empty($settingsReader);
+$translateSelectLabel = lang_endonym($translateLang ?? ui_locale());
 ?>
 	<dialog id=settings class="dialog-sheet settings"<?php if ($settingsCatalog): ?> aria-labelledby=settings-title<?php else: ?> aria-label="<?= e(t('nav.settings')) ?>"<?php endif; ?>>
 		<div class=panel>
@@ -15,27 +16,26 @@ $settingsReader = !empty($settingsReader);
 <?php if ($settingsCatalog): ?>
 
 				<div class="settings-catalog flex columns gap-small">
-					<div>
-						<label for=translate-into><?= e(t('home.translate_into')) ?></label>
-						<div class=select-wrap>
-							<select id=translate-into class=select-medium data-translate-along data-change=saveCatalogPrefs>
+					<div class="flex columns gap-3xs onboarding-ui-field">
+						<label for=settings-translate-trigger class=onboarding-field-label data-i18n=onboarding.app_language_label><?= e(t('onboarding.app_language_label')) ?></label>
+						<div id=settings-translate-control class="home-title-control onboarding-ui-control full-width">
+							<button type=button id=settings-translate-trigger class="quiet home-title-trigger onboarding-ui-trigger" data-click=toggleTitleMenu aria-expanded=false aria-haspopup=listbox aria-controls=settings-translate-menu>
+								<span data-title-label translate=no lang=<?= e($translateLang) ?>><?= e($translateSelectLabel) ?></span>
+								<?php icon('chevron-down', ['size' => 16]); ?>
+							</button>
+							<div id=settings-translate-menu class=title-menu hidden role=listbox data-multiple=false data-translate-along data-change=saveCatalogPrefs>
 <?php foreach ($translateLangOptions as $code): ?>
-								<option value="<?= e($code) ?>"<?= $code === $translateLang ? ' selected' : '' ?> translate=no lang=<?= e($code) ?>><?= e(lang_endonym($code)) ?></option>
+								<label role=option aria-selected=<?= $code === $translateLang ? 'true' : 'false' ?> translate=no lang=<?= e($code) ?>>
+									<input type=radio name=settings-translate value="<?= e($code) ?>"<?= $code === $translateLang ? ' checked' : '' ?>>
+									<?php icon('check', ['size' => 16]); ?>
+<?php if (lang_flag_path($code) !== null): ?>
+									<?= lang_flag($code, ['decorative' => true]) ?>
+<?php endif; ?>
+									<span><?= e(lang_endonym($code)) ?></span>
+								</label>
 <?php endforeach; ?>
-							</select>
-							<?php icon('chevron-down', ['size' => 16]); ?>
+							</div>
 						</div>
-					</div>
-					<div class="settings-library flex columns gap-2xs">
-						<p class="settings-library-label text-color-tertiary"><?= e(t('settings.library')) ?></p>
-						<button type=button class="settings-library-link" data-library-link=hidden data-click=openHiddenLibrary hidden>
-							<span><?= e(t('settings.hidden_items')) ?></span>
-							<span class="settings-library-count" data-hidden-count>0</span>
-						</button>
-						<button type=button class="settings-library-link" data-library-link=completed data-click=openCompletedLibrary hidden>
-							<span><?= e(t('settings.completed_items')) ?></span>
-							<span class="settings-library-count" data-completed-count>0</span>
-						</button>
 					</div>
 				</div>
 <?php endif; ?>

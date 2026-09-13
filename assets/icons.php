@@ -33,6 +33,10 @@ function icon_definitions() {
       'viewBox' => '0 0 24 24',
       'body' => '<path d="M7.5 16.5L16.5 7.5" class="round"/><path d="M16.5 16.5L7.5 7.5" class="round"/>',
     ],
+    'clock' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<circle cx="12" cy="12" r="10" class="no-fill round"/><path d="M12 6v6l4 2" class="no-fill round"/>',
+    ],
     'check' => [
       'viewBox' => '0 0 16 16',
       'body' => '<path d="M3.5 8.5L6.5 11.5L12.5 4.5" class="round no-fill"/>',
