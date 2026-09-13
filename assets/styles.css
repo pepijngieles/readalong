@@ -2134,19 +2134,26 @@ body.ios:not(.started.show-translation) .translation-popover{
 .home-browse-filters{
   align-items: stretch;
   margin-block: var(--spacing-12) 0;
+  min-width: 0;
 }
 
-.home-browse-kinds{
-  flex-wrap: wrap;
+.home-browse-kinds,
+.home-browse-selects{
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .home-browse-selects{
-  flex-wrap: wrap;
   align-items: center;
 }
 
 .home-browse-selects .filter-field,
-.home-browse-selects label.filter-field{
+.home-browse-selects label.filter-field,
+.home-browse-selects .filter-dropdown{
+  flex-shrink: 0;
   width: auto;
 }
 
