@@ -620,7 +620,8 @@ dl dt{
 }
 
 .item-menu-action{
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   padding: var(--spacing-8) var(--spacing-12);
   border: 0;
@@ -633,6 +634,11 @@ dl dt{
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.item-menu-action .icon{
+  flex-shrink: 0;
+  color: var(--icon-default);
 }
 
 @media (hover: hover) {
@@ -735,6 +741,9 @@ dl dt{
 }
 
 [data-icon] path,
+[data-icon] circle:not(.fill),
+[data-icon] line,
+[data-icon] polyline,
 [data-icon] .stroke{
   stroke: currentColor;
 }
@@ -750,6 +759,7 @@ dl dt{
 }
 
 [data-icon] path,
+[data-icon] circle.no-fill,
 [data-icon] .no-fill{
   fill: none;
 }

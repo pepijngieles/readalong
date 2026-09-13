@@ -70,8 +70,26 @@
     menu.style.right = Math.round(window.innerWidth - rect.right) + 'px'
   }
 
+  const MENU_ACTION_ICONS = {
+    favorite: 'heart',
+    unfavorite: 'heart-filled',
+    complete: 'circle-check',
+    uncomplete: 'circle',
+    reset: 'rotate-ccw',
+    'dismiss-continue': 'list-x',
+    hide: 'eye-off',
+    unhide: 'eye',
+    share: 'share'
+  }
+
+  function menuIcon(action) {
+    const icons = window.ITEM_MENU_ICONS || {}
+    const name = MENU_ACTION_ICONS[action]
+    return name && icons[name] ? icons[name] : ''
+  }
+
   function menuButton(action, label) {
-    return '<button type=button class="item-menu-action" role=menuitem data-click=runItemAction data-item-action="' + action + '">' + label + '</button>'
+    return '<button type=button class="item-menu-action flex gap-small" role=menuitem data-click=runItemAction data-item-action="' + action + '">' + menuIcon(action) + '<span>' + label + '</span></button>'
   }
 
   function buildItemMenu(itemEl, inContinue) {
@@ -80,6 +98,13 @@
     const hidden = state.isHidden(meta.id)
     const started = state.isStarted(meta.id)
     const parts = []
+    const favorite = state.isFavorite(meta.id)
+
+    if (favorite) {
+      parts.push(menuButton('unfavorite', i18n('unfavorite', 'Remove from favorites')))
+    } else {
+      parts.push(menuButton('favorite', i18n('favorite', 'Add to favorites')))
+    }
 
     if (!completed) {
       parts.push(menuButton('complete', completeLabel(meta.kind)))
@@ -200,6 +225,10 @@
       state.resetProgress(meta.id)
     } else if (action === 'dismiss-continue') {
       state.dismissFromContinue(meta.id, meta.slug)
+    } else if (action === 'favorite' || action === 'unfavorite') {
+      const next = action === 'favorite'
+      state.setFavorite(meta.id, next)
+      syncAllFavoriteButtons(document)
     } else if (action === 'share') {
       const href = activeItemEl.querySelector('.story-item')?.getAttribute('href') || ('stories/' + meta.slug + '/')
       const url = new URL(href, location.href).href

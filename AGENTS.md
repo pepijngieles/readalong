@@ -185,7 +185,7 @@ Component CSS only where utilities cannot express the design (radio cards, featu
 
 - Escape output: `e()` helper
 - Strings: `t('key')` via `assets/i18n.php`
-- Icons: `icon('name', $attrs)` from `assets/icons.php`
+- Icons: `icon('name', $attrs)` from `assets/icons.php` — see [Icons](#icons) below
 - Story lists: `render_story_list()` / `story_list_item()` in `assets/story.php`
 
 **Story folder layout**
@@ -199,6 +199,41 @@ stories/<slug>/
 ```
 
 Audio files live under `audio/<slug>/`.
+
+---
+
+## Icons
+
+UI icons come from the [Lucide](https://lucide.dev) library (MIT). They are **vendored** into `assets/icons.php` at build time — nothing is fetched in the browser.
+
+### Adding or updating an icon
+
+1. Pick the Lucide name on [lucide.dev/icons](https://lucide.dev/icons) (kebab-case, e.g. `circle-check`).
+2. Generate a PHP snippet:
+
+```bash
+python3 tools/lucide_icon.py circle-check
+python3 tools/lucide_icon.py heart --name heart-filled --style fill   # solid variant
+python3 tools/lucide_icon.py ellipsis --name more --style dots        # filled dots
+```
+
+3. Paste the output into `icon_definitions()` in `assets/icons.php`. Use a descriptive key (`circle-check`, not Lucide’s internal export name unless they match).
+4. Use in PHP: `icon('circle-check', ['size' => 16])` or `icon_html(...)` when building HTML strings.
+5. For icons used in JS-built menus, also add `icon_html(...)` to `window.ITEM_MENU_ICONS` in `assets/partials/item-actions-i18n.php` (see item context menu).
+
+### What the script strips
+
+Lucide SVGs ship with `stroke`, `fill`, `stroke-width`, and line-cap/join attributes. Readalong drops those and drives appearance from CSS via classes on each shape:
+
+| Class | Use |
+|-------|-----|
+| `no-fill round` | Default stroke icon (paths, outline circles) |
+| `fill` | Solid shape (play triangle, filled heart, ellipsis dots) |
+| `no-stroke` | With `fill` when a path must not pick up a stroke |
+
+Icons render as inline `<svg class=icon data-icon aria-hidden=true>` so `[data-icon]` rules in `assets/styles.css` apply (Chromium cannot style `<use>` shadow content).
+
+Do **not** hand-draw new UI icons — extend Lucide via the script above. Thumbnail topic icons in `assets/thumbnail-icons.php` use a separate Phosphor set; only chrome/action icons follow this Lucide workflow.
 
 ---
 

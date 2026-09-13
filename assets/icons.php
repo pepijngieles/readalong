@@ -17,6 +17,14 @@ function icon_definitions() {
       'viewBox' => '0 0 16 16',
       'body' => '<path d="M7.5 10.5L4.5 7.5" class="round"/><path d="M7.5 10.5L10.5 7.5" class="round"/>',
     ],
+    'circle' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<circle cx="12" cy="12" r="10" class="no-fill round"/>',
+    ],
+    'circle-check' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<circle cx="12" cy="12" r="10" class="no-fill round"/><path d="m16 9-5.5 5.5L8 12" class="no-fill round"/>',
+    ],
     'close' => [
       'viewBox' => '0 0 24 24',
       'body' => '<path d="M4.5 19.5L19.5 4.5" class="round"/><path d="M19.5 19.5L4.5 4.5" class="round"/>',
@@ -28,6 +36,14 @@ function icon_definitions() {
     'check' => [
       'viewBox' => '0 0 16 16',
       'body' => '<path d="M3.5 8.5L6.5 11.5L12.5 4.5" class="round no-fill"/>',
+    ],
+    'eye' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" class="no-fill round"/><circle cx="12" cy="12" r="3" class="no-fill round"/>',
+    ],
+    'eye-off' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" class="no-fill round"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" class="no-fill round"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" class="no-fill round"/><path d="m2 2 20 20" class="no-fill round"/>',
     ],
     'curve' => [
       'viewBox' => '0 0 80 24',
@@ -44,6 +60,10 @@ function icon_definitions() {
     'play' => [
       'viewBox' => '0 0 24 24',
       'body' => '<path d="M6.5 21.5V2.5L21.5 12L6.5 21.5Z" class="fill"/>',
+    ],
+    'rotate-ccw' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" class="no-fill round"/><path d="M3 3v5h5" class="no-fill round"/>',
     ],
     'rewind' => [
       'viewBox' => '0 0 24 24',
@@ -91,19 +111,23 @@ function icon_definitions() {
     ],
     'heart' => [
       'viewBox' => '0 0 24 24',
-      'body' => '<path d="M12 20.5 10.8 19.4C5.4 14.6 2 11.7 2 7.7 2 5.2 4 3.2 6.5 3.2c1.5 0 3 .8 3.8 2 .8-1.2 2.3-2 3.8-2C16 3.2 18 5.2 18 7.7c0 4-3.4 6.9-8.8 12.8L12 20.5Z" class="no-fill round"/>',
+      'body' => '<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" class="no-fill round"/>',
     ],
     'heart-filled' => [
       'viewBox' => '0 0 24 24',
-      'body' => '<path d="M12 20.5 10.8 19.4C5.4 14.6 2 11.7 2 7.7 2 5.2 4 3.2 6.5 3.2c1.5 0 3 .8 3.8 2 .8-1.2 2.3-2 3.8-2C16 3.2 18 5.2 18 7.7c0 4-3.4 6.9-8.8 12.8L12 20.5Z" class="fill"/>',
+      'body' => '<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" class="fill"/>',
+    ],
+    'list-x' => [
+      'viewBox' => '0 0 24 24',
+      'body' => '<path d="M16 5H3" class="no-fill round"/><path d="M11 12H3" class="no-fill round"/><path d="M16 19H3" class="no-fill round"/><path d="m15.5 9.5 5 5" class="no-fill round"/><path d="m20.5 9.5-5 5" class="no-fill round"/>',
     ],
     'more' => [
       'viewBox' => '0 0 24 24',
-      'body' => '<circle cx="6" cy="12" r="1.5" class="fill"/><circle cx="12" cy="12" r="1.5" class="fill"/><circle cx="18" cy="12" r="1.5" class="fill"/>',
+      'body' => '<circle cx="5" cy="12" r="1" class="fill"/><circle cx="12" cy="12" r="1" class="fill"/><circle cx="19" cy="12" r="1" class="fill"/>',
     ],
     'share' => [
       'viewBox' => '0 0 24 24',
-      'body' => '<path d="M12 3.5V14.5" class="no-fill round"/><path d="M8.5 7 12 3.5 15.5 7" class="no-fill round"/><path d="M5.5 10.5V18.5C5.5 19.6 6.4 20.5 7.5 20.5H16.5C17.6 20.5 18.5 19.6 18.5 18.5V10.5" class="no-fill round"/>',
+      'body' => '<path d="M12 2v13" class="no-fill round"/><path d="m16 6-4-4-4 4" class="no-fill round"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" class="no-fill round"/>',
     ],
   ];
 }
