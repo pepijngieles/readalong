@@ -206,7 +206,8 @@ function applyAllItems() {
   allList.querySelectorAll('li').forEach(function (item) {
     const id = item.getAttribute('data-id') || ''
     const hiddenByUser = itemState && itemState.isHidden(id)
-    const show = matchesHomeFilters(item, true) && !hiddenByUser
+    const completed = itemState && itemState.isCompleted(id)
+    const show = matchesHomeFilters(item, true) && !hiddenByUser && !completed
     item.hidden = !show
     if (show) visible++
   })
