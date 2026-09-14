@@ -2161,12 +2161,15 @@ body.ios:not(.started.show-translation) .translation-popover{
   margin-block: var(--spacing-12) 0;
 }
 
-.home-browse-kinds{
+.home-browse-kinds,
+.home-browse-selects{
   flex-wrap: wrap;
+  overflow-x: visible;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .home-browse-selects{
-  flex-wrap: wrap;
   align-items: center;
 }
 
