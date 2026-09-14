@@ -12,10 +12,13 @@
 			'share_copied' => t('item.share_copied'),
 			'snackbar_hidden' => t('item.snackbar.hidden'),
 			'snackbar_completed' => t('item.snackbar.completed'),
+			'in_progress' => t('home.filter.progress.in_progress'),
+			'completed' => t('home.filter.progress.done'),
 		], JSON_UNESCAPED_UNICODE) ?>;
 		window.ITEM_MENU_ICONS = <?= json_encode([
 			'heart' => icon_html('heart', ['size' => 16]),
 			'heart-filled' => icon_html('heart-filled', ['size' => 16]),
+			'clock' => icon_html('clock', ['size' => 16]),
 			'circle-check' => icon_html('circle-check', ['size' => 16]),
 			'circle' => icon_html('circle', ['size' => 16]),
 			'eye-off' => icon_html('eye-off', ['size' => 16]),
