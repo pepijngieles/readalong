@@ -7,12 +7,6 @@ const itemState = window.ReadalongItemState
 
 let kindFilter = DEFAULT_KIND
 let durationLimit = 0
-let visibilityFilter = 'default'
-let statusFilters = {
-  favorites: false,
-  inProgress: false,
-  completed: false
-}
 
 function homeEl(selector) {
   return document.querySelector(selector)
@@ -128,27 +122,6 @@ function writeFiltersToUrl() {
   }
 }
 
-function loadBrowseFiltersFromStorage() {
-  if (!itemState) return
-  const stored = itemState.loadBrowseFilters()
-  visibilityFilter = stored.visibility || 'default'
-  statusFilters = {
-    favorites: !!stored.favorites,
-    inProgress: !!stored.inProgress,
-    completed: !!stored.completed
-  }
-}
-
-function saveBrowseFiltersToStorage() {
-  if (!itemState) return
-  itemState.saveBrowseFilters({
-    visibility: visibilityFilter,
-    favorites: statusFilters.favorites,
-    inProgress: statusFilters.inProgress,
-    completed: statusFilters.completed
-  })
-}
-
 function syncFilterState() {
   homeAll('[data-kind-filter]').forEach(function (chip) {
     chip.setAttribute('aria-pressed', chip.getAttribute('data-kind-filter') === kindFilter ? 'true' : 'false')
@@ -157,41 +130,10 @@ function syncFilterState() {
   if (durationSelect) {
     durationSelect.value = durationLimit ? String(durationLimit / 60) : ''
   }
-  const visibilitySelect = homeEl('[data-visibility-filter]')
-  if (visibilitySelect) visibilitySelect.value = visibilityFilter
-  homeAll('[data-status-filter]').forEach(function (chip) {
-    const filter = chip.getAttribute('data-status-filter')
-    let active = false
-    if (filter === 'favorites') active = statusFilters.favorites
-    else if (filter === 'in-progress') active = statusFilters.inProgress
-    else if (filter === 'completed') active = statusFilters.completed
-    chip.setAttribute('aria-pressed', active ? 'true' : 'false')
-  })
-}
-
-function statusFiltersAtDefault() {
-  return !statusFilters.favorites && !statusFilters.inProgress && !statusFilters.completed
-}
-
-function updateStatusFilterPills() {
-  if (!itemState) return
-  const counts = {
-    favorites: itemState.favoriteCount(),
-    'in-progress': itemState.inProgressCount(),
-    completed: itemState.completedCount()
-  }
-  homeAll('[data-status-filter]').forEach(function (chip) {
-    const filter = chip.getAttribute('data-status-filter')
-    chip.hidden = !counts[filter]
-  })
-}
-
-function browseFiltersAtDefault() {
-  return visibilityFilter === 'default' && statusFiltersAtDefault()
 }
 
 function filtersActive() {
-  return !!durationLimit || !browseFiltersAtDefault()
+  return !!durationLimit
 }
 
 function updateKindPills(readFilter, levelFilter, sourceLangs) {
@@ -263,10 +205,8 @@ function applyAllItems() {
 
   allList.querySelectorAll('li').forEach(function (item) {
     const id = item.getAttribute('data-id') || ''
-    const matchStatus = itemState
-      ? itemState.matchesBrowseStatus(id, visibilityFilter, statusFilters)
-      : true
-    const show = matchesHomeFilters(item, true) && matchStatus
+    const hiddenByUser = itemState && itemState.isHidden(id)
+    const show = matchesHomeFilters(item, true) && !hiddenByUser
     item.hidden = !show
     if (show) visible++
   })
@@ -276,7 +216,9 @@ function applyAllItems() {
   if (weatherList) {
     let weatherVisible = 0
     weatherList.querySelectorAll('li').forEach(function (item) {
-      const show = matchesHomeFilters(item, false)
+      const id = item.getAttribute('data-id') || ''
+      const hiddenByUser = itemState && itemState.isHidden(id)
+      const show = matchesHomeFilters(item, false) && !hiddenByUser
       item.hidden = !show
       if (show) weatherVisible++
     })
@@ -296,7 +238,6 @@ function applyAllItems() {
   homeAll('[data-clear-filters]').forEach(function (button) {
     button.hidden = !filtersActive()
   })
-  updateStatusFilterPills()
   writeFiltersToUrl()
 }
 
@@ -439,26 +380,6 @@ function fillContinueReading() {
 
 function clearFilters() {
   durationLimit = 0
-  visibilityFilter = 'default'
-  statusFilters = { favorites: false, inProgress: false, completed: false }
-  saveBrowseFiltersToStorage()
-  syncFilterState()
-  applyAllItems()
-}
-
-function filterVisibility(el) {
-  visibilityFilter = el.value || 'default'
-  saveBrowseFiltersToStorage()
-  applyAllItems()
-}
-
-function toggleStatusFilter(el) {
-  const filter = el.getAttribute('data-status-filter')
-  const next = el.getAttribute('aria-pressed') !== 'true'
-  if (filter === 'favorites') statusFilters.favorites = next
-  else if (filter === 'in-progress') statusFilters.inProgress = next
-  else if (filter === 'completed') statusFilters.completed = next
-  saveBrowseFiltersToStorage()
   syncFilterState()
   applyAllItems()
 }
@@ -785,13 +706,11 @@ function refreshHomeLists() {
   if (typeof window.syncAllItemMetaIndicators === 'function') {
     window.syncAllItemMetaIndicators(document)
   }
-  updateStatusFilterPills()
 }
 
 function initHome() {
   if (!homeEl('[data-all-items]')) return
 
-  loadBrowseFiltersFromStorage()
   readFiltersFromUrl()
   syncFilterState()
   fillContinueReading()
@@ -802,7 +721,6 @@ function initHome() {
   if (typeof window.syncAllItemMetaIndicators === 'function') {
     window.syncAllItemMetaIndicators(document)
   }
-  updateStatusFilterPills()
   initTitleMenus()
   document.addEventListener('readalong:items-changed', refreshHomeLists)
   window.addEventListener('pageshow', function (event) {
@@ -816,8 +734,6 @@ function initHome() {
 window.clearFilters = clearFilters
 window.filterKind = filterKind
 window.filterDuration = filterDuration
-window.filterVisibility = filterVisibility
-window.toggleStatusFilter = toggleStatusFilter
 window.toggleTitleMenu = toggleTitleMenu
 window.updateTitleFilter = updateTitleFilter
 
