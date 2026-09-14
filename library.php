@@ -3,7 +3,7 @@ require_once __DIR__ . '/assets/helpers.php';
 require_once __DIR__ . '/assets/story.php';
 
 $view = $_GET['view'] ?? 'in_progress';
-if (!in_array($view, ['in_progress', 'hidden', 'completed'], true)) {
+if (!in_array($view, ['in_progress', 'hidden', 'completed', 'favorites'], true)) {
   $view = 'in_progress';
 }
 
@@ -52,13 +52,17 @@ $stories = story_apply_home_hidden($stories, [$readAlongLang], $contentLangs, $l
 					<span class=button><?= e(t('home.filter.progress.done')) ?></span>
 				</label>
 				<label>
+					<input type=radio name=library-view value=favorites<?= $view === 'favorites' ? ' checked' : '' ?>>
+					<span class=button><?= e(t('home.favorites')) ?></span>
+				</label>
+				<label>
 					<input type=radio name=library-view value=hidden<?= $view === 'hidden' ? ' checked' : '' ?>>
 					<span class=button><?= e(t('home.filter.visibility.hidden')) ?></span>
 				</label>
 			</fieldset>
 		</header>
 
-		<section class=home-section data-library-section data-library-view="<?= e($view) ?>" data-i18n-empty-in-progress="<?= e(t('library.empty_in_progress')) ?>" data-i18n-empty-hidden="<?= e(t('library.empty_hidden')) ?>" data-i18n-empty-completed="<?= e(t('library.empty_completed')) ?>">
+		<section class=home-section data-library-section data-library-view="<?= e($view) ?>" data-i18n-empty-in-progress="<?= e(t('library.empty_in_progress')) ?>" data-i18n-empty-hidden="<?= e(t('library.empty_hidden')) ?>" data-i18n-empty-completed="<?= e(t('library.empty_completed')) ?>" data-i18n-empty-favorites="<?= e(t('library.empty_favorites')) ?>">
 <?php render_story_list($stories, 'data-library-items', $showTranslationLang, true, true); ?>
 			<div class="home-empty" data-library-empty hidden>
 				<p data-library-empty-message></p>
@@ -84,10 +88,10 @@ include $partials . '/item-actions-i18n.php';
 		};
 	</script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=3" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=4" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=5" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=6" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=4" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=6" defer></script>
 
 </body>
 </html>

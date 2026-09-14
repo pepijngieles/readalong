@@ -90,7 +90,7 @@ if (!$needsOnboarding) {
 ?>
 			</div>
 			<div class="home-header-actions flex gap-2xs">
-				<a class="quiet icon-only small rounded home-library-toggle" href="/library/in_progress" aria-label="<?= e(t('library.title')) ?>">
+				<a class="quiet icon-only small rounded home-library-toggle" href="/library/in_progress" aria-label="<?= e(t('library.title')) ?>" title="<?= e(t('library.title')) ?>">
 					<?php icon('clock', ['size' => 20]); ?>
 				</a>
 				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
@@ -103,7 +103,7 @@ if (!$needsOnboarding) {
 		<section class="home-section js-only" data-continue-section hidden<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
 			<div class="section-header flex gap-small">
 				<h2><?= e(t('home.continue_reading')) ?></h2>
-				<a class="quiet section-link" href="/library/in_progress" data-continue-history-link hidden><?= e(t('home.continue_history')) ?></a>
+				<a class="quiet section-link" href="/library/in_progress" data-continue-history-link hidden><?= e(t('home.all_in_progress')) ?></a>
 			</div>
 			<ul class="list continue-list" data-continue-featured></ul>
 		</section>
@@ -145,17 +145,6 @@ if (!$needsOnboarding) {
 				);
 ?>
 					<label class=filter-field>
-						<span class=visually-hidden><?= e(t('home.filter.visibility')) ?></span>
-						<div class=select-wrap>
-							<select class=select-medium data-visibility-filter data-change=filterVisibility>
-								<option value=default><?= e(t('home.filter.visibility.default')) ?></option>
-								<option value=hidden-only><?= e(t('home.filter.visibility.hidden')) ?></option>
-								<option value=all><?= e(t('home.filter.visibility.all')) ?></option>
-							</select>
-							<?php icon('chevron-down', ['size' => 16]); ?>
-						</div>
-					</label>
-					<label class=filter-field>
 						<span class=visually-hidden><?= e(t('home.duration_filters')) ?></span>
 						<div class=select-wrap>
 							<select class=select-medium data-duration-filter data-change=filterDuration>
@@ -167,12 +156,6 @@ if (!$needsOnboarding) {
 							<?php icon('chevron-down', ['size' => 16]); ?>
 						</div>
 					</label>
-				</div>
-				<div class="home-browse-kinds flex gap-2xs" role=group aria-label="<?= e(t('home.favorites')) ?>" data-favorites-filter-row hidden>
-					<button type=button class="pill choice" data-favorites-filter data-click=toggleFavoritesFilter aria-pressed=false>
-						<?php icon('heart-filled', ['size' => 16]); ?>
-						<?= e(t('home.favorites')) ?>
-					</button>
 				</div>
 			</div>
 			<div class="home-results-bar flex gap-small">
@@ -225,10 +208,10 @@ include $partials . '/item-actions-i18n.php';
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/item-state.js?v=3" defer></script>
-	<script type="text/javascript" src="assets/item-actions.js?v=5" defer></script>
+	<script type="text/javascript" src="assets/item-state.js?v=5" defer></script>
+	<script type="text/javascript" src="assets/item-actions.js?v=6" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=6" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=31" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=34" defer></script>
 
 <?php endif; ?>
 

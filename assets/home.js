@@ -7,8 +7,6 @@ const itemState = window.ReadalongItemState
 
 let kindFilter = DEFAULT_KIND
 let durationLimit = 0
-let visibilityFilter = 'default'
-let favoritesFilter = false
 
 function homeEl(selector) {
   return document.querySelector(selector)
@@ -124,21 +122,6 @@ function writeFiltersToUrl() {
   }
 }
 
-function loadBrowseFiltersFromStorage() {
-  if (!itemState) return
-  const stored = itemState.loadBrowseFilters()
-  visibilityFilter = stored.visibility || 'default'
-  favoritesFilter = !!stored.favorites
-}
-
-function saveBrowseFiltersToStorage() {
-  if (!itemState) return
-  itemState.saveBrowseFilters({
-    visibility: visibilityFilter,
-    favorites: favoritesFilter
-  })
-}
-
 function syncFilterState() {
   homeAll('[data-kind-filter]').forEach(function (chip) {
     chip.setAttribute('aria-pressed', chip.getAttribute('data-kind-filter') === kindFilter ? 'true' : 'false')
@@ -147,33 +130,10 @@ function syncFilterState() {
   if (durationSelect) {
     durationSelect.value = durationLimit ? String(durationLimit / 60) : ''
   }
-  const visibilitySelect = homeEl('[data-visibility-filter]')
-  if (visibilitySelect) visibilitySelect.value = visibilityFilter
-  const favoritesChip = homeEl('[data-favorites-filter]')
-  if (favoritesChip) {
-    favoritesChip.setAttribute('aria-pressed', favoritesFilter ? 'true' : 'false')
-  }
-}
-
-function browseFiltersAtDefault() {
-  return visibilityFilter === 'default' &&
-    !favoritesFilter
-}
-
-function updateFavoritesFilterRow() {
-  const row = homeEl('[data-favorites-filter-row]')
-  if (!row || !itemState) return
-  const showFavorites = itemState.favoriteCount() > 1
-  row.hidden = !showFavorites
-  if (!showFavorites && favoritesFilter) {
-    favoritesFilter = false
-    saveBrowseFiltersToStorage()
-    syncFilterState()
-  }
 }
 
 function filtersActive() {
-  return !!durationLimit || !browseFiltersAtDefault()
+  return !!durationLimit
 }
 
 function updateKindPills(readFilter, levelFilter, sourceLangs) {
@@ -245,10 +205,9 @@ function applyAllItems() {
 
   allList.querySelectorAll('li').forEach(function (item) {
     const id = item.getAttribute('data-id') || ''
-    const matchStatus = itemState
-      ? itemState.matchesBrowseStatus(id, visibilityFilter, favoritesFilter)
-      : true
-    const show = matchesHomeFilters(item, true) && matchStatus
+    const hiddenByUser = itemState && itemState.isHidden(id)
+    const completed = itemState && itemState.isCompleted(id)
+    const show = matchesHomeFilters(item, true) && !hiddenByUser && !completed
     item.hidden = !show
     if (show) visible++
   })
@@ -258,7 +217,9 @@ function applyAllItems() {
   if (weatherList) {
     let weatherVisible = 0
     weatherList.querySelectorAll('li').forEach(function (item) {
-      const show = matchesHomeFilters(item, false)
+      const id = item.getAttribute('data-id') || ''
+      const hiddenByUser = itemState && itemState.isHidden(id)
+      const show = matchesHomeFilters(item, false) && !hiddenByUser
       item.hidden = !show
       if (show) weatherVisible++
     })
@@ -278,7 +239,6 @@ function applyAllItems() {
   homeAll('[data-clear-filters]').forEach(function (button) {
     button.hidden = !filtersActive()
   })
-  updateFavoritesFilterRow()
   writeFiltersToUrl()
 }
 
@@ -320,7 +280,6 @@ function decorateContinueItem(item, progress) {
   const remainingSeconds = Math.max(0, duration * ratio)
   const remainingMinutes = Math.round(remainingSeconds / 60)
   const remainingEl = item.querySelector('[data-remaining]')
-  const progressEl = item.querySelector('[data-item-progress]')
   const showTranslationLang = continueSection?.hasAttribute('data-show-translation-lang')
   const durationDisplay = item.getAttribute('data-duration-display') || ''
   const kindLabel = item.getAttribute('data-kind-label') || ''
@@ -343,9 +302,8 @@ function decorateContinueItem(item, progress) {
   if (remainingEl) {
     remainingEl.hidden = true
   }
-  if (progressEl) {
-    progressEl.value = Math.max(0, Math.min(100, Math.round((sentence / Math.max(total - 1, 1)) * 100)))
-    progressEl.hidden = false
+  if (itemState && typeof itemState.decorateItemProgress === 'function') {
+    itemState.decorateItemProgress(item)
   }
 }
 
@@ -423,22 +381,6 @@ function fillContinueReading() {
 
 function clearFilters() {
   durationLimit = 0
-  visibilityFilter = 'default'
-  favoritesFilter = false
-  saveBrowseFiltersToStorage()
-  syncFilterState()
-  applyAllItems()
-}
-
-function filterVisibility(el) {
-  visibilityFilter = el.value || 'default'
-  saveBrowseFiltersToStorage()
-  applyAllItems()
-}
-
-function toggleFavoritesFilter(el) {
-  favoritesFilter = el.getAttribute('aria-pressed') !== 'true'
-  saveBrowseFiltersToStorage()
   syncFilterState()
   applyAllItems()
 }
@@ -762,18 +704,27 @@ function refreshHomeLists() {
   if (typeof window.syncAllFavoriteIndicators === 'function') {
     window.syncAllFavoriteIndicators(document)
   }
-  updateFavoritesFilterRow()
+  if (itemState && typeof itemState.syncAllItemProgress === 'function') {
+    itemState.syncAllItemProgress(document)
+  }
+  if (typeof window.syncAllItemMetaIndicators === 'function') {
+    window.syncAllItemMetaIndicators(document)
+  }
 }
 
 function initHome() {
   if (!homeEl('[data-all-items]')) return
 
-  loadBrowseFiltersFromStorage()
   readFiltersFromUrl()
   syncFilterState()
   fillContinueReading()
   applyAllItems()
-  updateFavoritesFilterRow()
+  if (itemState && typeof itemState.syncAllItemProgress === 'function') {
+    itemState.syncAllItemProgress(document)
+  }
+  if (typeof window.syncAllItemMetaIndicators === 'function') {
+    window.syncAllItemMetaIndicators(document)
+  }
   initTitleMenus()
   document.addEventListener('readalong:items-changed', refreshHomeLists)
   window.addEventListener('pageshow', function (event) {
@@ -787,8 +738,6 @@ function initHome() {
 window.clearFilters = clearFilters
 window.filterKind = filterKind
 window.filterDuration = filterDuration
-window.filterVisibility = filterVisibility
-window.toggleFavoritesFilter = toggleFavoritesFilter
 window.toggleTitleMenu = toggleTitleMenu
 window.updateTitleFilter = updateTitleFilter
 

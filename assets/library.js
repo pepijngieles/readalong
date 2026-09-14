@@ -32,6 +32,8 @@
       let show = false
       if (view === 'hidden') {
         show = state.isHidden(id)
+      } else if (view === 'favorites') {
+        show = state.isFavorite(id)
       } else if (view === 'in_progress') {
         show = state.isStarted(id) && !state.isCompleted(id) && !state.isHidden(id)
       } else {
@@ -45,9 +47,11 @@
       const messageEl = empty.querySelector('[data-library-empty-message]')
       const emptyKey = view === 'hidden'
         ? 'data-i18n-empty-hidden'
-        : view === 'in_progress'
-          ? 'data-i18n-empty-in-progress'
-          : 'data-i18n-empty-completed'
+        : view === 'favorites'
+          ? 'data-i18n-empty-favorites'
+          : view === 'in_progress'
+            ? 'data-i18n-empty-in-progress'
+            : 'data-i18n-empty-completed'
       const emptyText = section.getAttribute(emptyKey) || ''
       if (messageEl && emptyText) messageEl.textContent = emptyText
       empty.hidden = visible > 0

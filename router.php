@@ -72,7 +72,7 @@ if (preg_match('#^/library/?$#', $uri)) {
   return true;
 }
 
-if (preg_match('#^/library/(in_progress|hidden|completed)/?$#', $uri, $m)) {
+if (preg_match('#^/library/(in_progress|hidden|completed|favorites)/?$#', $uri, $m)) {
   $_GET['view'] = $m[1];
   require __DIR__ . '/library.php';
   return true;
