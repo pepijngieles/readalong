@@ -84,10 +84,10 @@ include $partials . '/item-actions-i18n.php';
 		};
 	</script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=3" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=4" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=5" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=6" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=4" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=5" defer></script>
 
 </body>
 </html>
