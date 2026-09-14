@@ -700,6 +700,9 @@ function initTitleMenus() {
 function refreshHomeLists() {
   applyAllItems()
   fillContinueReading()
+  if (typeof window.syncAllFavoriteIndicators === 'function') {
+    window.syncAllFavoriteIndicators(document)
+  }
   if (itemState && typeof itemState.syncAllItemProgress === 'function') {
     itemState.syncAllItemProgress(document)
   }

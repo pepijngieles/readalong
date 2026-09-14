@@ -56,8 +56,6 @@
       if (messageEl && emptyText) messageEl.textContent = emptyText
       empty.hidden = visible > 0
     }
-
-    if (state.syncAllItemProgress) state.syncAllItemProgress(list)
   }
 
   function switchLibraryView(el, event) {
