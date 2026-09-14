@@ -2170,8 +2170,12 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .pill.icon-only{
+  box-sizing: border-box;
   gap: 0;
-  padding: calc(var(--spacing-8) - 1px);
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  padding: 0;
   justify-content: center;
 }
 
@@ -2191,6 +2195,10 @@ body.ios:not(.started.show-translation) .translation-popover{
   overflow-x: visible;
   min-width: 0;
   max-width: 100%;
+}
+
+.home-browse-kinds{
+  align-items: center;
 }
 
 .home-browse-selects{
