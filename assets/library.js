@@ -8,7 +8,7 @@
 
   function currentLibraryView() {
     const section = libraryEl('[data-library-section]')
-    return section ? (section.getAttribute('data-library-view') || 'completed') : 'completed'
+    return section ? (section.getAttribute('data-library-view') || 'in_progress') : 'in_progress'
   }
 
   function syncLibraryViewUrl(view) {
@@ -29,14 +29,25 @@
 
     list.querySelectorAll('li[data-id]').forEach(function (item) {
       const id = item.getAttribute('data-id') || ''
-      let show = view === 'hidden' ? state.isHidden(id) : state.isCompleted(id)
+      let show = false
+      if (view === 'hidden') {
+        show = state.isHidden(id)
+      } else if (view === 'in_progress') {
+        show = state.isStarted(id) && !state.isCompleted(id) && !state.isHidden(id)
+      } else {
+        show = state.isCompleted(id)
+      }
       item.hidden = !show
       if (show) visible++
     })
 
     if (empty) {
       const messageEl = empty.querySelector('[data-library-empty-message]')
-      const emptyKey = view === 'hidden' ? 'data-i18n-empty-hidden' : 'data-i18n-empty-completed'
+      const emptyKey = view === 'hidden'
+        ? 'data-i18n-empty-hidden'
+        : view === 'in_progress'
+          ? 'data-i18n-empty-in-progress'
+          : 'data-i18n-empty-completed'
       const emptyText = section.getAttribute(emptyKey) || ''
       if (messageEl && emptyText) messageEl.textContent = emptyText
       empty.hidden = visible > 0

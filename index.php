@@ -90,7 +90,7 @@ if (!$needsOnboarding) {
 ?>
 			</div>
 			<div class="home-header-actions flex gap-2xs">
-				<a class="quiet icon-only small rounded home-library-toggle" href="/library/completed" aria-label="<?= e(t('library.completed_title')) ?>">
+				<a class="quiet icon-only small rounded home-library-toggle" href="/library/in_progress" aria-label="<?= e(t('library.title')) ?>">
 					<?php icon('clock', ['size' => 20]); ?>
 				</a>
 				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
@@ -100,13 +100,12 @@ if (!$needsOnboarding) {
 			</div>
 		</header>
 
-		<section class="home-section js-only" data-continue-section hidden data-i18n-history="<?= e(t('home.continue_history')) ?>" data-i18n-hide-history="<?= e(t('home.hide_history')) ?>"<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
+		<section class="home-section js-only" data-continue-section hidden<?= $showTranslationLang ? ' data-show-translation-lang' : '' ?>>
 			<div class="section-header flex gap-small">
 				<h2><?= e(t('home.continue_reading')) ?></h2>
-				<button type=button class="quiet section-link" data-continue-history-toggle data-click=toggleHistory hidden aria-expanded=false><?= e(t('home.continue_history')) ?></button>
+				<a class="quiet section-link" href="/library/in_progress" data-continue-history-link hidden><?= e(t('home.continue_history')) ?></a>
 			</div>
 			<ul class="list continue-list" data-continue-featured></ul>
-			<ul class="list continue-list history" data-continue-history hidden></ul>
 		</section>
 
 <?php if ($weatherStories): ?>
@@ -229,7 +228,7 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript" src="assets/item-state.js?v=3" defer></script>
 	<script type="text/javascript" src="assets/item-actions.js?v=5" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=6" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=30" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=31" defer></script>
 
 <?php endif; ?>
 
