@@ -617,18 +617,18 @@ dl dt{
   line-height: var(--spacing-20);
 }
 
-.story-item .meta-indicator{
+.story-item .meta-favorite{
   display: inline;
   color: var(--text-tertiary);
 }
 
-.story-item .meta-indicator .meta-indicator-icon{
+.story-item .meta-favorite .meta-favorite-icon{
   display: inline-flex;
   vertical-align: middle;
   margin-inline-start: .0625rem;
 }
 
-.story-item .meta-indicator .icon{
+.story-item .meta-favorite .icon{
   width: .75rem;
   height: .75rem;
   opacity: .65;
@@ -2167,17 +2167,6 @@ body.ios:not(.started.show-translation) .translation-popover{
   box-shadow: none;
   background-color: var(--background-yellow);
   color: var(--text-yellow);
-}
-
-.pill.icon-only{
-  gap: 0;
-  padding: calc(var(--spacing-8) - 1px);
-  justify-content: center;
-}
-
-.pill.icon-only .icon{
-  width: 1rem;
-  height: 1rem;
 }
 
 .home-browse-filters{

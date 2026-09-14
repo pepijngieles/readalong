@@ -6,39 +6,6 @@
   let undoTimer = null
   let undoAction = null
 
-  const INDICATOR_ATTRS = [
-    'data-favorite-indicator',
-    'data-progress-indicator',
-    'data-completed-indicator'
-  ]
-
-  const INDICATOR_SPECS = [
-    {
-      attr: 'data-favorite-indicator',
-      className: 'meta-indicator meta-favorite',
-      iconName: 'heart-filled',
-      labelKey: 'favorite',
-      labelFallback: 'Favorite',
-      isActive: function (id) { return state.isFavorite(id) }
-    },
-    {
-      attr: 'data-progress-indicator',
-      className: 'meta-indicator meta-status',
-      iconName: 'clock',
-      labelKey: 'in_progress',
-      labelFallback: 'In progress',
-      isActive: function (id) { return state.isInProgress(id) }
-    },
-    {
-      attr: 'data-completed-indicator',
-      className: 'meta-indicator meta-completed',
-      iconName: 'circle-check',
-      labelKey: 'completed',
-      labelFallback: 'Completed',
-      isActive: function (id) { return state.isCompleted(id) }
-    }
-  ]
-
   function i18n(key, fallback) {
     const strings = window.ITEM_ACTIONS_I18N || {}
     return strings[key] || fallback || key
@@ -70,10 +37,10 @@
     document.dispatchEvent(new CustomEvent('readalong:items-changed'))
   }
 
-  function indicatorHtml(iconName) {
+  function favoriteIndicatorHtml() {
     const icons = window.ITEM_MENU_ICONS || {}
-    const icon = icons[iconName] || ''
-    return '<span class="meta-sep"> · </span><span class="meta-indicator-icon" aria-hidden=true>' + icon + '</span>'
+    const icon = icons['heart-filled'] || ''
+    return '<span class="meta-sep"> · </span><span class="meta-favorite-icon" aria-hidden=true>' + icon + '</span>'
   }
 
   function mergeMetaTail(metaEl) {
@@ -96,81 +63,54 @@
     return baseEl
   }
 
-  function removeAllIndicators(metaEl) {
-    INDICATOR_ATTRS.forEach(function (attr) {
-      metaEl.querySelector('[' + attr + ']')?.remove()
-    })
-  }
-
-  function splitMetaAtLevel(metaEl, baseEl, level) {
-    if (!level || metaEl.querySelector('[data-meta-tail]')) return
-    const text = baseEl.textContent || ''
-    if (!text.includes(level)) return
-    const idx = text.indexOf(level) + level.length
-    baseEl.textContent = text.slice(0, idx)
-    const tail = document.createElement('span')
-    tail.setAttribute('data-meta-tail', '')
-    tail.textContent = text.slice(idx)
-    baseEl.after(tail)
-  }
-
-  function createIndicatorEl(spec) {
-    const indicatorEl = document.createElement('span')
-    indicatorEl.className = spec.className
-    indicatorEl.setAttribute(spec.attr, '')
-    indicatorEl.setAttribute('aria-label', i18n(spec.labelKey, spec.labelFallback))
-    indicatorEl.innerHTML = indicatorHtml(spec.iconName)
-    return indicatorEl
-  }
-
-  function syncItemMetaIndicators(itemEl) {
+  function syncFavoriteIndicator(itemEl) {
     const metaEl = itemEl.querySelector('.story-item .meta')
     if (!metaEl) return
 
     const id = itemEl.getAttribute('data-id') || ''
+    const active = state.isFavorite(id)
     const level = itemEl.getAttribute('data-level') || ''
-    const activeSpecs = INDICATOR_SPECS.filter(function (spec) {
-      return spec.isActive(id)
-    })
+    const indicator = metaEl.querySelector('[data-favorite-indicator]')
 
-    if (!activeSpecs.length) {
-      removeAllIndicators(metaEl)
+    if (!active) {
+      if (indicator) indicator.remove()
       mergeMetaTail(metaEl)
       return
     }
 
     const baseEl = ensureMetaBase(metaEl)
-    splitMetaAtLevel(metaEl, baseEl, level)
+    if (indicator) return
 
-    INDICATOR_SPECS.forEach(function (spec) {
-      const existing = metaEl.querySelector('[' + spec.attr + ']')
-      const shouldShow = activeSpecs.indexOf(spec) !== -1
-      if (!shouldShow && existing) existing.remove()
-    })
-
-    let insertAfter = baseEl
-    activeSpecs.forEach(function (spec) {
-      let indicatorEl = metaEl.querySelector('[' + spec.attr + ']')
-      if (!indicatorEl) {
-        indicatorEl = createIndicatorEl(spec)
-        insertAfter.after(indicatorEl)
-      }
-      insertAfter = indicatorEl
-    })
+    const indicatorEl = document.createElement('span')
+    indicatorEl.className = 'meta-favorite'
+    indicatorEl.setAttribute('data-favorite-indicator', '')
+    indicatorEl.setAttribute('aria-label', i18n('favorite', 'Add to favorites'))
+    indicatorEl.innerHTML = favoriteIndicatorHtml()
 
     const tailEl = metaEl.querySelector('[data-meta-tail]')
-    if (tailEl && tailEl.previousElementSibling !== insertAfter) {
-      insertAfter.after(tailEl)
+    if (tailEl) {
+      baseEl.after(indicatorEl)
+      return
     }
-  }
 
-  function syncAllItemMetaIndicators(root) {
-    const scope = root || document
-    scope.querySelectorAll('li[data-id]').forEach(syncItemMetaIndicators)
+    const text = baseEl.textContent || ''
+    if (level && text.includes(level)) {
+      const idx = text.indexOf(level) + level.length
+      baseEl.textContent = text.slice(0, idx)
+      const tail = document.createElement('span')
+      tail.setAttribute('data-meta-tail', '')
+      tail.textContent = text.slice(idx)
+      baseEl.after(indicatorEl)
+      indicatorEl.after(tail)
+      return
+    }
+
+    baseEl.after(indicatorEl)
   }
 
   function syncAllFavoriteIndicators(root) {
-    syncAllItemMetaIndicators(root)
+    const scope = root || document
+    scope.querySelectorAll('li[data-id]').forEach(syncFavoriteIndicator)
   }
 
   function setItemMetaText(itemEl, text) {
@@ -192,7 +132,7 @@
       return
     }
 
-    removeAllIndicators(metaEl)
+    metaEl.querySelector('[data-favorite-indicator]')?.remove()
     metaEl.querySelector('[data-meta-tail]')?.remove()
     let baseEl = metaEl.querySelector('[data-meta-base]')
     if (!baseEl) {
@@ -202,7 +142,7 @@
       metaEl.appendChild(baseEl)
     }
     baseEl.textContent = text
-    syncItemMetaIndicators(itemEl)
+    syncFavoriteIndicator(itemEl)
   }
 
   function closeItemMenu() {
@@ -372,7 +312,7 @@
     } else if (action === 'favorite' || action === 'unfavorite') {
       const next = action === 'favorite'
       state.setFavorite(meta.id, next)
-      syncAllItemMetaIndicators(document)
+      syncAllFavoriteIndicators(document)
     } else if (action === 'share') {
       const href = activeItemEl.querySelector('.story-item')?.getAttribute('href') || ('stories/' + meta.slug + '/')
       const url = new URL(href, location.href).href
@@ -400,7 +340,7 @@
   }
 
   function initItemActions() {
-    syncAllItemMetaIndicators(document)
+    syncAllFavoriteIndicators(document)
 
     document.addEventListener('click', function (event) {
       if (event.target.closest('#item-menu, [data-click=openItemMenu]')) return
@@ -410,14 +350,13 @@
       if (event.key === 'Escape') closeItemMenu()
     })
     document.addEventListener('readalong:items-changed', function () {
-      syncAllItemMetaIndicators(document)
+      syncAllFavoriteIndicators(document)
     })
   }
 
   window.openItemMenu = openItemMenu
   window.runItemAction = runItemAction
   window.undoItemAction = undoItemAction
-  window.syncAllItemMetaIndicators = syncAllItemMetaIndicators
   window.syncAllFavoriteIndicators = syncAllFavoriteIndicators
   window.setItemMetaText = setItemMetaText
 

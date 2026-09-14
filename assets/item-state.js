@@ -6,9 +6,7 @@ window.ReadalongItemState = (function () {
 
   const DEFAULT_BROWSE_FILTERS = {
     visibility: 'default',
-    favorites: false,
-    inProgress: false,
-    completed: false
+    favorites: false
   }
 
   function readJson(key, fallback) {
@@ -52,10 +50,6 @@ window.ReadalongItemState = (function () {
     return !!(progress && (progress.started || progress.sentence > 0))
   }
 
-  function isInProgress(id) {
-    return isStarted(id) && !isCompleted(id)
-  }
-
   function setFavorite(id, value) {
     const map = loadFavorites()
     if (value) map[id] = true
@@ -92,7 +86,7 @@ window.ReadalongItemState = (function () {
     const progress = getProgress(id)
     const progressEl = item.querySelector('[data-item-progress]')
     if (!progressEl) return
-    if (!isInProgress(id)) {
+    if (!hasItemProgress(progress)) {
       progressEl.hidden = true
       progressEl.value = 0
       return
@@ -137,14 +131,6 @@ window.ReadalongItemState = (function () {
     }).length
   }
 
-  function inProgressCount() {
-    const map = loadProgressMap()
-    return Object.keys(map).filter(function (id) {
-      const progress = map[id]
-      return progress && !progress.completed && (progress.started || progress.sentence > 0)
-    }).length
-  }
-
   function loadBrowseFilters() {
     const stored = readJson(BROWSE_FILTERS_KEY, null)
     if (!stored) return Object.assign({}, DEFAULT_BROWSE_FILTERS)
@@ -155,22 +141,18 @@ window.ReadalongItemState = (function () {
     localStorage.setItem(BROWSE_FILTERS_KEY, JSON.stringify(filters))
   }
 
-  function statusFiltersActive(statusFilters) {
-    return !!(statusFilters && (statusFilters.favorites || statusFilters.inProgress || statusFilters.completed))
-  }
-
-  function matchesBrowseStatus(id, visibilityFilter, statusFilters) {
+  function matchesBrowseStatus(id, visibilityFilter, favoritesOnly) {
     const hidden = isHidden(id)
+    const completed = isCompleted(id)
+    const favorite = isFavorite(id)
+
+    if (favoritesOnly && !favorite) return false
+    if (completed) return false
 
     if (visibilityFilter === 'default' && hidden) return false
     if (visibilityFilter === 'hidden-only' && !hidden) return false
 
-    if (!statusFiltersActive(statusFilters)) return true
-
-    if (statusFilters.favorites && isFavorite(id)) return true
-    if (statusFilters.inProgress && isInProgress(id)) return true
-    if (statusFilters.completed && isCompleted(id)) return true
-    return false
+    return true
   }
 
   return {
@@ -181,7 +163,6 @@ window.ReadalongItemState = (function () {
     isHidden: isHidden,
     isCompleted: isCompleted,
     isStarted: isStarted,
-    isInProgress: isInProgress,
     setFavorite: setFavorite,
     setHidden: setHidden,
     getProgress: getProgress,
@@ -194,7 +175,6 @@ window.ReadalongItemState = (function () {
     favoriteCount: favoriteCount,
     hiddenCount: hiddenCount,
     completedCount: completedCount,
-    inProgressCount: inProgressCount,
     loadBrowseFilters: loadBrowseFilters,
     saveBrowseFilters: saveBrowseFilters,
     matchesBrowseStatus: matchesBrowseStatus
