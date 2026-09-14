@@ -395,14 +395,11 @@ function cloneContinueItem(entry, featured) {
 function fillContinueReading() {
   const continueSection = homeEl('[data-continue-section]')
   const continueFeatured = homeEl('[data-continue-featured]')
-  const continueHistory = homeEl('[data-continue-history]')
-  const historyToggle = homeEl('[data-continue-history-toggle]')
+  const historyLink = homeEl('[data-continue-history-link]')
   if (!continueSection || !continueFeatured) return
 
-  const historyLabel = continueSection.getAttribute('data-i18n-history') || 'All history'
   const entries = displayableContinueEntries(continueEntriesForReadLanguage(loadProgressEntries()))
   continueFeatured.innerHTML = ''
-  if (continueHistory) continueHistory.innerHTML = ''
 
   if (entries.length === 0) {
     continueSection.hidden = true
@@ -417,19 +414,8 @@ function fillContinueReading() {
 
   continueFeatured.appendChild(featuredItem)
 
-  if (continueHistory) {
-    entries.slice(1).forEach(function (entry) {
-      const item = cloneContinueItem(entry, false)
-      if (item) continueHistory.appendChild(item)
-    })
-  }
-
-  if (historyToggle) {
-    const hasHistory = continueHistory && continueHistory.children.length > 0
-    historyToggle.hidden = !hasHistory
-    historyToggle.textContent = historyLabel
-    historyToggle.setAttribute('aria-expanded', 'false')
-    if (continueHistory) continueHistory.hidden = true
+  if (historyLink) {
+    historyLink.hidden = entries.length < 2
   }
 
   continueSection.hidden = continueFeatured.children.length === 0
@@ -469,18 +455,6 @@ function filterDuration(el) {
   const minutes = parseInt(el.value, 10)
   durationLimit = DURATION_OPTIONS.indexOf(minutes) !== -1 ? minutes * 60 : 0
   applyAllItems()
-}
-
-function toggleHistory(el) {
-  const continueHistory = homeEl('[data-continue-history]')
-  const continueSection = homeEl('[data-continue-section]')
-  if (!continueHistory || !continueSection) return
-  const historyLabel = continueSection.getAttribute('data-i18n-history') || 'All history'
-  const hideHistoryLabel = continueSection.getAttribute('data-i18n-hide-history') || 'Hide history'
-  const expanded = el.getAttribute('aria-expanded') === 'true'
-  continueHistory.hidden = expanded
-  el.setAttribute('aria-expanded', expanded ? 'false' : 'true')
-  el.textContent = expanded ? historyLabel : hideHistoryLabel
 }
 
 function filterMenuTriggers() {
@@ -815,7 +789,6 @@ window.filterKind = filterKind
 window.filterDuration = filterDuration
 window.filterVisibility = filterVisibility
 window.toggleFavoritesFilter = toggleFavoritesFilter
-window.toggleHistory = toggleHistory
 window.toggleTitleMenu = toggleTitleMenu
 window.updateTitleFilter = updateTitleFilter
 

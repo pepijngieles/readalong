@@ -67,12 +67,12 @@ if (preg_match('#^/stories/([a-z0-9-]+)/?$#', $uri, $m)) {
 }
 
 if (preg_match('#^/library/?$#', $uri)) {
-  $_GET['view'] = 'completed';
+  $_GET['view'] = 'in_progress';
   require __DIR__ . '/library.php';
   return true;
 }
 
-if (preg_match('#^/library/(hidden|completed)/?$#', $uri, $m)) {
+if (preg_match('#^/library/(in_progress|hidden|completed)/?$#', $uri, $m)) {
   $_GET['view'] = $m[1];
   require __DIR__ . '/library.php';
   return true;

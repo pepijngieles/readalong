@@ -2,9 +2,9 @@
 require_once __DIR__ . '/assets/helpers.php';
 require_once __DIR__ . '/assets/story.php';
 
-$view = $_GET['view'] ?? 'completed';
-if (!in_array($view, ['hidden', 'completed'], true)) {
-  $view = 'completed';
+$view = $_GET['view'] ?? 'in_progress';
+if (!in_array($view, ['in_progress', 'hidden', 'completed'], true)) {
+  $view = 'in_progress';
 }
 
 $base = '/';
@@ -44,17 +44,21 @@ $stories = story_apply_home_hidden($stories, [$readAlongLang], $contentLangs, $l
 			<fieldset class="library-segment flex gap-2xs" data-change=switchLibraryView>
 				<legend class=visually-hidden><?= e(t('library.title')) ?></legend>
 				<label>
+					<input type=radio name=library-view value=in_progress<?= $view === 'in_progress' ? ' checked' : '' ?>>
+					<span class=button><?= e(t('home.filter.progress.in_progress')) ?></span>
+				</label>
+				<label>
 					<input type=radio name=library-view value=completed<?= $view === 'completed' ? ' checked' : '' ?>>
-					<span class=button><?= e(t('library.completed_title')) ?></span>
+					<span class=button><?= e(t('home.filter.progress.done')) ?></span>
 				</label>
 				<label>
 					<input type=radio name=library-view value=hidden<?= $view === 'hidden' ? ' checked' : '' ?>>
-					<span class=button><?= e(t('library.hidden_title')) ?></span>
+					<span class=button><?= e(t('home.filter.visibility.hidden')) ?></span>
 				</label>
 			</fieldset>
 		</header>
 
-		<section class=home-section data-library-section data-library-view="<?= e($view) ?>" data-i18n-empty-hidden="<?= e(t('library.empty_hidden')) ?>" data-i18n-empty-completed="<?= e(t('library.empty_completed')) ?>">
+		<section class=home-section data-library-section data-library-view="<?= e($view) ?>" data-i18n-empty-in-progress="<?= e(t('library.empty_in_progress')) ?>" data-i18n-empty-hidden="<?= e(t('library.empty_hidden')) ?>" data-i18n-empty-completed="<?= e(t('library.empty_completed')) ?>">
 <?php render_story_list($stories, 'data-library-items', $showTranslationLang, true, true); ?>
 			<div class="home-empty" data-library-empty hidden>
 				<p data-library-empty-message></p>
@@ -83,7 +87,7 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=3" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=5" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=6" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=3" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=4" defer></script>
 
 </body>
 </html>
