@@ -68,6 +68,38 @@ window.ReadalongItemState = (function () {
     return loadProgressMap()[id] || null
   }
 
+  function hasItemProgress(progress) {
+    return !!(progress && (progress.completed || progress.started || progress.sentence > 0))
+  }
+
+  function itemProgressPercent(item, progress) {
+    const total = Math.max(parseInt(item.getAttribute('data-sentence-count'), 10) || 1, 1)
+    if (progress.completed) return 100
+    const sentence = progress.sentence || 0
+    return Math.max(0, Math.min(100, Math.round((sentence / Math.max(total - 1, 1)) * 100)))
+  }
+
+  function decorateItemProgress(item) {
+    if (!item) return
+    const id = item.getAttribute('data-id') || ''
+    if (!id) return
+    const progress = getProgress(id)
+    const progressEl = item.querySelector('[data-item-progress]')
+    if (!progressEl) return
+    if (!hasItemProgress(progress)) {
+      progressEl.hidden = true
+      progressEl.value = 0
+      return
+    }
+    progressEl.value = itemProgressPercent(item, progress)
+    progressEl.hidden = false
+  }
+
+  function syncAllItemProgress(root) {
+    const scope = root && root.querySelectorAll ? root : document
+    scope.querySelectorAll('li[data-id]').forEach(decorateItemProgress)
+  }
+
   function saveProgressEntry(id, entry) {
     const map = loadProgressMap()
     map[id] = Object.assign({}, map[id] || {}, entry, { updatedAt: Date.now() })
@@ -134,6 +166,10 @@ window.ReadalongItemState = (function () {
     setFavorite: setFavorite,
     setHidden: setHidden,
     getProgress: getProgress,
+    hasItemProgress: hasItemProgress,
+    itemProgressPercent: itemProgressPercent,
+    decorateItemProgress: decorateItemProgress,
+    syncAllItemProgress: syncAllItemProgress,
     saveProgressEntry: saveProgressEntry,
     markComplete: markComplete,
     favoriteCount: favoriteCount,

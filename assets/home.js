@@ -310,7 +310,6 @@ function decorateContinueItem(item, progress) {
   const remainingSeconds = Math.max(0, duration * ratio)
   const remainingMinutes = Math.round(remainingSeconds / 60)
   const remainingEl = item.querySelector('[data-remaining]')
-  const progressEl = item.querySelector('[data-item-progress]')
   const showTranslationLang = continueSection?.hasAttribute('data-show-translation-lang')
   const durationDisplay = item.getAttribute('data-duration-display') || ''
   const kindLabel = item.getAttribute('data-kind-label') || ''
@@ -333,9 +332,8 @@ function decorateContinueItem(item, progress) {
   if (remainingEl) {
     remainingEl.hidden = true
   }
-  if (progressEl) {
-    progressEl.value = Math.max(0, Math.min(100, Math.round((sentence / Math.max(total - 1, 1)) * 100)))
-    progressEl.hidden = false
+  if (itemState && typeof itemState.decorateItemProgress === 'function') {
+    itemState.decorateItemProgress(item)
   }
 }
 
@@ -743,6 +741,9 @@ function initTitleMenus() {
 function refreshHomeLists() {
   applyAllItems()
   fillContinueReading()
+  if (itemState && typeof itemState.syncAllItemProgress === 'function') {
+    itemState.syncAllItemProgress(document)
+  }
   if (typeof window.syncAllFavoriteIndicators === 'function') {
     window.syncAllFavoriteIndicators(document)
   }
