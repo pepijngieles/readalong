@@ -282,6 +282,18 @@ function applyAllItems() {
   writeFiltersToUrl()
 }
 
+function progressUpdatedAt(entry) {
+  const value = entry && entry.progress && entry.progress.updatedAt
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? numeric : 0
+}
+
+function compareProgressEntries(a, b) {
+  const byActivity = progressUpdatedAt(b) - progressUpdatedAt(a)
+  if (byActivity !== 0) return byActivity
+  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+}
+
 function loadProgressEntries() {
   let map = {}
   try {
@@ -296,9 +308,7 @@ function loadProgressEntries() {
     return entry.progress &&
       !entry.progress.completed &&
       (entry.progress.sentence > 0 || entry.progress.started)
-  }).sort(function (a, b) {
-    return (b.progress.updatedAt || 0) - (a.progress.updatedAt || 0)
-  })
+  }).sort(compareProgressEntries)
 }
 
 function decorateContinueItem(item, progress) {
@@ -357,12 +367,18 @@ function findContinueSource(entry) {
 function continueEntriesForReadLanguage(entries) {
   const sourceLangs = allowedCodesFromMenu('read')
   const readFilter = savedReadFilter()
-  if (isAllFilter(readFilter, sourceLangs)) return entries
+  if (isAllFilter(readFilter, sourceLangs)) return entries.slice()
   return entries.filter(function (entry) {
     const source = findContinueSource(entry)
     if (!source) return false
     const language = source.getAttribute('data-language') || ''
     return readFilter.indexOf(language) !== -1
+  })
+}
+
+function displayableContinueEntries(entries) {
+  return entries.filter(function (entry) {
+    return findContinueSource(entry) !== null
   })
 }
 
@@ -384,7 +400,7 @@ function fillContinueReading() {
   if (!continueSection || !continueFeatured) return
 
   const historyLabel = continueSection.getAttribute('data-i18n-history') || 'All history'
-  const entries = continueEntriesForReadLanguage(loadProgressEntries())
+  const entries = displayableContinueEntries(continueEntriesForReadLanguage(loadProgressEntries()))
   continueFeatured.innerHTML = ''
   if (continueHistory) continueHistory.innerHTML = ''
 
@@ -786,6 +802,12 @@ function initHome() {
   updateFavoritesFilterRow()
   initTitleMenus()
   document.addEventListener('readalong:items-changed', refreshHomeLists)
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) fillContinueReading()
+  })
+  window.addEventListener('storage', function (event) {
+    if (event.key === PROGRESS_KEY) fillContinueReading()
+  })
 }
 
 window.clearFilters = clearFilters
