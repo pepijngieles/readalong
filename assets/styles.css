@@ -586,23 +586,6 @@ dl dt{
   height: var(--spacing-4);
   margin-block-start: var(--spacing-8);
   z-index: auto;
-  border-radius: calc(var(--spacing-4) / 2);
-  overflow: hidden;
-}
-
-.story-item progress::-webkit-progress-bar{
-  border-radius: calc(var(--spacing-4) / 2);
-  background-color: var(--shade-default);
-}
-
-.story-item progress::-webkit-progress-value{
-  border-radius: calc(var(--spacing-4) / 2);
-  background-color: var(--progress-fill);
-}
-
-.story-item progress::-moz-progress-bar{
-  border-radius: calc(var(--spacing-4) / 2);
-  background-color: var(--progress-fill);
 }
 
 .story-actions{
@@ -617,18 +600,18 @@ dl dt{
   line-height: var(--spacing-20);
 }
 
-.story-item .meta-indicator{
+.story-item .meta-favorite{
   display: inline;
   color: var(--text-tertiary);
 }
 
-.story-item .meta-indicator .meta-indicator-icon{
+.story-item .meta-favorite .meta-favorite-icon{
   display: inline-flex;
   vertical-align: middle;
   margin-inline-start: .0625rem;
 }
 
-.story-item .meta-indicator .icon{
+.story-item .meta-favorite .icon{
   width: .75rem;
   height: .75rem;
   opacity: .65;
@@ -2169,21 +2152,6 @@ body.ios:not(.started.show-translation) .translation-popover{
   color: var(--text-yellow);
 }
 
-.pill.icon-only{
-  box-sizing: border-box;
-  gap: 0;
-  width: 2rem;
-  height: 2rem;
-  min-width: 2rem;
-  padding: 0;
-  justify-content: center;
-}
-
-.pill.icon-only .icon{
-  width: 1rem;
-  height: 1rem;
-}
-
 .home-browse-filters{
   align-items: stretch;
   margin-block: var(--spacing-12) 0;
@@ -2195,10 +2163,6 @@ body.ios:not(.started.show-translation) .translation-popover{
   overflow-x: visible;
   min-width: 0;
   max-width: 100%;
-}
-
-.home-browse-kinds{
-  align-items: center;
 }
 
 .home-browse-selects{

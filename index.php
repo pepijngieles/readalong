@@ -122,28 +122,15 @@ if (!$needsOnboarding) {
 				<h2><?= e(t('home.browse_content')) ?></h2>
 			</div>
 			<div class="home-browse-filters flex columns gap-2xs">
-				<div class="home-browse-kinds flex gap-2xs">
-					<div class="flex gap-2xs" role=group aria-label="<?= e(t('home.filter.progress')) ?>" data-status-filters>
-						<button type=button class="pill choice icon-only" data-status-filter=favorites data-click=toggleStatusFilter aria-pressed=false aria-label="<?= e(t('home.favorites')) ?>">
-							<?php icon('heart-filled', ['size' => 16]); ?>
-						</button>
-						<button type=button class="pill choice icon-only" data-status-filter=in-progress data-click=toggleStatusFilter aria-pressed=false aria-label="<?= e(t('home.filter.progress.in_progress')) ?>">
-							<?php icon('clock', ['size' => 16]); ?>
-						</button>
-						<button type=button class="pill choice icon-only" data-status-filter=completed data-click=toggleStatusFilter aria-pressed=false aria-label="<?= e(t('home.filter.progress.done')) ?>">
-							<?php icon('circle-check', ['size' => 16]); ?>
-						</button>
-					</div>
 <?php if (count($kindTiles) > 1): ?>
-					<div class="flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>" data-kind-filters>
+				<div class="home-browse-kinds flex gap-2xs" role=group aria-label="<?= e(t('home.kind_filters')) ?>" data-kind-filters>
 <?php foreach ($kindTiles as $kind): ?>
-						<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === $defaultKind ? 'true' : 'false' ?>>
-							<?= e(t('home.kind.' . $kind)) ?>
-						</button>
+					<button type=button class="pill choice" data-kind-filter="<?= e($kind) ?>" data-click=filterKind aria-pressed=<?= $kind === $defaultKind ? 'true' : 'false' ?>>
+						<?= e(t('home.kind.' . $kind)) ?>
+					</button>
 <?php endforeach; ?>
-					</div>
-<?php endif; ?>
 				</div>
+<?php endif; ?>
 				<div class="home-browse-selects flex gap-2xs">
 <?php
 				render_browse_filter_menu(
@@ -180,6 +167,12 @@ if (!$needsOnboarding) {
 							<?php icon('chevron-down', ['size' => 16]); ?>
 						</div>
 					</label>
+				</div>
+				<div class="home-browse-kinds flex gap-2xs" role=group aria-label="<?= e(t('home.favorites')) ?>" data-favorites-filter-row hidden>
+					<button type=button class="pill choice" data-favorites-filter data-click=toggleFavoritesFilter aria-pressed=false>
+						<?php icon('heart-filled', ['size' => 16]); ?>
+						<?= e(t('home.favorites')) ?>
+					</button>
 				</div>
 			</div>
 			<div class="home-results-bar flex gap-small">
@@ -232,10 +225,10 @@ include $partials . '/item-actions-i18n.php';
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/item-state.js?v=5" defer></script>
-	<script type="text/javascript" src="assets/item-actions.js?v=6" defer></script>
+	<script type="text/javascript" src="assets/item-state.js?v=3" defer></script>
+	<script type="text/javascript" src="assets/item-actions.js?v=5" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=6" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=33" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=31" defer></script>
 
 <?php endif; ?>
 
