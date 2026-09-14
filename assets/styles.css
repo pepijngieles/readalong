@@ -586,23 +586,6 @@ dl dt{
   height: var(--spacing-4);
   margin-block-start: var(--spacing-8);
   z-index: auto;
-  border-radius: calc(var(--spacing-4) / 2);
-  overflow: hidden;
-}
-
-.story-item progress::-webkit-progress-bar{
-  border-radius: calc(var(--spacing-4) / 2);
-  background-color: var(--shade-default);
-}
-
-.story-item progress::-webkit-progress-value{
-  border-radius: calc(var(--spacing-4) / 2);
-  background-color: var(--progress-fill);
-}
-
-.story-item progress::-moz-progress-bar{
-  border-radius: calc(var(--spacing-4) / 2);
-  background-color: var(--progress-fill);
 }
 
 .story-actions{
