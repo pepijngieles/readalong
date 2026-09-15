@@ -2186,14 +2186,42 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .continue-list{
+  display: flex;
+  gap: var(--gap-small);
   margin-block: 0;
+  margin-inline: calc(-1 * var(--spacing-16));
+  padding-inline: var(--spacing-16);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--spacing-16);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.continue-list::-webkit-scrollbar{
+  display: none;
+}
+
+.continue-list li:first-of-type .story-row,
+.continue-list li:first-of-type > a.story-item,
+.continue-list li:last-of-type .story-row,
+.continue-list li:last-of-type > a.story-item{
+  padding-block: 0;
 }
 
 .continue-list li.featured{
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: min(20rem, calc(100% - var(--spacing-24)));
   background-color: var(--background-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius-medium);
   padding: var(--spacing-16);
+}
+
+.continue-list li.featured:only-child{
+  width: 100%;
 }
 
 .continue-list li.featured .story-row{

@@ -362,19 +362,24 @@ function fillContinueReading() {
     return
   }
 
-  const featuredItem = cloneContinueItem(entries[0], true)
-  if (!featuredItem) {
+  let hasItems = false
+  entries.forEach(function (entry) {
+    const item = cloneContinueItem(entry, true)
+    if (!item) return
+    continueFeatured.appendChild(item)
+    hasItems = true
+  })
+
+  if (!hasItems) {
     continueSection.hidden = true
     return
   }
-
-  continueFeatured.appendChild(featuredItem)
 
   if (historyLink) {
     historyLink.hidden = entries.length < 2
   }
 
-  continueSection.hidden = continueFeatured.children.length === 0
+  continueSection.hidden = false
 }
 
 function clearFilters() {
