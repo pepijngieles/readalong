@@ -22,8 +22,8 @@ if (!$needsOnboarding) {
   $levelCodes = level_codes();
   $levelFilter = lang_prefs_list('level', $levelCodes, []);
   $showTranslationLang = false;
-  $stories = story_list($storiesDir, [$translateLang], null, []);
-  $stories = story_apply_home_hidden($stories, [$readAlongLang], $contentLangs, $levelFilter);
+  $continueCatalogStories = story_list($storiesDir, [$translateLang], null, []);
+  $stories = story_apply_home_hidden($continueCatalogStories, [$readAlongLang], $contentLangs, $levelFilter);
   [$weatherStories, $stories] = story_partition_by_kind($stories, 'weather');
   $kindStories = story_apply_home_hidden(
     story_list($storiesDir, [$translateLang], null, []),
@@ -106,6 +106,11 @@ if (!$needsOnboarding) {
 				<h2><?= e(t('home.continue_reading')) ?></h2>
 				<a class="quiet section-link" href="/library/in_progress" data-continue-history-link hidden><?= e(t('home.all_in_progress')) ?></a>
 			</div>
+			<ul class="visually-hidden" data-continue-catalog aria-hidden="true" hidden>
+<?php foreach ($continueCatalogStories as $item): ?>
+<?= story_list_item($item, $showTranslationLang, false) ?>
+<?php endforeach; ?>
+			</ul>
 			<ul class="list continue-list" data-continue-featured></ul>
 		</section>
 
@@ -213,7 +218,7 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript" src="assets/item-state.js?v=6" defer></script>
 	<script type="text/javascript" src="assets/item-actions.js?v=9" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=9" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=36" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=37" defer></script>
 
 <?php endif; ?>
 
