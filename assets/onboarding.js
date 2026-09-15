@@ -61,7 +61,10 @@
       if (exceptButton && button === exceptButton) return;
       button.setAttribute('aria-expanded', 'false');
       const menu = document.getElementById(button.getAttribute('aria-controls'));
-      if (menu) menu.hidden = true;
+      if (menu) {
+        if (typeof window.resetOverlayMenu === 'function') window.resetOverlayMenu(menu);
+        menu.hidden = true;
+      }
     });
   }
 
@@ -73,6 +76,7 @@
     if (!open) {
       el.setAttribute('aria-expanded', 'true');
       menu.hidden = false;
+      if (typeof window.positionOverlayMenu === 'function') window.positionOverlayMenu(el, menu);
     }
   };
 
