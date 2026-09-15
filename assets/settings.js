@@ -8,8 +8,7 @@ const SETTINGS_DEFAULTS = Object.assign({
   layout: 'start'
 }, window.ReadalongTheme ? window.ReadalongTheme.THEME_DEFAULTS : {
   appearance: 'system',
-  lightTheme: 'light',
-  darkTheme: 'dark'
+  paper: 'neutral'
 })
 
 function settingsEl(selector) {
@@ -33,13 +32,6 @@ function applyThemeSettings(settings) {
   if (window.ReadalongTheme) window.ReadalongTheme.applyThemeSettings(settings)
 }
 
-function syncThemePairs(appearance) {
-  document.querySelectorAll('[data-theme-pair]').forEach(function (pair) {
-    const kind = pair.getAttribute('data-theme-pair')
-    pair.hidden = (appearance === 'light' && kind === 'dark') || (appearance === 'dark' && kind === 'light')
-  })
-}
-
 function applyLayout(value) {
   document.body.classList.remove('layout-start', 'layout-justify', 'layout-dense', 'layout-spaced')
   if (value === 'justify') document.body.classList.add('layout-justify')
@@ -54,6 +46,8 @@ function readStoredSettings() {
       if (settings.layout === 'spaced') settings.layout = 'justify'
       if (window.ReadalongTheme) Object.assign(settings, window.ReadalongTheme.normalizeThemeSettings(settings))
       delete settings.theme
+      delete settings.lightTheme
+      delete settings.darkTheme
       return settings
     }
   } catch (error) {}
@@ -72,8 +66,7 @@ function getSettingsFromForm() {
   if (form.playbackRate) next.playbackRate = parseFloat(form.playbackRate.value)
   if (form.sentencePause) next.sentencePause = parseInt(form.sentencePause.value, 10)
   if (form.appearance) next.appearance = form.appearance.value
-  if (form.lightTheme) next.lightTheme = form.lightTheme.value
-  if (form.darkTheme) next.darkTheme = form.darkTheme.value
+  if (form.paper) next.paper = form.paper.value
   if (form.layout) next.layout = form.layout.value
   return next
 }
@@ -82,6 +75,8 @@ function saveSettings() {
   const next = Object.assign({}, SETTINGS_DEFAULTS, readStoredSettings(), getSettingsFromForm())
   if (window.ReadalongTheme) Object.assign(next, window.ReadalongTheme.normalizeThemeSettings(next))
   delete next.theme
+  delete next.lightTheme
+  delete next.darkTheme
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(next))
 }
 
@@ -90,7 +85,6 @@ function applyAppearanceFromForm(save) {
   const stored = readStoredSettings()
   const appearance = (form && form.appearance && form.appearance.value) || stored.appearance
   const next = Object.assign({}, stored, getSettingsFromForm(), { appearance: appearance })
-  syncThemePairs(appearance)
   applyThemeSettings(next)
   if (form && form.layout) applyLayout(form.layout.value)
   if (save !== false) saveSettings()
@@ -105,10 +99,8 @@ function fillSettingsForm(settings) {
   if (form.playbackRate) form.playbackRate.value = settings.playbackRate
   if (form.sentencePause) form.sentencePause.value = settings.sentencePause
   if (form.appearance) form.appearance.value = settings.appearance
-  if (form.lightTheme) form.lightTheme.value = settings.lightTheme
-  if (form.darkTheme) form.darkTheme.value = settings.darkTheme
+  if (form.paper) form.paper.value = settings.paper
   if (form.layout) form.layout.value = settings.layout
-  syncThemePairs(settings.appearance)
 }
 
 function loadThemeFromStorage() {

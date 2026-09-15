@@ -4,8 +4,7 @@
   var SETTINGS_KEY = 'readalong-settings'
   var THEME_DEFAULTS = {
     appearance: 'system',
-    lightTheme: 'light',
-    darkTheme: 'dark'
+    paper: 'neutral'
   }
   var THEME_META_PREFIX = '--theme-meta-'
 
@@ -21,42 +20,58 @@
   }
 
   function normalizeThemeSettings(settings) {
-    var next = {}
     var source = settings || {}
-    next.appearance = source.appearance
-    next.lightTheme = source.lightTheme
-    next.darkTheme = source.darkTheme
-    next.theme = source.theme
+    var appearance = source.appearance
+    var paper = source.paper
 
-    if (next.appearance !== 'system' && next.appearance !== 'light' && next.appearance !== 'dark') {
-      if (next.theme === 'cream') {
-        next.appearance = 'light'
-        next.lightTheme = 'cream'
-      } else if (next.theme === 'dark' || next.theme === 'black') {
-        next.appearance = 'dark'
-        next.darkTheme = next.theme
+    if (appearance !== 'system' && appearance !== 'light' && appearance !== 'dark') {
+      if (source.theme === 'dark' || source.theme === 'black') appearance = 'dark'
+      else appearance = THEME_DEFAULTS.appearance
+    }
+
+    if (paper !== 'warm' && paper !== 'neutral') {
+      if (source.paper === 'cream' || source.lightTheme === 'cream' || source.theme === 'cream') {
+        paper = 'warm'
       } else {
-        next.appearance = THEME_DEFAULTS.appearance
+        paper = THEME_DEFAULTS.paper
       }
     }
-    if (next.lightTheme !== 'cream') next.lightTheme = THEME_DEFAULTS.lightTheme
-    if (next.darkTheme !== 'black') next.darkTheme = THEME_DEFAULTS.darkTheme
+
     return {
-      appearance: next.appearance,
-      lightTheme: next.lightTheme,
-      darkTheme: next.darkTheme
+      appearance: appearance,
+      paper: paper
     }
   }
 
-  function resolvePalette(settings, prefs) {
+  function resolveTheme(settings, prefs) {
     var theme = normalizeThemeSettings(settings)
     var system = prefs || systemPrefs()
     var scheme = theme.appearance === 'light' || theme.appearance === 'dark'
       ? theme.appearance
       : system.scheme
-    var contrast = theme.appearance === 'system' && !!system.contrast
-    if (scheme === 'dark') return contrast ? 'black' : theme.darkTheme
-    return contrast ? 'light' : theme.lightTheme
+    var contrast = !!system.contrast
+    var warm = theme.paper === 'warm'
+    var palette = 'light'
+    if (scheme === 'dark') palette = contrast ? 'black' : 'dark'
+    return {
+      palette: palette,
+      warm: warm,
+      scheme: scheme,
+      contrast: contrast
+    }
+  }
+
+  function resolvePalette(settings, prefs) {
+    var resolved = resolveTheme(settings, prefs)
+    if (resolved.warm && resolved.palette === 'light') return 'cream'
+    return resolved.palette
+  }
+
+  function metaKey(resolved) {
+    if (resolved.warm && resolved.palette === 'light') return 'cream'
+    if (resolved.warm && resolved.palette === 'dark') return 'dark-warm'
+    if (resolved.warm && resolved.palette === 'black') return 'black-warm'
+    return resolved.palette
   }
 
   function cssToken(name) {
@@ -69,27 +84,45 @@
     return value || cssToken(THEME_META_PREFIX + 'light-' + variant)
   }
 
-  function applyPalette(palette) {
+  function applyResolved(resolved) {
     var document = root.document
-    if (!document || !document.body) return palette
-    document.body.classList.remove('theme-light', 'theme-cream', 'theme-dark', 'theme-black')
-    if (palette !== 'light') document.body.classList.add('theme-' + palette)
-    var scheme = palette === 'dark' || palette === 'black' ? 'dark' : 'light'
-    document.body.style.colorScheme = scheme
+    if (!document || !document.body) return resolved
+    var body = document.body
+    body.classList.remove('theme-light', 'theme-cream', 'theme-dark', 'theme-black', 'theme-warm')
+    if (resolved.palette === 'dark') body.classList.add('theme-dark')
+    if (resolved.palette === 'black') body.classList.add('theme-black')
+    if (resolved.warm) {
+      body.classList.add('theme-warm')
+      if (resolved.palette === 'light') body.classList.add('theme-cream')
+    }
+    var scheme = resolved.palette === 'dark' || resolved.palette === 'black' ? 'dark' : 'light'
+    body.style.colorScheme = scheme
     document.documentElement.style.colorScheme = scheme
-    api.currentPalette = palette
+    api.current = resolved
+    api.currentPalette = metaKey(resolved)
     if (typeof root.updateThemeColor === 'function') {
       root.updateThemeColor()
     } else {
       var meta = document.querySelector('meta[name=theme-color]')
-      var color = themeMetaColor(palette, 'primary')
+      var color = themeMetaColor(api.currentPalette, 'primary')
       if (meta && color) meta.setAttribute('content', color)
     }
-    return palette
+    return resolved
+  }
+
+  function applyPalette(palette) {
+    var warm = palette === 'cream'
+    var resolved = {
+      palette: warm ? 'light' : palette,
+      warm: warm,
+      scheme: palette === 'dark' || palette === 'black' ? 'dark' : 'light',
+      contrast: palette === 'black'
+    }
+    return applyResolved(resolved)
   }
 
   function applyThemeSettings(settings, prefs) {
-    return applyPalette(resolvePalette(settings, prefs))
+    return applyResolved(resolveTheme(settings, prefs))
   }
 
   function readStoredSettings() {
@@ -107,8 +140,6 @@
   function watchSystem() {
     if (typeof matchMedia !== 'function') return
     var onChange = function () {
-      var stored = readStoredSettings()
-      if (normalizeThemeSettings(stored).appearance !== 'system') return
       applyFromStorage()
     }
     var queries = [
@@ -136,11 +167,15 @@
     THEME_DEFAULTS: THEME_DEFAULTS,
     THEME_META_PREFIX: THEME_META_PREFIX,
     currentPalette: 'light',
+    current: { palette: 'light', warm: false, scheme: 'light', contrast: false },
     systemPrefs: systemPrefs,
     normalizeThemeSettings: normalizeThemeSettings,
+    resolveTheme: resolveTheme,
     resolvePalette: resolvePalette,
+    metaKey: metaKey,
     themeMetaColor: themeMetaColor,
     applyPalette: applyPalette,
+    applyResolved: applyResolved,
     applyThemeSettings: applyThemeSettings,
     applyFromStorage: applyFromStorage,
     readStoredSettings: readStoredSettings,

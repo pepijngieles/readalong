@@ -121,34 +121,19 @@ $translateSelectLabel = lang_endonym($translateLang ?? ui_locale());
 				</fieldset>
 
 				<div class="settings-row flex gap-medium">
-					<div class="settings-themes-group flex gap-xs">
-						<fieldset class="settings-themes flex gap-2xs" data-theme-pair=light>
-							<legend class=visually-hidden><?= e(t('settings.light')) ?></legend>
-							<label class=settings-theme>
-								<input type=radio name=lightTheme value=light checked>
-								<span class="swatch light" aria-hidden=true></span>
-								<span class=visually-hidden><?= e(t('settings.white')) ?></span>
-							</label>
-							<label class=settings-theme>
-								<input type=radio name=lightTheme value=cream>
-								<span class="swatch cream" aria-hidden=true></span>
-								<span class=visually-hidden><?= e(t('settings.cream')) ?></span>
-							</label>
-						</fieldset>
-						<fieldset class="settings-themes flex gap-2xs" data-theme-pair=dark>
-							<legend class=visually-hidden><?= e(t('settings.dark')) ?></legend>
-							<label class=settings-theme>
-								<input type=radio name=darkTheme value=dark checked>
-								<span class="swatch dark" aria-hidden=true></span>
-								<span class=visually-hidden><?= e(t('settings.dark')) ?></span>
-							</label>
-							<label class=settings-theme>
-								<input type=radio name=darkTheme value=black>
-								<span class="swatch black" aria-hidden=true></span>
-								<span class=visually-hidden><?= e(t('settings.black')) ?></span>
-							</label>
-						</fieldset>
-					</div>
+					<fieldset class="settings-themes flex gap-2xs">
+						<legend class=visually-hidden><?= e(t('settings.paper')) ?></legend>
+						<label class=settings-theme>
+							<input type=radio name=paper value=neutral checked>
+							<span class="swatch light" aria-hidden=true></span>
+							<span class=visually-hidden><?= e(t('settings.neutral')) ?></span>
+						</label>
+						<label class=settings-theme>
+							<input type=radio name=paper value=warm>
+							<span class="swatch cream" aria-hidden=true></span>
+							<span class=visually-hidden><?= e(t('settings.cream')) ?></span>
+						</label>
+					</fieldset>
 <?php if ($settingsReader): ?>
 
 					<fieldset class="settings-layouts flex gap-2xs">

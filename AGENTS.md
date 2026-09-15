@@ -122,13 +122,13 @@ Settings is a native `<dialog>`:
 
 **Theme model** (`assets/theme.js`, applied from `theme-bootstrap.php`)
 
-Default is **System**. Resolution:
+Three independent axes. Default follows the OS; cream/warm does not pin light.
 
-1. Appearance: System (OS `prefers-color-scheme`) or forced Light / Dark
-2. High contrast (`prefers-contrast: more` or `forced-colors: active`) applies only in System: light → white, dark → black
-3. Palettes are overrides within a scheme: Light gets White or Cream; Dark gets Dark or Black
+1. **Appearance:** System (OS `prefers-color-scheme`) or forced Light / Dark
+2. **Contrast:** always OS (`prefers-contrast: more` or `forced-colors: active`) — light stays light, dark becomes black
+3. **Paper:** Neutral or Warm. Warm removes blue from whatever the other axes resolved (cream in light, warm gray/black in dark), including high contrast
 
-Picking Light or Dark ignores OS color scheme and contrast. Stored as `appearance`, `lightTheme`, `darkTheme` in `readalong-settings`.
+Light / Dark only override color scheme. Stored as `appearance` + `paper` in `readalong-settings`.
 
 Home read-along language is a single-select title menu; levels are a multi-select (`toggleTitleMenu`, `updateTitleFilter`). Consecutive levels collapse to a range (`A1-B2`). Trigger width follows the active label. No comma in the title. They apply immediately via `setLangPref` (no reload). They are not in `#settings`. Translation language in the settings sheet applies on change (`data-change=saveCatalogPrefs`) and reloads. There is no save button; the reader sheet has no title.
 
@@ -138,7 +138,7 @@ Home read-along language is a single-select title menu; levels are a multi-selec
 
 | File | Scope |
 |------|-------|
-| `assets/theme.js` | Theme resolve (system light/dark + contrast, palette overrides); inlined by `theme-bootstrap.php` |
+| `assets/theme.js` | Theme resolve (system light/dark + contrast, independent warm/paper axis); inlined by `theme-bootstrap.php` |
 | `assets/settings.js` | Settings sheet: appearance form, reader controls, theme-color meta |
 | `assets/scripts.js` | Story player: audio, sentences, settings, translation, progress |
 | `assets/home.js` | Home: filters, continue reading, header language/level dropdowns |
@@ -271,7 +271,7 @@ After UI or chrome changes, test:
 - [ ] Language is single-select; levels are multi-select with ranges like A1-B2; trigger width follows the active label
 - [ ] Language and level filters apply immediately (no reload)
 - [ ] Settings gear: translation language + appearance/palettes only (not read-along/level)
-- [ ] Theme default System follows OS light/dark and high contrast; Light/Dark + swatches override
+- [ ] Theme default System follows OS light/dark and high contrast; Light/Dark override only the scheme; Neutral/Warm paper applies in every combination
 - [ ] Settings: open, Escape, backdrop, close X; translation language applies on change + reload; no save button
 - [ ] Filters: kind pills, duration select, clear filters
 - [ ] History toggle (only when 2+ continue items)
@@ -288,7 +288,7 @@ After UI or chrome changes, test:
 
 - [ ] Play / pause / rewind / forward
 - [ ] Translation show/hide; popover close button alignment
-- [ ] Settings sheet: sliders, appearance, palettes, font, layout (no title, no save button)
+- [ ] Settings sheet: sliders, appearance, paper, font, layout (no title, no save button)
 - [ ] Settings bottom sheet on desktop and ~390px width
 
 **Regressions**
