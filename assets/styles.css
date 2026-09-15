@@ -2167,6 +2167,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 [data-continue-section]{
   min-width: 0;
+  overflow-x: clip;
 }
 
 [data-continue-section] .section-header{
@@ -2190,19 +2191,23 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .continue-list{
+  --continue-gutter: max(var(--spacing-16), calc((100vw - var(--page-width)) / 2 + var(--spacing-16)));
+  --continue-peek: var(--spacing-48);
   display: flex;
   flex-flow: row nowrap;
   gap: var(--gap-small);
-  width: 100%;
-  max-width: 100%;
+  width: 100vw;
+  max-width: 100vw;
   min-width: 0;
   margin-block: 0;
-  margin-inline: calc(-1 * var(--spacing-16));
-  padding-inline: var(--spacing-16);
+  margin-inline: calc(50% - 50vw);
+  padding-inline-start: var(--continue-gutter);
+  padding-inline-end: 0;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--spacing-16);
+  scroll-padding-inline-start: var(--continue-gutter);
+  scroll-padding-inline-end: 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   touch-action: pan-x;
@@ -2220,7 +2225,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .continue-list li.featured{
-  flex: 0 0 min(20rem, calc(100% - var(--spacing-48)));
+  flex: 0 0 min(20rem, calc(100% - var(--continue-peek)));
   scroll-snap-align: start;
   scroll-snap-stop: always;
   background-color: var(--background-secondary);
@@ -2229,8 +2234,19 @@ body.ios:not(.started.show-translation) .translation-popover{
   padding: var(--spacing-16);
 }
 
-.continue-list li.featured:only-child{
-  flex-basis: 100%;
+.continue-list li.featured:only-child,
+.continue-list li.featured:last-child{
+  flex-basis: min(20rem, 100%);
+}
+
+body.theme-dark .continue-list,
+body.theme-black .continue-list{
+  background-color: var(--background-secondary);
+}
+
+body.theme-dark .continue-list li.featured,
+body.theme-black .continue-list li.featured{
+  background-color: var(--background-primary);
 }
 
 .continue-list li.featured .story-row{
