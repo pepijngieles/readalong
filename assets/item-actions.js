@@ -2,7 +2,11 @@
   const state = window.ReadalongItemState
   if (!state) return
 
+  const ITEM_MENU_SCROLL_CLOSE_THRESHOLD = 12
+
   let activeItemEl = null
+  let itemMenuTrigger = null
+  let itemMenuAnchorRect = null
   let undoTimer = null
   let undoAction = null
 
@@ -154,6 +158,22 @@
       button.setAttribute('aria-expanded', 'false')
     })
     activeItemEl = null
+    itemMenuTrigger = null
+    itemMenuAnchorRect = null
+  }
+
+  function checkItemMenuScrollClose(event) {
+    if (!itemMenuTrigger || !itemMenuAnchorRect) return
+    const menu = document.getElementById('item-menu')
+    if (!menu || menu.hidden) return
+    if (event && event.target && event.target.closest && event.target.closest('#item-menu')) return
+
+    const rect = itemMenuTrigger.getBoundingClientRect()
+    const dx = rect.left - itemMenuAnchorRect.left
+    const dy = rect.top - itemMenuAnchorRect.top
+    if (Math.hypot(dx, dy) >= ITEM_MENU_SCROLL_CLOSE_THRESHOLD) {
+      closeItemMenu()
+    }
   }
 
   const MENU_ACTION_ICONS = {
@@ -253,6 +273,8 @@
     menu.appendChild(buildItemMenu(itemEl))
     menu.hidden = false
     el.setAttribute('aria-expanded', 'true')
+    itemMenuTrigger = el
+    itemMenuAnchorRect = el.getBoundingClientRect()
     if (typeof window.positionOverlayMenu === 'function') window.positionOverlayMenu(el, menu)
   }
 
@@ -358,6 +380,16 @@
     document.addEventListener('readalong:items-changed', function () {
       syncAllFavoriteIndicators(document)
     })
+    document.addEventListener('scroll', checkItemMenuScrollClose, true)
+    window.addEventListener('resize', function () {
+      if (itemMenuTrigger) closeItemMenu()
+    })
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('scroll', checkItemMenuScrollClose)
+      window.visualViewport.addEventListener('resize', function () {
+        if (itemMenuTrigger) closeItemMenu()
+      })
+    }
   }
 
   window.openItemMenu = openItemMenu

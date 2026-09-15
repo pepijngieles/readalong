@@ -7,6 +7,6 @@
 		};
 	</script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/menu-position.js?v=1" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/menu-position.js?v=2" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=9" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/scripts.js?v=28" defer></script>
