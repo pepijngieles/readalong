@@ -753,8 +753,10 @@ dl dt{
   outline-offset: 2px;
 }
 
-#settings .title-menu.is-fixed{
+.title-menu.is-fixed{
+  position: fixed;
   z-index: 30;
+  min-width: 0;
 }
 
 .library-back{

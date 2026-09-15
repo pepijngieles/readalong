@@ -403,31 +403,14 @@ function filterMenuTriggers() {
   return homeAll('.home-title-trigger, .filter-trigger')
 }
 
-function positionOnboardingUiMenu(button, menu) {
-  const rect = button.getBoundingClientRect()
-  menu.classList.add('is-fixed')
-  menu.style.top = Math.round(rect.bottom + 8) + 'px'
-  menu.style.left = Math.round(rect.left) + 'px'
-  menu.style.right = 'auto'
-  menu.style.width = Math.round(rect.width) + 'px'
-}
-
-function resetOnboardingUiMenu(menu) {
-  menu.classList.remove('is-fixed')
-  menu.style.top = ''
-  menu.style.left = ''
-  menu.style.right = ''
-  menu.style.width = ''
-}
-
 function closeTitleMenus(except) {
   filterMenuTriggers().forEach(function (button) {
     if (except && button === except) return
     button.setAttribute('aria-expanded', 'false')
     const menu = document.getElementById(button.getAttribute('aria-controls'))
     if (menu) {
+      if (typeof window.resetOverlayMenu === 'function') window.resetOverlayMenu(menu)
       menu.hidden = true
-      resetOnboardingUiMenu(menu)
     }
   })
 }
@@ -440,9 +423,7 @@ function toggleTitleMenu(el) {
   if (!open) {
     el.setAttribute('aria-expanded', 'true')
     menu.hidden = false
-    if (menu.closest('.onboarding-ui-control')) {
-      positionOnboardingUiMenu(el, menu)
-    }
+    if (typeof window.positionOverlayMenu === 'function') window.positionOverlayMenu(el, menu)
   }
 }
 
