@@ -282,11 +282,10 @@ function decorateContinueItem(item, progress) {
   const remainingEl = item.querySelector('[data-remaining]')
   const showTranslationLang = continueSection?.hasAttribute('data-show-translation-lang')
   const durationDisplay = item.getAttribute('data-duration-display') || ''
-  const kindLabel = item.getAttribute('data-kind-label') || ''
   const level = item.getAttribute('data-level') || ''
   const translationEndonym = item.getAttribute('data-translation-endonym') || ''
   const parts = []
-  const remainingTemplate = (homeEl('[data-all-section]')?.getAttribute('data-i18n-remaining')) || '{n} min'
+  const remainingTemplate = (homeEl('[data-all-section]')?.getAttribute('data-i18n-remaining')) || '{n}m left'
 
   if (durationDisplay) parts.push(durationDisplay)
   if (level) parts.push(level)
@@ -294,7 +293,6 @@ function decorateContinueItem(item, progress) {
     parts.push(remainingTemplate.replace('{n}', String(remainingMinutes)))
   }
   if (showTranslationLang && translationEndonym) parts.push(translationEndonym)
-  if (kindLabel) parts.push(kindLabel)
 
   if (parts.length && typeof window.setItemMetaText === 'function') {
     window.setItemMetaText(item, parts.join(' · '))
@@ -403,31 +401,14 @@ function filterMenuTriggers() {
   return homeAll('.home-title-trigger, .filter-trigger')
 }
 
-function positionOnboardingUiMenu(button, menu) {
-  const rect = button.getBoundingClientRect()
-  menu.classList.add('is-fixed')
-  menu.style.top = Math.round(rect.bottom + 8) + 'px'
-  menu.style.left = Math.round(rect.left) + 'px'
-  menu.style.right = 'auto'
-  menu.style.width = Math.round(rect.width) + 'px'
-}
-
-function resetOnboardingUiMenu(menu) {
-  menu.classList.remove('is-fixed')
-  menu.style.top = ''
-  menu.style.left = ''
-  menu.style.right = ''
-  menu.style.width = ''
-}
-
 function closeTitleMenus(except) {
   filterMenuTriggers().forEach(function (button) {
     if (except && button === except) return
     button.setAttribute('aria-expanded', 'false')
     const menu = document.getElementById(button.getAttribute('aria-controls'))
     if (menu) {
+      if (typeof window.resetOverlayMenu === 'function') window.resetOverlayMenu(menu)
       menu.hidden = true
-      resetOnboardingUiMenu(menu)
     }
   })
 }
@@ -440,9 +421,7 @@ function toggleTitleMenu(el) {
   if (!open) {
     el.setAttribute('aria-expanded', 'true')
     menu.hidden = false
-    if (menu.closest('.onboarding-ui-control')) {
-      positionOnboardingUiMenu(el, menu)
-    }
+    if (typeof window.positionOverlayMenu === 'function') window.positionOverlayMenu(el, menu)
   }
 }
 

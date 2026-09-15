@@ -609,6 +609,24 @@ dl dt{
   height: var(--spacing-4);
   margin-block-start: var(--spacing-8);
   z-index: auto;
+  border-radius: var(--spacing-2);
+  overflow: hidden;
+  background-color: var(--shade-default);
+}
+
+.story-item progress::-webkit-progress-bar{
+  border-radius: var(--spacing-2);
+  background-color: var(--shade-default);
+}
+
+.story-item progress::-webkit-progress-value{
+  border-radius: var(--spacing-2);
+  background-color: var(--progress-fill);
+}
+
+.story-item progress::-moz-progress-bar{
+  border-radius: var(--spacing-2);
+  background-color: var(--progress-fill);
 }
 
 .story-actions{
@@ -655,6 +673,7 @@ dl dt{
   border: 0;
   border-radius: var(--border-radius-small);
   background: transparent;
+  box-shadow: none;
   color: var(--text-primary);
   font: inherit;
   font-size: 1rem;
@@ -662,6 +681,17 @@ dl dt{
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.item-menu-action:active:not([disabled]){
+  box-shadow: none;
+}
+
+.item-menu-separator{
+  height: 1px;
+  margin-block: var(--spacing-4);
+  margin-inline: var(--spacing-8);
+  background-color: var(--border-subtle);
 }
 
 .item-menu-action .icon{
@@ -776,8 +806,10 @@ dl dt{
   outline-offset: 2px;
 }
 
-#settings .title-menu.is-fixed{
+.title-menu.is-fixed{
+  position: fixed;
   z-index: 30;
+  min-width: 0;
 }
 
 .library-back{

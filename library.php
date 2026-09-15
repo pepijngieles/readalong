@@ -63,7 +63,7 @@ $stories = story_apply_home_hidden($stories, [$readAlongLang], $contentLangs, $l
 		</header>
 
 		<section class=home-section data-library-section data-library-view="<?= e($view) ?>" data-i18n-empty-in-progress="<?= e(t('library.empty_in_progress')) ?>" data-i18n-empty-hidden="<?= e(t('library.empty_hidden')) ?>" data-i18n-empty-completed="<?= e(t('library.empty_completed')) ?>" data-i18n-empty-favorites="<?= e(t('library.empty_favorites')) ?>">
-<?php render_story_list($stories, 'data-library-items', $showTranslationLang, true, true); ?>
+<?php render_story_list($stories, 'data-library-items', $showTranslationLang, true); ?>
 			<div class="home-empty" data-library-empty hidden>
 				<p data-library-empty-message></p>
 			</div>
@@ -88,10 +88,11 @@ include $partials . '/item-actions-i18n.php';
 		};
 	</script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=4" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=5" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/menu-position.js?v=1" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=6" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=9" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=8" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=6" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=7" defer></script>
 
 </body>
 </html>

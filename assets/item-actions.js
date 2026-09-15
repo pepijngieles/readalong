@@ -148,6 +148,7 @@
   function closeItemMenu() {
     const menu = document.getElementById('item-menu')
     if (!menu) return
+    if (typeof window.resetOverlayMenu === 'function') window.resetOverlayMenu(menu)
     menu.hidden = true
     document.querySelectorAll('[data-click=openItemMenu][aria-expanded=true]').forEach(function (button) {
       button.setAttribute('aria-expanded', 'false')
@@ -155,21 +156,14 @@
     activeItemEl = null
   }
 
-  function positionItemMenu(button, menu) {
-    const rect = button.getBoundingClientRect()
-    menu.style.top = Math.round(rect.bottom + 8) + 'px'
-    menu.style.left = 'auto'
-    menu.style.right = Math.round(window.innerWidth - rect.right) + 'px'
-  }
-
   const MENU_ACTION_ICONS = {
     favorite: 'heart',
     unfavorite: 'heart-filled',
     complete: 'circle-check',
-    uncomplete: 'circle',
     hide: 'eye-off',
     unhide: 'eye',
-    share: 'share'
+    share: 'share',
+    reset: 'rotate-ccw'
   }
 
   function menuIconHtml(action) {
@@ -203,12 +197,20 @@
     return button
   }
 
+  function createMenuSeparator() {
+    const separator = document.createElement('div')
+    separator.className = 'item-menu-separator'
+    separator.setAttribute('role', 'separator')
+    return separator
+  }
+
   function buildItemMenu(itemEl) {
     const meta = itemMeta(itemEl)
     const completed = state.isCompleted(meta.id)
     const hidden = state.isHidden(meta.id)
     const menu = document.createDocumentFragment()
     const favorite = state.isFavorite(meta.id)
+    const started = state.isStarted(meta.id) || completed
 
     if (favorite) {
       menu.appendChild(createMenuButton('unfavorite', i18n('unfavorite', 'Remove from favorites')))
@@ -218,9 +220,11 @@
 
     if (!completed) {
       menu.appendChild(createMenuButton('complete', completeLabel(meta.kind)))
-    } else {
-      menu.appendChild(createMenuButton('uncomplete', i18n('mark_incomplete', 'Mark as not completed')))
     }
+
+    menu.appendChild(createMenuButton('share', i18n('share', 'Share link')))
+
+    menu.appendChild(createMenuSeparator())
 
     if (!hidden) {
       menu.appendChild(createMenuButton('hide', i18n('hide', 'Hide item')))
@@ -228,7 +232,9 @@
       menu.appendChild(createMenuButton('unhide', i18n('unhide', 'Show item again')))
     }
 
-    menu.appendChild(createMenuButton('share', i18n('share', 'Share link')))
+    if (started) {
+      menu.appendChild(createMenuButton('reset', i18n('reset_progress', 'Reset progress')))
+    }
 
     return menu
   }
@@ -245,9 +251,9 @@
     activeItemEl = itemEl
     menu.replaceChildren()
     menu.appendChild(buildItemMenu(itemEl))
-    positionItemMenu(el, menu)
     menu.hidden = false
     el.setAttribute('aria-expanded', 'true')
+    if (typeof window.positionOverlayMenu === 'function') window.positionOverlayMenu(el, menu)
   }
 
   function hideSnackbar() {
@@ -297,8 +303,6 @@
         if (wasHidden) state.setHidden(meta.id, true)
         dispatchItemChange()
       })
-    } else if (action === 'uncomplete') {
-      state.markComplete(meta.id, meta.slug, false)
     } else if (action === 'hide') {
       const wasCompleted = state.isCompleted(meta.id)
       state.setHidden(meta.id, true)
@@ -309,6 +313,8 @@
       })
     } else if (action === 'unhide') {
       state.setHidden(meta.id, false)
+    } else if (action === 'reset') {
+      state.resetProgress(meta.id)
     } else if (action === 'favorite' || action === 'unfavorite') {
       const next = action === 'favorite'
       state.setFavorite(meta.id, next)
