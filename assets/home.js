@@ -308,7 +308,7 @@ function decorateContinueItem(item, progress) {
 function findContinueSource(entry) {
   const id = entry.id.replace(/"/g, '')
   const slug = (entry.progress && entry.progress.slug) ? entry.progress.slug.replace(/"/g, '') : ''
-  const lists = homeAll('[data-all-items], [data-weather-items]')
+  const lists = homeAll('[data-continue-catalog], [data-all-items], [data-weather-items]')
   for (let i = 0; i < lists.length; i++) {
     const list = lists[i]
     let source = list.querySelector('li[data-id="' + id + '"]')
@@ -332,12 +332,6 @@ function continueEntriesForReadLanguage(entries) {
   })
 }
 
-function displayableContinueEntries(entries) {
-  return entries.filter(function (entry) {
-    return findContinueSource(entry) !== null
-  })
-}
-
 function cloneContinueItem(entry, featured) {
   const source = findContinueSource(entry)
   if (!source) return null
@@ -354,7 +348,7 @@ function fillContinueReading() {
   const historyLink = homeEl('[data-continue-history-link]')
   if (!continueSection || !continueFeatured) return
 
-  const entries = displayableContinueEntries(continueEntriesForReadLanguage(loadProgressEntries()))
+  const entries = continueEntriesForReadLanguage(loadProgressEntries())
   continueFeatured.innerHTML = ''
 
   if (entries.length === 0) {
