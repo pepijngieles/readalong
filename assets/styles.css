@@ -586,6 +586,24 @@ dl dt{
   height: var(--spacing-4);
   margin-block-start: var(--spacing-8);
   z-index: auto;
+  border-radius: var(--spacing-2);
+  overflow: hidden;
+  background-color: var(--shade-default);
+}
+
+.story-item progress::-webkit-progress-bar{
+  border-radius: var(--spacing-2);
+  background-color: var(--shade-default);
+}
+
+.story-item progress::-webkit-progress-value{
+  border-radius: var(--spacing-2);
+  background-color: var(--progress-fill);
+}
+
+.story-item progress::-moz-progress-bar{
+  border-radius: var(--spacing-2);
+  background-color: var(--progress-fill);
 }
 
 .story-actions{
@@ -639,6 +657,13 @@ dl dt{
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.item-menu-separator{
+  height: 1px;
+  margin-block: var(--spacing-4);
+  margin-inline: var(--spacing-8);
+  background-color: var(--border-subtle);
 }
 
 .item-menu-action .icon{

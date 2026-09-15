@@ -163,7 +163,8 @@
     uncomplete: 'circle',
     hide: 'eye-off',
     unhide: 'eye',
-    share: 'share'
+    share: 'share',
+    reset: 'rotate-ccw'
   }
 
   function menuIconHtml(action) {
@@ -197,12 +198,20 @@
     return button
   }
 
+  function createMenuSeparator() {
+    const separator = document.createElement('div')
+    separator.className = 'item-menu-separator'
+    separator.setAttribute('role', 'separator')
+    return separator
+  }
+
   function buildItemMenu(itemEl) {
     const meta = itemMeta(itemEl)
     const completed = state.isCompleted(meta.id)
     const hidden = state.isHidden(meta.id)
     const menu = document.createDocumentFragment()
     const favorite = state.isFavorite(meta.id)
+    const started = state.isStarted(meta.id) || completed
 
     if (favorite) {
       menu.appendChild(createMenuButton('unfavorite', i18n('unfavorite', 'Remove from favorites')))
@@ -216,13 +225,19 @@
       menu.appendChild(createMenuButton('uncomplete', i18n('mark_incomplete', 'Mark as not completed')))
     }
 
+    menu.appendChild(createMenuButton('share', i18n('share', 'Share link')))
+
+    menu.appendChild(createMenuSeparator())
+
     if (!hidden) {
       menu.appendChild(createMenuButton('hide', i18n('hide', 'Hide item')))
     } else {
       menu.appendChild(createMenuButton('unhide', i18n('unhide', 'Show item again')))
     }
 
-    menu.appendChild(createMenuButton('share', i18n('share', 'Share link')))
+    if (started) {
+      menu.appendChild(createMenuButton('reset', i18n('reset_progress', 'Reset progress')))
+    }
 
     return menu
   }
@@ -303,6 +318,8 @@
       })
     } else if (action === 'unhide') {
       state.setHidden(meta.id, false)
+    } else if (action === 'reset') {
+      state.resetProgress(meta.id)
     } else if (action === 'favorite' || action === 'unfavorite') {
       const next = action === 'favorite'
       state.setFavorite(meta.id, next)
