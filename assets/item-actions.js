@@ -148,18 +148,12 @@
   function closeItemMenu() {
     const menu = document.getElementById('item-menu')
     if (!menu) return
+    if (typeof window.resetOverlayMenu === 'function') window.resetOverlayMenu(menu)
     menu.hidden = true
     document.querySelectorAll('[data-click=openItemMenu][aria-expanded=true]').forEach(function (button) {
       button.setAttribute('aria-expanded', 'false')
     })
     activeItemEl = null
-  }
-
-  function positionItemMenu(button, menu) {
-    const rect = button.getBoundingClientRect()
-    menu.style.top = Math.round(rect.bottom + 8) + 'px'
-    menu.style.left = 'auto'
-    menu.style.right = Math.round(window.innerWidth - rect.right) + 'px'
   }
 
   const MENU_ACTION_ICONS = {
@@ -260,9 +254,9 @@
     activeItemEl = itemEl
     menu.replaceChildren()
     menu.appendChild(buildItemMenu(itemEl))
-    positionItemMenu(el, menu)
     menu.hidden = false
     el.setAttribute('aria-expanded', 'true')
+    if (typeof window.positionOverlayMenu === 'function') window.positionOverlayMenu(el, menu)
   }
 
   function hideSnackbar() {

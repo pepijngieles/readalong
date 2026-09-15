@@ -127,23 +127,10 @@ function closeSettingsTitleMenus(exceptButton) {
     button.setAttribute('aria-expanded', 'false')
     const menu = document.getElementById(button.getAttribute('aria-controls'))
     if (menu) {
+      if (typeof window.resetOverlayMenu === 'function') window.resetOverlayMenu(menu)
       menu.hidden = true
-      menu.classList.remove('is-fixed')
-      menu.style.top = ''
-      menu.style.left = ''
-      menu.style.right = ''
-      menu.style.width = ''
     }
   })
-}
-
-function positionSettingsTitleMenu(button, menu) {
-  const rect = button.getBoundingClientRect()
-  menu.classList.add('is-fixed')
-  menu.style.top = Math.round(rect.bottom + 8) + 'px'
-  menu.style.left = Math.round(rect.left) + 'px'
-  menu.style.right = 'auto'
-  menu.style.width = Math.round(rect.width) + 'px'
 }
 
 function updateSettingsTranslateLabel(chosen) {
@@ -199,22 +186,9 @@ function initSettingsTitleMenu() {
       if (!open) {
         el.setAttribute('aria-expanded', 'true')
         targetMenu.hidden = false
-        positionSettingsTitleMenu(el, targetMenu)
+        if (typeof window.positionOverlayMenu === 'function') window.positionOverlayMenu(el, targetMenu)
       }
     }
-
-    window.addEventListener('scroll', function () {
-      document.querySelectorAll('#settings .home-title-trigger[aria-expanded=true]').forEach(function (button) {
-        const openMenu = document.getElementById(button.getAttribute('aria-controls'))
-        if (openMenu && !openMenu.hidden) positionSettingsTitleMenu(button, openMenu)
-      })
-    }, true)
-    window.addEventListener('resize', function () {
-      document.querySelectorAll('#settings .home-title-trigger[aria-expanded=true]').forEach(function (button) {
-        const openMenu = document.getElementById(button.getAttribute('aria-controls'))
-        if (openMenu && !openMenu.hidden) positionSettingsTitleMenu(button, openMenu)
-      })
-    })
 
     document.addEventListener('click', function (event) {
       if (event.target.closest('#settings .home-title-control')) return
