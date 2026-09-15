@@ -422,7 +422,7 @@ function story_search_text($text) {
   return strtolower((string) $text);
 }
 
-function story_item_meta(array $item, $showTranslationLang = false, $includeKind = true) {
+function story_item_meta(array $item, $showTranslationLang = false) {
   $parts = [];
   if (!empty($item['duration']) && $item['duration'] !== '&mdash;') {
     $parts[] = $item['duration'];
@@ -433,21 +433,18 @@ function story_item_meta(array $item, $showTranslationLang = false, $includeKind
   if ($showTranslationLang && !empty($item['translationLang'])) {
     $parts[] = lang_endonym($item['translationLang']);
   }
-  if ($includeKind && !empty($item['kindLabel'])) {
-    $parts[] = $item['kindLabel'];
-  }
   return implode(' · ', $parts);
 }
 
-function story_item_meta_html(array $item, $showTranslationLang = false, $includeKind = true) {
-  $meta = story_item_meta($item, $showTranslationLang, $includeKind);
+function story_item_meta_html(array $item, $showTranslationLang = false) {
+  $meta = story_item_meta($item, $showTranslationLang);
   if ($meta === '') {
     return '';
   }
   return '<small class=meta><span data-meta-base>' . e($meta) . '</span></small>';
 }
 
-function story_list_item(array $item, $showTranslationLang = false, $includeKind = true, $withActions = false) {
+function story_list_item(array $item, $showTranslationLang = false, $withActions = false) {
   $search = trim($item['title'] . ' ' . ($item['sourceTitle'] ?? '') . ' ' . ($item['kindLabel'] ?? ''));
   $attrs = ' data-id="' . e($item['id']) . '"';
   $attrs .= ' data-kind="' . e($item['kind'] ?? '') . '"';
@@ -471,7 +468,7 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
     $attrs .= ' hidden';
   }
 
-  $metaHtml = story_item_meta_html($item, $showTranslationLang, $includeKind);
+  $metaHtml = story_item_meta_html($item, $showTranslationLang);
   $lang = $item['language'] ?? '';
   $langAttr = $lang !== '' ? ' lang="' . e($lang) . '"' : '';
   $title = '<p' . $langAttr . '>' . e($item['title']) . '</p>';
@@ -502,10 +499,10 @@ function story_list_item(array $item, $showTranslationLang = false, $includeKind
   return $html;
 }
 
-function render_story_list(array $items, $extraAttrs = '', $showTranslationLang = false, $includeKind = true, $withActions = false) {
+function render_story_list(array $items, $extraAttrs = '', $showTranslationLang = false, $withActions = false) {
   echo "\t\t<ul class=list" . ($extraAttrs !== '' ? ' ' . $extraAttrs : '') . ">\n";
   foreach ($items as $item) {
-    echo story_list_item($item, $showTranslationLang, $includeKind, $withActions);
+    echo story_list_item($item, $showTranslationLang, $withActions);
   }
   echo "\t\t</ul>\n";
 }

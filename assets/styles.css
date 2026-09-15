@@ -632,6 +632,7 @@ dl dt{
   border: 0;
   border-radius: var(--border-radius-small);
   background: transparent;
+  box-shadow: none;
   color: var(--text-primary);
   font: inherit;
   font-size: 1rem;
@@ -639,6 +640,10 @@ dl dt{
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.item-menu-action:active:not([disabled]){
+  box-shadow: none;
 }
 
 .item-menu-action .icon{
