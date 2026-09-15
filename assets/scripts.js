@@ -293,7 +293,16 @@ function changeSentence() {
 
   /* 5.3 Check if auto-scrolling is needed --------------------------------- */
   let scrollMargin = 12
-  
+
+  function visibleBottom() {
+    const dialog = document.getElementById('settings')
+    if (dialog && dialog.tagName === 'DIALOG' && dialog.open) {
+      const top = dialog.getBoundingClientRect().top
+      if (top > 0) return top
+    }
+    return window.innerHeight - navHeight
+  }
+
   function checkForScroll() {
     if (document.body.classList.contains('onboarding-page')) return
     if (!currentSentenceEl) return
@@ -304,12 +313,14 @@ function changeSentence() {
       return
     }
 
-    let contentHeight = window.innerHeight - navHeight
+    let contentHeight = visibleBottom()
     let popoverRect = translationPopover ? translationPopover.getBoundingClientRect() : sentenceOffset
     let offsetBottom = (showTranslation) ? popoverRect.bottom + 48 : sentenceOffset.bottom + scrollMargin
-    
+
     if (contentHeight < offsetBottom) window.scrollBy(0, sentenceOffset.top - scrollMargin)
   }
+
+  window.revealReaderPreview = checkForScroll
 
   /* 5.4 Update the progress bar ------------------------------------------- */
   function updateProgressBar() {
@@ -478,6 +489,7 @@ window.applyReaderSettings = function () {
   if (form.sentencePause && form.sentencePauseOut) form.sentencePauseOut.value = formatPause(form.sentencePause.value)
   updateAllRangeProgress()
   if (typeof updateTranslation === 'function') updateTranslation()
+  if (typeof window.revealReaderPreview === 'function') window.revealReaderPreview()
 }
 
 applyReaderSettings()

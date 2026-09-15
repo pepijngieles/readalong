@@ -91,7 +91,7 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript" src="<?= e($base) ?>assets/menu-position.js?v=1" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/item-state.js?v=6" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/item-actions.js?v=9" defer></script>
-	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=8" defer></script>
+	<script type="text/javascript" src="<?= e($base) ?>assets/settings.js?v=9" defer></script>
 	<script type="text/javascript" src="<?= e($base) ?>assets/library.js?v=7" defer></script>
 
 </body>
