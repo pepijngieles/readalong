@@ -90,8 +90,9 @@ if (!$needsOnboarding) {
 ?>
 			</div>
 			<div class="home-header-actions flex gap-2xs">
-				<a class="quiet icon-only small rounded home-library-toggle" href="/library/in_progress" aria-label="<?= e(t('library.title')) ?>" title="<?= e(t('library.title')) ?>">
-					<?php icon('clock', ['size' => 20]); ?>
+				<a class="button quiet icon-only small rounded home-library-toggle" href="/library/in_progress" aria-label="<?= e(t('library.title')) ?>">
+					<span class=visually-hidden><?= e(t('library.title')) ?></span>
+					<?php icon('library', ['size' => 20]); ?>
 				</a>
 				<button type=button class="quiet icon-only small rounded home-settings-toggle" data-click=openSettings aria-haspopup=dialog aria-controls=settings>
 					<span class=visually-hidden><?= e(t('nav.settings')) ?></span>
