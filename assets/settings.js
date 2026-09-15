@@ -209,6 +209,11 @@ function initSettingsTitleMenu() {
 
 function openSettings(el, event) {
   openDialog(el, event, 'settings')
+  if (typeof window.revealReaderPreview === 'function') {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(window.revealReaderPreview)
+    })
+  }
 }
 
 function initSettingsControls() {
