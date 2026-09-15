@@ -168,6 +168,7 @@ body.theme-cream{
 
 body.theme-dark,
 body.theme-black{
+  color-scheme: dark;
   color: var(--text-secondary);
   --focus-outline: var(--accent-yellow);
   --icon-accent: var(--accent-yellow);
@@ -259,6 +260,7 @@ body:has(#settings[open]),
 html{
   scroll-behavior: smooth;
   cursor: default;
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -1429,8 +1431,13 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .settings-segment label input:checked + .button .preview,
-.settings-segment label input:checked + .button .label{
+.settings-segment label input:checked + .button .label,
+.settings-segment label input:checked + .button .icon{
   color: var(--text-yellow);
+}
+
+.settings-appearance .icon{
+  color: var(--text-preview);
 }
 
 .settings-segment label input:focus-visible + .button{
@@ -1536,6 +1543,7 @@ body.ios:not(.started.show-translation) .translation-popover{
   min-width: 0;
 }
 
+.settings-themes-group,
 .settings-themes,
 .settings-layouts{
   align-items: center;
@@ -1543,6 +1551,11 @@ body.ios:not(.started.show-translation) .translation-popover{
   padding: 0;
   margin: 0;
   border: none;
+}
+
+.settings-themes-group .settings-themes:not([hidden]) + .settings-themes:not([hidden]){
+  padding-left: var(--spacing-8);
+  border-left: 1px solid var(--border-subtle);
 }
 
 .settings-theme,

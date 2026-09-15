@@ -139,6 +139,6 @@ $storyConfig = [
 	window.ONBOARDING_DEFAULT_READ = <?= json_encode($defaultRead, JSON_UNESCAPED_UNICODE) ?>;
 </script>
 <script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-<script type="text/javascript" src="assets/settings.js?v=5" defer></script>
+<script type="text/javascript" src="assets/settings.js?v=7" defer></script>
 <script type="text/javascript" src="assets/scripts.js?v=27" defer></script>
 <script type="text/javascript" src="assets/onboarding.js?v=14" defer></script>

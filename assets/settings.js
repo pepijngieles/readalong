@@ -1,47 +1,43 @@
 const SETTINGS_KEY = 'readalong-settings'
-const SETTINGS_DEFAULTS = {
+const SETTINGS_DEFAULTS = Object.assign({
   fontFamily: 'sans',
   fontSize: 100,
   lineHeight: 1.5,
   playbackRate: 1,
   sentencePause: 0,
-  theme: 'light',
   layout: 'start'
-}
-const THEME_META_PREFIX = '--theme-meta-'
+}, window.ReadalongTheme ? window.ReadalongTheme.THEME_DEFAULTS : {
+  appearance: 'system',
+  lightTheme: 'light',
+  darkTheme: 'dark'
+})
 
 function settingsEl(selector) {
   return document.querySelector(selector)
 }
 
-function cssToken(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
-}
-
-function themeMetaColor(theme, variant) {
-  const value = cssToken(THEME_META_PREFIX + theme + '-' + variant)
-  return value || cssToken(THEME_META_PREFIX + 'light-' + variant)
-}
-
-let currentTheme = 'light'
-
 function updateThemeColor() {
   const themeColorEl = document.querySelector('meta[name=theme-color]')
-  if (!themeColorEl) return
+  const theme = window.ReadalongTheme
+  if (!themeColorEl || !theme) return
   const settingsDialog = document.getElementById('settings')
   const started = document.body.classList.contains('started')
   const showTranslation = document.body.classList.contains('show-translation')
   const variant = (settingsDialog && settingsDialog.open && started) || (started && showTranslation)
     ? 'secondary'
     : 'primary'
-  themeColorEl.setAttribute('content', themeMetaColor(currentTheme, variant))
+  themeColorEl.setAttribute('content', theme.themeMetaColor(theme.currentPalette, variant))
 }
 
-function applyTheme(value) {
-  document.body.classList.remove('theme-light', 'theme-cream', 'theme-dark', 'theme-black')
-  if (value !== 'light') document.body.classList.add('theme-' + value)
-  currentTheme = value
-  updateThemeColor()
+function applyThemeSettings(settings) {
+  if (window.ReadalongTheme) window.ReadalongTheme.applyThemeSettings(settings)
+}
+
+function syncThemePairs(appearance) {
+  document.querySelectorAll('[data-theme-pair]').forEach(function (pair) {
+    const kind = pair.getAttribute('data-theme-pair')
+    pair.hidden = (appearance === 'light' && kind === 'dark') || (appearance === 'dark' && kind === 'light')
+  })
 }
 
 function applyLayout(value) {
@@ -56,10 +52,14 @@ function readStoredSettings() {
       const settings = Object.assign({}, SETTINGS_DEFAULTS, JSON.parse(stored))
       if (settings.layout === 'dense') settings.layout = 'start'
       if (settings.layout === 'spaced') settings.layout = 'justify'
+      if (window.ReadalongTheme) Object.assign(settings, window.ReadalongTheme.normalizeThemeSettings(settings))
+      delete settings.theme
       return settings
     }
   } catch (error) {}
-  return Object.assign({}, SETTINGS_DEFAULTS)
+  const settings = Object.assign({}, SETTINGS_DEFAULTS)
+  if (window.ReadalongTheme) Object.assign(settings, window.ReadalongTheme.normalizeThemeSettings(settings))
+  return settings
 }
 
 function getSettingsFromForm() {
@@ -71,21 +71,27 @@ function getSettingsFromForm() {
   if (form.lineHeight) next.lineHeight = parseFloat(form.lineHeight.value)
   if (form.playbackRate) next.playbackRate = parseFloat(form.playbackRate.value)
   if (form.sentencePause) next.sentencePause = parseInt(form.sentencePause.value, 10)
-  if (form.theme) next.theme = form.theme.value
+  if (form.appearance) next.appearance = form.appearance.value
+  if (form.lightTheme) next.lightTheme = form.lightTheme.value
+  if (form.darkTheme) next.darkTheme = form.darkTheme.value
   if (form.layout) next.layout = form.layout.value
   return next
 }
 
 function saveSettings() {
   const next = Object.assign({}, SETTINGS_DEFAULTS, readStoredSettings(), getSettingsFromForm())
+  if (window.ReadalongTheme) Object.assign(next, window.ReadalongTheme.normalizeThemeSettings(next))
+  delete next.theme
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(next))
 }
 
 function applyAppearanceFromForm(save) {
   const form = document.forms.settings
   const stored = readStoredSettings()
-  const theme = (form && form.theme && form.theme.value) || stored.theme
-  applyTheme(theme)
+  const appearance = (form && form.appearance && form.appearance.value) || stored.appearance
+  const next = Object.assign({}, stored, getSettingsFromForm(), { appearance: appearance })
+  syncThemePairs(appearance)
+  applyThemeSettings(next)
   if (form && form.layout) applyLayout(form.layout.value)
   if (save !== false) saveSettings()
 }
@@ -98,12 +104,15 @@ function fillSettingsForm(settings) {
   if (form.lineHeight) form.lineHeight.value = settings.lineHeight
   if (form.playbackRate) form.playbackRate.value = settings.playbackRate
   if (form.sentencePause) form.sentencePause.value = settings.sentencePause
-  if (form.theme) form.theme.value = settings.theme
+  if (form.appearance) form.appearance.value = settings.appearance
+  if (form.lightTheme) form.lightTheme.value = settings.lightTheme
+  if (form.darkTheme) form.darkTheme.value = settings.darkTheme
   if (form.layout) form.layout.value = settings.layout
+  syncThemePairs(settings.appearance)
 }
 
 function loadThemeFromStorage() {
-  applyTheme(readStoredSettings().theme)
+  applyThemeSettings(readStoredSettings())
 }
 
 function loadSettings() {
@@ -275,6 +284,7 @@ function updateSettings() {
   }
 }
 
+window.updateThemeColor = updateThemeColor
 initSettingsControls()
 
 window.saveCatalogPrefs = saveCatalogPrefs
