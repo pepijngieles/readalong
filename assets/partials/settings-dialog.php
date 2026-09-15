@@ -95,28 +95,43 @@ $translateSelectLabel = lang_endonym($translateLang ?? ui_locale());
 				</div>
 
 <?php endif; ?>
+				<fieldset class="settings-segment settings-appearance flex gap-xs">
+					<legend class=visually-hidden><?= e(t('settings.appearance')) ?></legend>
+					<label>
+						<input type=radio name=appearance value=system checked>
+						<span class=button>
+							<?php icon('sun-moon', ['size' => 24]); ?>
+							<span class=label><?= e(t('settings.system')) ?></span>
+						</span>
+					</label>
+					<label>
+						<input type=radio name=appearance value=light>
+						<span class=button>
+							<?php icon('sun', ['size' => 24]); ?>
+							<span class=label><?= e(t('settings.light')) ?></span>
+						</span>
+					</label>
+					<label>
+						<input type=radio name=appearance value=dark>
+						<span class=button>
+							<?php icon('moon', ['size' => 24]); ?>
+							<span class=label><?= e(t('settings.dark')) ?></span>
+						</span>
+					</label>
+				</fieldset>
+
 				<div class="settings-row flex gap-medium">
 					<fieldset class="settings-themes flex gap-2xs">
-						<legend class=visually-hidden><?= e(t('settings.theme')) ?></legend>
+						<legend class=visually-hidden><?= e(t('settings.paper')) ?></legend>
 						<label class=settings-theme>
-							<input type=radio name=theme value=light checked>
+							<input type=radio name=paper value=neutral checked>
 							<span class="swatch light" aria-hidden=true></span>
-							<span class=visually-hidden><?= e(t('settings.light')) ?></span>
+							<span class=visually-hidden><?= e(t('settings.neutral')) ?></span>
 						</label>
 						<label class=settings-theme>
-							<input type=radio name=theme value=cream>
+							<input type=radio name=paper value=warm>
 							<span class="swatch cream" aria-hidden=true></span>
 							<span class=visually-hidden><?= e(t('settings.cream')) ?></span>
-						</label>
-						<label class=settings-theme>
-							<input type=radio name=theme value=dark>
-							<span class="swatch dark" aria-hidden=true></span>
-							<span class=visually-hidden><?= e(t('settings.dark')) ?></span>
-						</label>
-						<label class=settings-theme>
-							<input type=radio name=theme value=black>
-							<span class="swatch black" aria-hidden=true></span>
-							<span class=visually-hidden><?= e(t('settings.black')) ?></span>
 						</label>
 					</fieldset>
 <?php if ($settingsReader): ?>

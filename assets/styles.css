@@ -89,6 +89,10 @@
   --background-dark-secondary: #2a2a2a;
   --background-black-primary: var(--color-black);
   --background-black-secondary: #0a0a0a;
+  --background-dark-warm-primary: #3b342c;
+  --background-dark-warm-secondary: #2e2822;
+  --background-black-warm-primary: #140f0c;
+  --background-black-warm-secondary: #0c0908;
 
   --text-primary: rgba(0,0,0,1);
   --text-secondary: rgba(0,0,0,.84);
@@ -125,6 +129,10 @@
   --theme-meta-dark-secondary: var(--background-dark-secondary);
   --theme-meta-black-primary: var(--background-black-primary);
   --theme-meta-black-secondary: var(--background-black-secondary);
+  --theme-meta-dark-warm-primary: var(--background-dark-warm-primary);
+  --theme-meta-dark-warm-secondary: var(--background-dark-warm-secondary);
+  --theme-meta-black-warm-primary: var(--background-black-warm-primary);
+  --theme-meta-black-warm-secondary: var(--background-black-warm-secondary);
 
   --theme-swatch-light: var(--color-white);
   --theme-swatch-dark: var(--background-dark-primary);
@@ -160,7 +168,8 @@
   --thumb-motif-echo-opacity: 0.13;
 }
 
-body.theme-cream{
+body.theme-cream,
+body.theme-warm:not(.theme-dark):not(.theme-black){
   --background-primary: var(--background-cream);
   --background-secondary: var(--background-cream-secondary);
   --background-popover: var(--background-cream);
@@ -168,6 +177,7 @@ body.theme-cream{
 
 body.theme-dark,
 body.theme-black{
+  color-scheme: dark;
   color: var(--text-secondary);
   --focus-outline: var(--accent-yellow);
   --icon-accent: var(--accent-yellow);
@@ -230,6 +240,18 @@ body.theme-black{
   --background-popover: var(--background-black-primary);
 }
 
+body.theme-dark.theme-warm{
+  --background-primary: var(--background-dark-warm-primary);
+  --background-secondary: var(--background-dark-warm-secondary);
+  --background-popover: var(--background-dark-warm-primary);
+}
+
+body.theme-black.theme-warm{
+  --background-primary: var(--background-black-warm-primary);
+  --background-secondary: var(--background-black-warm-secondary);
+  --background-popover: var(--background-black-warm-primary);
+}
+
 body.layout-justify .story{
   text-align: justify;
 }
@@ -259,6 +281,7 @@ body:has(#settings[open]),
 html{
   scroll-behavior: smooth;
   cursor: default;
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -1461,8 +1484,13 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .settings-segment label input:checked + .button .preview,
-.settings-segment label input:checked + .button .label{
+.settings-segment label input:checked + .button .label,
+.settings-segment label input:checked + .button .icon{
   color: var(--text-yellow);
+}
+
+.settings-appearance .icon{
+  color: var(--text-preview);
 }
 
 .settings-segment label input:focus-visible + .button{

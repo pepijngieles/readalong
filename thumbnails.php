@@ -128,7 +128,7 @@ thumb_demo_cell('empty-topic', '', 'weather', 96, 'empty topic · unknown type')
 	<script>
 		function setThumbDemoTheme(el) {
 			var theme = el.getAttribute('data-theme') || 'light';
-			document.body.classList.remove('theme-cream', 'theme-dark', 'theme-black');
+			document.body.classList.remove('theme-cream', 'theme-dark', 'theme-black', 'theme-warm');
 			if (theme !== 'light') {
 				document.body.classList.add('theme-' + theme);
 			}

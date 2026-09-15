@@ -103,7 +103,7 @@ Settings is a native `<dialog>`:
 
 | Id | Where | Role |
 |----|-------|------|
-| `#settings` | `assets/partials/settings-dialog.php` | Bottom sheet: theme; on home also translation language; in the player also reader controls |
+| `#settings` | `assets/partials/settings-dialog.php` | Bottom sheet: appearance + palettes; on home also translation language; in the player also reader controls |
 
 **Contract**
 
@@ -120,6 +120,16 @@ Settings is a native `<dialog>`:
 - Project CSS wins over Brio’s centered dialog on wide viewports (`#settings` stays a bottom sheet)
 - `updateThemeColor()` in `settings.js` checks `settingsDialog.open`, not `.hidden`
 
+**Theme model** (`assets/theme.js`, applied from `theme-bootstrap.php`)
+
+Three independent axes. Default follows the OS; cream/warm does not pin light.
+
+1. **Appearance:** System (OS `prefers-color-scheme`) or forced Light / Dark
+2. **Contrast:** always OS (`prefers-contrast: more` or `forced-colors: active`) — light stays light, dark becomes black
+3. **Paper:** Neutral or Warm. Warm removes blue from whatever the other axes resolved (cream in light, warm gray/black in dark), including high contrast
+
+Light / Dark only override color scheme. Stored as `appearance` + `paper` in `readalong-settings`.
+
 Home read-along language is a single-select title menu; levels are a multi-select (`toggleTitleMenu`, `updateTitleFilter`). Consecutive levels collapse to a range (`A1-B2`). Trigger width follows the active label. No comma in the title. They apply immediately via `setLangPref` (no reload). They are not in `#settings`. Translation language in the settings sheet applies on change (`data-change=saveCatalogPrefs`) and reloads. There is no save button; the reader sheet has no title.
 
 ---
@@ -128,6 +138,8 @@ Home read-along language is a single-select title menu; levels are a multi-selec
 
 | File | Scope |
 |------|-------|
+| `assets/theme.js` | Theme resolve (system light/dark + contrast, independent warm/paper axis); inlined by `theme-bootstrap.php` |
+| `assets/settings.js` | Settings sheet: appearance form, reader controls, theme-color meta |
 | `assets/scripts.js` | Story player: audio, sentences, settings, translation, progress |
 | `assets/home.js` | Home: filters, continue reading, header language/level dropdowns |
 | `assets/onboarding.js` | First-run flow; two steps — language tiles + translate menu, then demo with speed/pause |
@@ -258,7 +270,8 @@ After UI or chrome changes, test:
 - [ ] Header reads as one title: Readalong language dropdown level dropdown (no commas)
 - [ ] Language is single-select; levels are multi-select with ranges like A1-B2; trigger width follows the active label
 - [ ] Language and level filters apply immediately (no reload)
-- [ ] Settings gear: translation language + theme only (not read-along/level)
+- [ ] Settings gear: translation language + appearance/palettes only (not read-along/level)
+- [ ] Theme default System follows OS light/dark and high contrast; Light/Dark override only the scheme; Neutral/Warm paper applies in every combination
 - [ ] Settings: open, Escape, backdrop, close X; translation language applies on change + reload; no save button
 - [ ] Filters: kind pills, duration select, clear filters
 - [ ] History toggle (only when 2+ continue items)
@@ -275,7 +288,7 @@ After UI or chrome changes, test:
 
 - [ ] Play / pause / rewind / forward
 - [ ] Translation show/hide; popover close button alignment
-- [ ] Settings sheet: sliders, theme, font, layout (no title, no save button)
+- [ ] Settings sheet: sliders, appearance, paper, font, layout (no title, no save button)
 - [ ] Settings bottom sheet on desktop and ~390px width
 
 **Regressions**
@@ -305,7 +318,9 @@ assets/
   helpers.php             PHP utilities, needs_onboarding, lang prefs
   story.php               Story listing, render_story_list
   story-shell.php         Story page HTML shell
-  scripts.js              Player + settings
+  theme.js                Theme resolve (inlined by theme-bootstrap)
+  settings.js             Settings sheet + appearance
+  scripts.js              Player
   home.js                 Home chrome actions
   onboarding.js           Onboarding flow
   styles.css              All project CSS
@@ -315,6 +330,7 @@ assets/
     scripts.php           Brio + scripts.js
     nav.php               Player controls
     settings-dialog.php   #settings dialog
+    theme-bootstrap.php   Sync theme class before paint
     onboarding.php        First-run screen
     translation-popover.php
 stories/<slug>/           Content + thin index.php stub
