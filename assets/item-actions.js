@@ -160,7 +160,6 @@
     favorite: 'heart',
     unfavorite: 'heart-filled',
     complete: 'circle-check',
-    uncomplete: 'circle',
     hide: 'eye-off',
     unhide: 'eye',
     share: 'share',
@@ -221,8 +220,6 @@
 
     if (!completed) {
       menu.appendChild(createMenuButton('complete', completeLabel(meta.kind)))
-    } else {
-      menu.appendChild(createMenuButton('uncomplete', i18n('mark_incomplete', 'Mark as not completed')))
     }
 
     menu.appendChild(createMenuButton('share', i18n('share', 'Share link')))
@@ -306,8 +303,6 @@
         if (wasHidden) state.setHidden(meta.id, true)
         dispatchItemChange()
       })
-    } else if (action === 'uncomplete') {
-      state.markComplete(meta.id, meta.slug, false)
     } else if (action === 'hide') {
       const wasCompleted = state.isCompleted(meta.id)
       state.setHidden(meta.id, true)

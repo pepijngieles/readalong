@@ -282,11 +282,10 @@ function decorateContinueItem(item, progress) {
   const remainingEl = item.querySelector('[data-remaining]')
   const showTranslationLang = continueSection?.hasAttribute('data-show-translation-lang')
   const durationDisplay = item.getAttribute('data-duration-display') || ''
-  const kindLabel = item.getAttribute('data-kind-label') || ''
   const level = item.getAttribute('data-level') || ''
   const translationEndonym = item.getAttribute('data-translation-endonym') || ''
   const parts = []
-  const remainingTemplate = (homeEl('[data-all-section]')?.getAttribute('data-i18n-remaining')) || '{n} min'
+  const remainingTemplate = (homeEl('[data-all-section]')?.getAttribute('data-i18n-remaining')) || '{n}m left'
 
   if (durationDisplay) parts.push(durationDisplay)
   if (level) parts.push(level)
@@ -294,7 +293,6 @@ function decorateContinueItem(item, progress) {
     parts.push(remainingTemplate.replace('{n}', String(remainingMinutes)))
   }
   if (showTranslationLang && translationEndonym) parts.push(translationEndonym)
-  if (kindLabel) parts.push(kindLabel)
 
   if (parts.length && typeof window.setItemMetaText === 'function') {
     window.setItemMetaText(item, parts.join(' · '))

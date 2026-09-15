@@ -163,7 +163,7 @@ if (!$needsOnboarding) {
 				<p class="home-results-count text-color-tertiary" data-results-count></p>
 				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
 			</div>
-<?php render_story_list($stories, 'data-all-items', $showTranslationLang, false, true); ?>
+<?php render_story_list($stories, 'data-all-items', $showTranslationLang, true); ?>
 			<div class="home-empty" data-no-results<?= $visibleStories ? ' hidden' : '' ?> data-i18n-empty="<?= e(t('home.no_results')) ?>" data-i18n-empty-filters="<?= e(t('home.no_results_filters')) ?>">
 				<p data-empty-message><?= e(t('home.no_results')) ?></p>
 				<button type=button class="quiet home-clear-filters" data-clear-filters data-click=clearFilters hidden><?= e(t('home.clear_filters')) ?></button>
@@ -211,9 +211,9 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/menu-position.js?v=1" defer></script>
 	<script type="text/javascript" src="assets/item-state.js?v=6" defer></script>
-	<script type="text/javascript" src="assets/item-actions.js?v=8" defer></script>
+	<script type="text/javascript" src="assets/item-actions.js?v=9" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=7" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=35" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=36" defer></script>
 
 <?php endif; ?>
 
