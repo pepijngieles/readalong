@@ -369,11 +369,13 @@ function fillContinueReading() {
     return
   }
 
+  const renderedCount = continueFeatured.children.length
+
   if (historyLink) {
-    historyLink.hidden = entries.length < 2
+    historyLink.hidden = renderedCount < 2
   }
 
-  continueSection.hidden = false
+  continueSection.hidden = renderedCount === 0
 }
 
 function clearFilters() {

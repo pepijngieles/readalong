@@ -106,7 +106,7 @@ if (!$needsOnboarding) {
 				<h2><?= e(t('home.continue_reading')) ?></h2>
 				<a class="quiet section-link" href="/library/in_progress" data-continue-history-link hidden><?= e(t('home.all_in_progress')) ?></a>
 			</div>
-			<ul class="visually-hidden" data-continue-catalog aria-hidden="true" hidden>
+			<ul class="visually-hidden" data-continue-catalog aria-hidden="true">
 <?php foreach ($continueCatalogStories as $item): ?>
 <?= story_list_item($item, $showTranslationLang, false) ?>
 <?php endforeach; ?>
@@ -218,7 +218,7 @@ include $partials . '/item-actions-i18n.php';
 	<script type="text/javascript" src="assets/item-state.js?v=6" defer></script>
 	<script type="text/javascript" src="assets/item-actions.js?v=10" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=9" defer></script>
-	<script type="text/javascript" src="assets/home.js?v=37" defer></script>
+	<script type="text/javascript" src="assets/home.js?v=38" defer></script>
 
 <?php endif; ?>
 

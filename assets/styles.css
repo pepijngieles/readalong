@@ -2165,6 +2165,10 @@ body.ios:not(.started.show-translation) .translation-popover{
   justify-content: space-between;
 }
 
+[data-continue-section]{
+  min-width: 0;
+}
+
 [data-continue-section] .section-header{
   min-height: calc(2 * calc(0.6875rem - 1px) + var(--spacing-20) + 2px);
 }
@@ -2187,7 +2191,11 @@ body.ios:not(.started.show-translation) .translation-popover{
 
 .continue-list{
   display: flex;
+  flex-flow: row nowrap;
   gap: var(--gap-small);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin-block: 0;
   margin-inline: calc(-1 * var(--spacing-16));
   padding-inline: var(--spacing-16);
@@ -2197,6 +2205,7 @@ body.ios:not(.started.show-translation) .translation-popover{
   scroll-padding-inline: var(--spacing-16);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  touch-action: pan-x;
 }
 
 .continue-list::-webkit-scrollbar{
@@ -2211,9 +2220,9 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .continue-list li.featured{
-  flex: 0 0 auto;
+  flex: 0 0 min(20rem, calc(100% - var(--spacing-48)));
   scroll-snap-align: start;
-  width: min(20rem, calc(100% - var(--spacing-24)));
+  scroll-snap-stop: always;
   background-color: var(--background-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius-medium);
@@ -2221,7 +2230,7 @@ body.ios:not(.started.show-translation) .translation-popover{
 }
 
 .continue-list li.featured:only-child{
-  width: 100%;
+  flex-basis: 100%;
 }
 
 .continue-list li.featured .story-row{
