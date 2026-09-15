@@ -209,8 +209,8 @@ include $partials . '/item-actions-i18n.php';
 		})();
 	</script>
 	<script type="text/javascript" src="assets/brio/brio.js?v=1" defer></script>
-	<script type="text/javascript" src="assets/item-state.js?v=5" defer></script>
-	<script type="text/javascript" src="assets/item-actions.js?v=6" defer></script>
+	<script type="text/javascript" src="assets/item-state.js?v=6" defer></script>
+	<script type="text/javascript" src="assets/item-actions.js?v=7" defer></script>
 	<script type="text/javascript" src="assets/settings.js?v=6" defer></script>
 	<script type="text/javascript" src="assets/home.js?v=34" defer></script>
 
