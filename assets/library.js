@@ -8,7 +8,7 @@
 
   function currentLibraryView() {
     const section = libraryEl('[data-library-section]')
-    return section ? (section.getAttribute('data-library-view') || 'in_progress') : 'in_progress'
+    return section ? (section.getAttribute('data-library-view') || 'favorites') : 'favorites'
   }
 
   function syncLibraryViewUrl(view) {

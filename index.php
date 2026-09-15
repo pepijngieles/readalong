@@ -90,7 +90,7 @@ if (!$needsOnboarding) {
 ?>
 			</div>
 			<div class="home-header-actions flex gap-2xs">
-				<a class="button quiet icon-only small rounded home-library-toggle" href="/library/in_progress" aria-label="<?= e(t('library.title')) ?>">
+				<a class="button quiet icon-only small rounded home-library-toggle" href="/library" aria-label="<?= e(t('library.title')) ?>">
 					<span class=visually-hidden><?= e(t('library.title')) ?></span>
 					<?php icon('library', ['size' => 20]); ?>
 				</a>
