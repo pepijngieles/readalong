@@ -67,7 +67,7 @@ if (preg_match('#^/stories/([a-z0-9-]+)/?$#', $uri, $m)) {
 }
 
 if (preg_match('#^/library/?$#', $uri)) {
-  $_GET['view'] = 'in_progress';
+  $_GET['view'] = 'favorites';
   require __DIR__ . '/library.php';
   return true;
 }

@@ -531,7 +531,7 @@ function ui_strings() {
       'home.level' => 'Niveau',
       'home.all_levels' => 'Alle niveaus',
       'home.all_languages' => 'Alle talen',
-      'home.continue_reading' => 'Verder',
+      'home.continue_reading' => 'Verder gaan',
       'home.continue_history' => 'Alle historie',
       'home.all_in_progress' => 'Alles bezig',
       'home.hide_history' => 'Verberg historie',

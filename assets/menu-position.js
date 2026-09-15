@@ -94,6 +94,7 @@ function repositionOpenOverlayMenus(event) {
   document.querySelectorAll('[aria-expanded=true][aria-controls]').forEach(function (button) {
     const menu = document.getElementById(button.getAttribute('aria-controls'))
     if (!menu || menu.hidden || !menu.classList.contains('title-menu')) return
+    if (menu.classList.contains('item-menu')) return
     positionOverlayMenu(button, menu)
   })
 }
