@@ -1655,6 +1655,10 @@ body.ios:not(.started.show-translation) .translation-popover{
   flex: 0 0 auto;
 }
 
+#settings.reader .settings-sliders{
+  grid-template-columns: 1fr;
+}
+
 #settings.reader .settings-sliders output{
   min-width: 2.25rem;
 }
